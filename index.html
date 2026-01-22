@@ -2,185 +2,102 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Diagnostic Premium</title>
+    <title>Studio CCAS - Rapport Pro PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root {
-            --ios-bg: #F2F2F7;
-            --ios-card: #FFFFFF;
-            --ios-gold: #D4AF37;
-            --ios-silver: #E5E5EA;
-            --ios-text: #1C1C1E;
-        }
+        :root { --ios-bg: #F2F2F7; --ios-gold: #B4941E; --ios-silver: #E5E5EA; --ios-text: #1C1C1E; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; }
+        header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); padding: 20px; text-align: center; border-bottom: 1px solid var(--ios-silver); z-index: 100; }
+        #editor { flex: 1; padding: 30px; overflow-y: auto; max-width: 850px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .ios-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(180, 148, 30, 0.2); }
+        .photo-entry { display: flex; gap: 15px; background: #F9F9FB; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid var(--ios-silver); }
+        .photo-entry img { width: 120px; height: 90px; object-fit: cover; border-radius: 10px; }
+        textarea { flex: 1; height: 80px; padding: 10px; border-radius: 10px; border: 1px solid #ddd; resize: none; font-size: 0.9rem; }
+        .footer { padding: 20px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
+        .btn { padding: 12px 25px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-gold { background: linear-gradient(145deg, #D4AF37, #B4941E); color: white; box-shadow: 0 4px 10px rgba(180, 148, 30, 0.3); }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; background: var(--ios-bg); color: var(--ios-text);
-            display: flex; flex-direction: column; height: 100vh;
-        }
-
-        header {
-            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px);
-            padding: 20px; text-align: center; border-bottom: 1px solid var(--ios-silver);
-            position: sticky; top: 0; z-index: 100;
-        }
-
-        #studio-editor {
-            flex: 1; padding: 30px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box;
-        }
-
-        .ios-card {
-            background: var(--ios-card); border-radius: 24px; padding: 25px; margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid rgba(212, 175, 55, 0.2);
-        }
-
-        .photo-item {
-            display: flex; gap: 20px; background: #F9F9FB; padding: 20px; 
-            border-radius: 20px; margin-top: 15px; align-items: flex-start;
-            border: 1px solid var(--ios-silver);
-        }
-
-        .photo-item img { width: 180px; height: 120px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        
-        textarea {
-            flex: 1; height: 110px; padding: 15px; border-radius: 12px;
-            border: 1px solid var(--ios-silver); resize: none; font-family: inherit; font-size: 1rem;
-        }
-        textarea:focus { border-color: var(--ios-gold); outline: none; }
-
-        .btn { padding: 14px 28px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        .btn-gold { background: linear-gradient(145deg, #D4AF37, #B4942E); color: white; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); }
-        .btn-del { background: #FF3B30; color: white; padding: 8px 15px; font-size: 0.8rem; }
-
-        footer { padding: 25px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
+        /* ZONE CACHÉE POUR LE RENDU DU PDF */
+        #pdf-template { display: none; width: 800px; color: black; background: white; }
+        .pdf-page { padding: 40px; page-break-after: always; min-height: 1000px; }
+        .pdf-title { color: #005596; border-bottom: 3px solid #D4AF37; padding-bottom: 10px; margin-bottom: 30px; }
+        .pdf-img { width: 100%; max-height: 500px; object-fit: contain; background: #f0f0f0; border-radius: 10px; }
+        .pdf-desc { margin-top: 20px; padding: 20px; border-left: 8px solid #005596; background: #f4f7f9; font-style: italic; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 style="margin:0; font-size: 1.4rem; letter-spacing: -0.5px;">STUDIO DIAGNOSTIC CCAS</h1>
-</header>
+<header><h1>Studio Diagnostic CCAS</h1></header>
 
-<div id="studio-editor">
+<div id="editor">
     <div class="ios-card">
-        <label><strong>Nom de la Présentation :</strong></label>
-        <input type="text" id="proj-name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--ios-silver); margin-top:10px;" placeholder="Ex: Diagnostic_Rafraichissement_2026">
+        <label><strong>Titre du Rapport PDF :</strong></label>
+        <input type="text" id="report-title" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-top:10px;" placeholder="Ex: Diagnostic_Rafraichissement_2026">
     </div>
-
-    <div id="structures-list"></div>
-
-    <div style="text-align:center;">
-        <button class="btn" style="background:white; color:var(--ios-gold); border: 1px solid var(--ios-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button>
-    </div>
+    <div id="data-list"></div>
+    <div style="text-align:center;"><button class="btn" style="background:white; color:var(--ios-gold); border:1px solid var(--ios-gold);" onclick="addBati()">+ Ajouter un bâtiment</button></div>
 </div>
 
-<footer>
-    <button class="btn btn-gold" onclick="exportHTML()">💾 GÉNÉRER LE FICHIER INTERACTIF</button>
-</footer>
+<div class="footer">
+    <button class="btn btn-gold" onclick="generatePDF()">💾 GÉNÉRER LE RAPPORT PDF PRO</button>
+</div>
+
+<div id="pdf-template"></div>
 
 <script>
-    let db = {};
+    let diagnostic = {};
 
     function addBati() {
-        const nom = prompt("Nom de la structure (ex: Crèche Dolto) :");
-        if (nom) { db[nom] = []; render(); }
+        const nom = prompt("Nom du bâtiment :");
+        if (nom) { diagnostic[nom] = []; render(); }
     }
 
-    function uploadImgs(nom, input) {
-        Array.from(input.files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                db[nom].push({ img: e.target.result, desc: "" });
-                render();
-            };
-            reader.readAsDataURL(file); // Qualité UHD [cite: 2026-01-02]
+    function upload(nom, input) {
+        Array.from(input.files).forEach(f => {
+            const r = new FileReader();
+            r.onload = e => { diagnostic[nom].push({ img: e.target.result, txt: "" }); render(); };
+            r.readAsDataURL(f); // UHD [cite: 2026-01-02]
         });
     }
 
     function render() {
-        const list = document.getElementById('structures-list');
-        list.innerHTML = '';
-        for (let b in db) {
-            let h = `<div class="ios-card">
-                <div style="display:flex; justify-content:space-between; align-items:center">
-                    <h2 style="color:var(--ios-gold); margin:0">${b}</h2>
-                    <button class="btn-del" style="border-radius:10px;" onclick="delete db['${b}']; render()">Supprimer Bâtiment</button>
-                </div>
-                <input type="file" multiple onchange="uploadImgs('${b}', this)" style="margin: 15px 0;">
-                <div id="imgs-${b}">`;
-            
-            db[b].forEach((p, i) => {
-                h += `
-                <div class="photo-item">
-                    <img src="${p.img}">
-                    <textarea placeholder="Ajouter la description de cette photo (ex: État des stores, Climatisation...)" 
-                              onchange="db['${b}'][${i}].desc = this.value">${p.desc}</textarea>
-                    <button class="btn-del" style="border-radius:50%; width:30px; height:30px; padding:0" onclick="db['${b}'].splice(${i},1); render()">×</button>
-                </div>`;
+        const list = document.getElementById('data-list'); list.innerHTML = '';
+        for (let b in diagnostic) {
+            let h = `<div class="ios-card"><h3>${b}</h3><input type="file" multiple onchange="upload('${b}', this)" style="margin-bottom:10px;">`;
+            diagnostic[b].forEach((s, i) => {
+                h += `<div class="photo-entry"><img src="${s.img}"><textarea onchange="diagnostic['${b}'][${i}].txt=this.value" placeholder="Observations...">${s.txt}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="background:none; border:none; color:red; cursor:pointer;">×</button></div>`;
             });
-            h += `</div></div>`;
-            list.innerHTML += h;
+            list.innerHTML += h + `</div>`;
         }
     }
 
-    function exportHTML() {
-        const title = document.getElementById('proj-name').value || "Diagnostic_CCAS";
-        const dataStr = JSON.stringify(db);
+    function generatePDF() {
+        const title = document.getElementById('report-title').value || "Diagnostic_CCAS";
+        const template = document.getElementById('pdf-template');
+        template.innerHTML = `<div class="pdf-page"><h1 style="font-size:3rem; text-align:center; margin-top:200px;">${title}</h1><h2 style="text-align:center; color:#666;">Rapport de Diagnostic Technique CCAS</h2></div>`;
 
-        const template = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>\${title}</title>
-    <style>
-        body { font-family: -apple-system, sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: white; overflow: hidden; }
-        #side { width: 320px; background: #1C1C1E; border-right: 1px solid #38383A; overflow-y: auto; }
-        .nav-btn { width: 100%; padding: 22px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #2C2C2E; font-size: 0.9rem; }
-        .nav-btn.active { color: #D4AF37; background: #2C2C2E; font-weight: bold; border-left: 6px solid #D4AF37; }
-        #main { flex: 1; display: flex; flex-direction: column; }
-        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .viewer img { max-width: 95%; max-height: 90%; object-fit: contain; }
-        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); color: white; border: none; padding: 25px; cursor: pointer; border-radius: 50%; font-size: 24px; }
-        .footer-desc { padding: 35px; background: #FFFFFF; color: #1C1C1E; border-top: 6px solid #D4AF37; min-height: 120px; font-size: 1.2rem; line-height: 1.6; }
-    </style>
-</head>
-<body>
-    <div id="side"><div style="padding:25px; font-weight:bold; color:#D4AF37; border-bottom:1px solid #38383A; text-transform:uppercase;">\${title}</div><div id="menu"></div></div>
-    <div id="main"><div class="viewer" id="v"></div><div class="footer-desc" id="t"></div></div>
-    <script>
-        const d = \${dataStr};
-        let b = Object.keys(d)[0], i = 0;
-        function r(){
-            const m = document.getElementById('menu'); m.innerHTML = '';
-            Object.keys(d).forEach(k => {
-                const btn = document.createElement('button');
-                btn.className = 'nav-btn' + (b === k ? ' active' : '');
-                btn.innerText = k;
-                btn.onclick = () => { b = k; i = 0; sh(); r(); };
-                m.appendChild(btn);
+        for (let bati in diagnostic) {
+            diagnostic[bati].forEach(item => {
+                template.innerHTML += `
+                    <div class="pdf-page">
+                        <h2 class="pdf-title">${bati}</h2>
+                        <img src="${item.img}" class="pdf-img">
+                        <div class="pdf-desc">${item.txt || "Aucune observation technique enregistrée."}</div>
+                    </div>`;
             });
         }
-        function sh(){
-            const v = document.getElementById('v'), items = d[b];
-            if (!items || items.length === 0) return;
-            v.innerHTML = '<img src="' + items[i].img + '">';
-            if (items.length > 1) {
-                v.innerHTML += '<button class="arr" style="left:25px" onclick="mv(-1)">❮</button>';
-                v.innerHTML += '<button class="arr" style="right:25px" onclick="mv(1)">❯</button>';
-            }
-            document.getElementById('t').innerHTML = "<strong>" + b + "</strong><br>" + (items[i].desc || "Aucune description pour cette photo.");
-        }
-        function mv(dir) { i = (i + dir + d[b].length) % d[b].length; sh(); }
-        r(); sh();
-    <\/script>
-</body>
-</html>`;
 
-        const finalContent = template.replace('\\${title}', title).replace('\\${dataStr}', dataStr);
-        const blob = new Blob([finalContent], { type: 'text/html' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = title + ".html";
-        a.click();
+        const opt = {
+            margin: 0,
+            filename: title + '.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
+        };
+
+        html2pdf().set(opt).from(template).save().then(() => {
+            alert("Votre rapport PDF a été généré avec succès !");
+        });
     }
 </script>
 </body>
