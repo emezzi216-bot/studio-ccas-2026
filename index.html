@@ -2,65 +2,251 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Créateur de Diagnostic</title>
+    <title>Studio CCAS - Diagnostic Premium</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; height: 100vh; }
-        header { background: #005596; color: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        #editor { flex: 1; padding: 30px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; }
-        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 8px solid #005596; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .img-item { display: flex; gap: 15px; margin-top: 10px; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
-        .img-item img { width: 100px; height: 75px; object-fit: cover; border-radius: 4px; }
-        textarea { flex: 1; height: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none; }
-        .footer { background: white; padding: 20px; border-top: 2px solid #ddd; text-align: center; }
-        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 5px; }
-        .btn-add { background: #005596; color: white; }
-        .btn-gen { background: #28a745; color: white; font-size: 1.1rem; }
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-blue: #007AFF;
+            --ios-gold: #D4AF37;
+            --ios-gold-light: #F4EBD0;
+            --ios-text: #1C1C1E;
+            --ios-gray: #8E8E93;
+            --ios-silver: #E5E5EA;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background: var(--ios-bg);
+            color: var(--ios-text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--ios-silver);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--ios-text);
+        }
+
+        #editor {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card {
+            background: var(--ios-card);
+            padding: 25px;
+            border-radius: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .img-item {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #F9F9FB;
+            border-radius: 18px;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .img-item img {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        textarea {
+            flex: 1;
+            height: 70px;
+            padding: 12px;
+            border: 1px solid var(--ios-silver);
+            border-radius: 12px;
+            resize: none;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--ios-gold);
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 25px;
+            border-top: 1px solid var(--ios-silver);
+            text-align: center;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add {
+            background: var(--ios-silver);
+            color: var(--ios-text);
+        }
+
+        .btn-add:hover {
+            background: #D1D1D6;
+        }
+
+        .btn-gen {
+            background: var(--ios-gold);
+            color: white;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-gen:hover {
+            background: #B4942E;
+            transform: scale(1.02);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--ios-silver);
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+
+        /* --- Style du Lecteur Généré --- */
+        #generated-style { display: none; }
     </style>
 </head>
 <body>
-<header><h1>Studio de Création CCAS</h1><p>Créez et téléchargez votre présentation interactive</p></header>
+
+<header>
+    <h1>Studio Diagnostic CCAS</h1>
+</header>
+
 <div id="editor">
     <div class="card">
-        <label><strong>Nom de la présentation et du fichier :</strong></label>
-        <input type="text" id="filename" style="width:100%; padding:10px; margin-top:10px;" placeholder="Ex: Diagnostic_Creches_2026">
+        <label><strong>Nom de la présentation</strong></label>
+        <input type="text" id="filename" placeholder="Ex: Plan_Rafraichissement_2026">
     </div>
     <div id="bati-list"></div>
-    <button class="btn btn-add" onclick="addBati()">+ Ajouter un bâtiment</button>
+    <div style="text-align: center;">
+        <button class="btn btn-add" onclick="addBati()">+ Ajouter un bâtiment</button>
+    </div>
 </div>
-<div class="footer"><button class="btn btn-gen" onclick="generate()">💾 GÉNÉRER LE FICHIER INTERACTIF (.html)</button></div>
+
+<div class="footer">
+    <button class="btn btn-gen" onclick="generate()">💾 Générer la présentation interactive</button>
+</div>
 
 <script>
     let db = {};
     function addBati() {
-        const n = prompt("Nom du bâtiment :");
+        const n = prompt("Nom de la structure :");
         if (n) { db[n] = []; render(); }
     }
     function upload(n, input) {
         Array.from(input.files).forEach(f => {
             const r = new FileReader();
             r.onload = e => { db[n].push({ img: e.target.result, txt: "" }); render(); };
-            r.readAsDataURL(f); // UHD data-uri
+            r.readAsDataURL(f);
         });
     }
     function render() {
         const c = document.getElementById('bati-list'); c.innerHTML = '';
         for (let b in db) {
-            let h = `<div class="card"><h3>${b}</h3><input type="file" multiple onchange="upload('${b}', this)">`;
+            let h = `<div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="margin:0">${b}</h3>
+                    <label class="btn btn-add" style="font-size:0.8rem; padding:8px 15px;">
+                        + Photos <input type="file" multiple style="display:none" onchange="upload('${b}', this)">
+                    </label>
+                </div>
+                <div id="list-${b}">`;
             db[b].forEach((s, i) => {
-                h += `<div class="img-item"><img src="${s.img}"><textarea onchange="db['${b}'][${i}].txt=this.value" placeholder="Diagnostic technique...">${s.txt}</textarea></div>`;
+                h += `<div class="img-item">
+                    <img src="${s.img}">
+                    <textarea onchange="db['${b}'][${i}].txt=this.value" placeholder="Écrire le diagnostic technique...">${s.txt}</textarea>
+                    <button onclick="db['${b}'].splice(${i},1); render()" style="background:none; border:none; color:var(--ios-gray); cursor:pointer; font-size:1.2rem;">×</button>
+                </div>`;
             });
-            c.innerHTML += h + `</div>`;
+            c.innerHTML += h + `</div></div>`;
         }
     }
     function generate() {
         const name = document.getElementById('filename').value || "Diagnostic_CCAS";
         const json = JSON.stringify(db);
         const code = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>\${name}</title>
-        <style>body{font-family:Arial;margin:0;display:flex;height:100vh;background:#1a1a1b;color:white;overflow:hidden}#side{width:320px;background:#202124;border-right:3px solid #005596;overflow-y:auto}.btn{width:100%;padding:18px;text-align:left;border:none;background:none;color:#aaa;cursor:pointer;border-bottom:1px solid #333}.btn.active{background:#005596;color:white;font-weight:bold;border-left:8px solid #ffcc00}#main{flex:1;display:flex;flex-direction:column;background:#f4f4f4;color:#333}.slider{flex:1;background:#000;position:relative;display:flex;align-items:center;justify-content:center}.slider img{max-width:100%;max-height:100%;object-fit:contain}.arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,85,150,0.8);color:white;border:none;padding:20px;cursor:pointer;border-radius:50%;font-size:24px}.diag{padding:25px;background:white;border-top:6px solid #005596;min-height:80px;font-style:italic}</style>
-        </head><body><div id="side"><div style="padding:20px;background:#005596;font-weight:bold">\${name}</div><div id="m"></div></div>
-        <div id="main"><div class="slider" id="s"></div><div class="diag" id="t"></div></div>
-        <script>const d=\${json};let b=Object.keys(d)[0],i=0;function r(){const m=document.getElementById('m');m.innerHTML='';Object.keys(d).forEach(k=>{const btn=document.createElement('button');btn.className='btn'+(b===k?' active':'');btn.innerText=k;btn.onclick=()=>{b=k;i=0;sh();r()};m.appendChild(btn)})}
-        function sh(){const c=document.getElementById('s'),it=d[b];if(!it||it.length===0)return;c.innerHTML='<img src="'+it[i].img+'">';if(it.length>1){c.innerHTML+='<button class="arr" style="left:20px" onclick="mv(-1)">❮</button><button class="arr" style="right:20px" onclick="mv(1)">❯</button>'}document.getElementById('t').innerText=it[i].txt||"Aucune observation."}
+        <style>
+            body{font-family:-apple-system,sans-serif;margin:0;display:flex;height:100vh;background:#000;color:white;overflow:hidden}
+            #side{width:300px;background:#1C1C1E;border-right:1px solid #38383A;overflow-y:auto;transition:all 0.4s}
+            .header-side{padding:25px;background:#1C1C1E;font-weight:700;font-size:1.1rem;border-bottom:1px solid #38383A;color:#D4AF37}
+            .btn-nav{width:100%;padding:18px 25px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #2C2C2E;transition:0.3s;font-size:0.9rem}
+            .btn-nav.active{background:#2C2C2E;color:white;font-weight:600;border-left:5px solid #D4AF37}
+            #main{flex:1;display:flex;flex-direction:column;background:#000}
+            .viewer{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+            .viewer img{max-width:100%;max-height:100%;object-fit:contain;transition:opacity 0.5s ease-in-out}
+            .arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);color:white;border:none;padding:20px;cursor:pointer;border-radius:50%;font-size:24px;transition:0.3s}
+            .arr:hover{background:rgba(255,255,255,0.2)}
+            .info-panel{padding:30px;background:#1C1C1E;border-top:1px solid #38383A;min-height:100px;animation:slideUp 0.5s ease}
+            @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+            .diag-txt{font-style:italic;color:#AEAEB2;line-height:1.5}
+        </style>
+        </head><body><div id="side"><div class="header-side">\${name}</div><div id="m"></div></div>
+        <div id="main"><div class="viewer" id="v"></div><div class="info-panel" id="t_box"><h2 id="b_title" style="margin:0 0 10px 0; font-size:1.2rem;"></h2><div class="diag-txt" id="t"></div></div></div>
+        <script>const d=\${json};let b=Object.keys(d)[0],i=0;function r(){const m=document.getElementById('m');m.innerHTML='';Object.keys(d).forEach(k=>{const btn=document.createElement('button');btn.className='btn-nav'+(b===k?' active':'');btn.innerText=k;btn.onclick=()=>{b=k;i=0;sh();r()};m.appendChild(btn)})}
+        function sh(){const c=document.getElementById('v'),it=d[b];if(!it||it.length===0)return;c.innerHTML='<img src="'+it[i].img+'">';if(it.length>1){c.innerHTML+='<button class="arr" style="left:20px" onclick="mv(-1)">❮</button><button class="arr" style="right:20px" onclick="mv(1)">❯</button>'}document.getElementById('b_title').innerText=b;document.getElementById('t').innerText=it[i].txt||"Aucune observation."}
         function mv(dir){i=(i+dir+d[b].length)%d[b].length;sh()}r();sh();<\/script></body></html>`;
         const blob = new Blob([code], { type: 'text/html' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name + ".html"; a.click();
