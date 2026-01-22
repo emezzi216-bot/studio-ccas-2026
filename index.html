@@ -6,47 +6,50 @@
     <style>
         :root {
             --ios-bg: #F2F2F7;
-            --ios-gold: #B4941E;
-            --ios-silver: #E5E5EA;
             --ios-card: #FFFFFF;
+            --ios-gold: #D4AF37;
+            --ios-silver: #E5E5EA;
             --ios-text: #1C1C1E;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0; background: var(--ios-bg); color: var(--ios-text);
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; height: 100vh;
         }
 
-        /* En-tête iOS Glassmorphism */
         header {
-            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
-            padding: 20px; text-align: center; border-bottom: 1px solid var(--ios-silver); z-index: 10;
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px);
+            padding: 20px; text-align: center; border-bottom: 1px solid var(--ios-silver);
+            position: sticky; top: 0; z-index: 100;
         }
 
-        #setup-container { flex: 1; padding: 30px; overflow-y: auto; max-width: 800px; margin: 0 auto; width: 100%; }
+        #studio-editor {
+            flex: 1; padding: 30px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box;
+        }
 
         .ios-card {
-            background: var(--ios-card); border-radius: 24px; padding: 25px; margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(180, 148, 30, 0.1);
+            background: var(--ios-card); border-radius: 24px; padding: 25px; margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
-        input[type="text"] {
-            width: 100%; padding: 15px; border-radius: 15px; border: 1px solid var(--ios-silver);
-            font-size: 1rem; outline: none; margin-bottom: 10px;
+        .photo-item {
+            display: flex; gap: 20px; background: #F9F9FB; padding: 20px; 
+            border-radius: 20px; margin-top: 15px; align-items: flex-start;
+            border: 1px solid var(--ios-silver);
         }
-        input[type="text"]:focus { border-color: var(--ios-gold); }
 
-        .btn {
-            padding: 14px 28px; border-radius: 50px; border: none; font-weight: 600;
-            cursor: pointer; transition: all 0.3s; font-size: 1rem;
+        .photo-item img { width: 180px; height: 120px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        textarea {
+            flex: 1; height: 110px; padding: 15px; border-radius: 12px;
+            border: 1px solid var(--ios-silver); resize: none; font-family: inherit; font-size: 1rem;
         }
-        .btn-gold { background: linear-gradient(135deg, #D4AF37, #B4941E); color: white; box-shadow: 0 4px 15px rgba(180, 148, 30, 0.3); }
-        .btn-gold:hover { transform: scale(1.03); }
+        textarea:focus { border-color: var(--ios-gold); outline: none; }
 
-        .photo-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
-        .photo-box { border-radius: 18px; overflow: hidden; background: #eee; position: relative; aspect-ratio: 1; }
-        .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+        .btn { padding: 14px 28px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-gold { background: linear-gradient(145deg, #D4AF37, #B4942E); color: white; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); }
+        .btn-del { background: #FF3B30; color: white; padding: 8px 15px; font-size: 0.8rem; }
 
         footer { padding: 25px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
     </style>
@@ -54,93 +57,100 @@
 <body>
 
 <header>
-    <h1 style="margin:0; font-weight:800; letter-spacing:-0.5px;">STUDIO DIAGNOSTIC CCAS</h1>
+    <h1 style="margin:0; font-size: 1.4rem; letter-spacing: -0.5px;">STUDIO DIAGNOSTIC CCAS</h1>
 </header>
 
-<div id="setup-container">
+<div id="studio-editor">
     <div class="ios-card">
-        <label style="font-weight:700; color:var(--ios-gold); margin-bottom:10px; display:block;">TITRE DE LA PRÉSENTATION</label>
-        <input type="text" id="project_name" placeholder="Ex: Plan Rafraîchissement - Crèches 2026">
+        <label><strong>Nom de la Présentation :</strong></label>
+        <input type="text" id="proj-name" style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--ios-silver); margin-top:10px;" placeholder="Ex: Diagnostic_Rafraichissement_2026">
     </div>
 
     <div id="structures-list"></div>
 
-    <div style="text-align:center; margin-bottom: 40px;">
-        <button class="btn" style="background:white; color:var(--ios-gold); border:1px solid var(--ios-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button>
+    <div style="text-align:center;">
+        <button class="btn" style="background:white; color:var(--ios-gold); border: 1px solid var(--ios-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button>
     </div>
 </div>
 
 <footer>
-    <button class="btn btn-gold" onclick="generateAndDownload()">📥 GÉNÉRER ET TÉLÉCHARGER LE FICHIER MAIRIE</button>
+    <button class="btn btn-gold" onclick="exportHTML()">💾 GÉNÉRER LE FICHIER INTERACTIF</button>
 </footer>
 
 <script>
     let db = {};
 
     function addBati() {
-        const nom = prompt("Nom du bâtiment (ex: Crèche Dolto) :");
+        const nom = prompt("Nom de la structure (ex: Crèche Dolto) :");
         if (nom) { db[nom] = []; render(); }
+    }
+
+    function uploadImgs(nom, input) {
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                db[nom].push({ img: e.target.result, desc: "" });
+                render();
+            };
+            reader.readAsDataURL(file); // Qualité UHD [cite: 2026-01-02]
+        });
     }
 
     function render() {
         const list = document.getElementById('structures-list');
         list.innerHTML = '';
         for (let b in db) {
-            list.innerHTML += `
-                <div class="ios-card">
-                    <h2 style="margin-top:0;">${b}</h2>
-                    <input type="file" multiple onchange="loadImages('${b}', this)" style="margin-bottom:15px;">
-                    <div class="photo-preview">
-                        ${db[b].map((p, i) => `
-                            <div class="photo-box">
-                                <img src="${p.img}">
-                                <textarea style="position:absolute; bottom:0; width:100%; height:40%; border:none; background:rgba(255,255,255,0.9); font-size:10px; padding:5px; box-sizing:border-box;" 
-                                          onchange="db['${b}'][${i}].txt=this.value" placeholder="Diagnostic technique...">${p.txt}</textarea>
-                            </div>
-                        `).join('')}
-                    </div>
+            let h = `<div class="ios-card">
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <h2 style="color:var(--ios-gold); margin:0">${b}</h2>
+                    <button class="btn-del" style="border-radius:10px;" onclick="delete db['${b}']; render()">Supprimer Bâtiment</button>
+                </div>
+                <input type="file" multiple onchange="uploadImgs('${b}', this)" style="margin: 15px 0;">
+                <div id="imgs-${b}">`;
+            
+            db[b].forEach((p, i) => {
+                h += `
+                <div class="photo-item">
+                    <img src="${p.img}">
+                    <textarea placeholder="Ajouter la description de cette photo (ex: État des stores, Climatisation...)" 
+                              onchange="db['${b}'][${i}].desc = this.value">${p.desc}</textarea>
+                    <button class="btn-del" style="border-radius:50%; width:30px; height:30px; padding:0" onclick="db['${b}'].splice(${i},1); render()">×</button>
                 </div>`;
+            });
+            h += `</div></div>`;
+            list.innerHTML += h;
         }
     }
 
-    function loadImages(b, input) {
-        Array.from(input.files).forEach(file => {
-            const r = new FileReader();
-            r.onload = e => { db[b].push({ img: e.target.result, txt: "" }); render(); };
-            r.readAsDataURL(file); // UHD [cite: 2026-01-02]
-        });
-    }
-
-    function generateAndDownload() {
-        const title = document.getElementById('project_name').value || "Diagnostic_CCAS";
+    function exportHTML() {
+        const title = document.getElementById('proj-name').value || "Diagnostic_CCAS";
         const dataStr = JSON.stringify(db);
-        
-        // On construit le code du lecteur final de façon très robuste
-        const viewerCode = `<!DOCTYPE html>
+
+        const template = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>${title}</title>
+    <title>\${title}</title>
     <style>
         body { font-family: -apple-system, sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: white; overflow: hidden; }
-        #side { width: 320px; background: #1C1C1E; border-right: 1px solid #38383A; display: flex; flex-direction: column; }
-        .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #2C2C2E; transition: 0.3s; }
-        .nav-btn.active { background: #2C2C2E; color: #D4AF37; font-weight: bold; border-left: 6px solid #D4AF37; }
-        #main { flex: 1; display: flex; flex-direction: column; background: #000; position: relative; }
-        .v-img { flex: 1; display: flex; align-items: center; justify-content: center; }
-        .v-img img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 12px; }
-        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); color: white; border: none; padding: 20px; cursor: pointer; border-radius: 50%; font-size: 24px; z-index: 10; }
-        .diag-box { background: white; color: black; padding: 30px; border-top: 6px solid #D4AF37; min-height: 100px; font-style: italic; font-size: 1.1rem; }
+        #side { width: 320px; background: #1C1C1E; border-right: 1px solid #38383A; overflow-y: auto; }
+        .nav-btn { width: 100%; padding: 22px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #2C2C2E; font-size: 0.9rem; }
+        .nav-btn.active { color: #D4AF37; background: #2C2C2E; font-weight: bold; border-left: 6px solid #D4AF37; }
+        #main { flex: 1; display: flex; flex-direction: column; }
+        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .viewer img { max-width: 95%; max-height: 90%; object-fit: contain; }
+        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); color: white; border: none; padding: 25px; cursor: pointer; border-radius: 50%; font-size: 24px; }
+        .footer-desc { padding: 35px; background: #FFFFFF; color: #1C1C1E; border-top: 6px solid #D4AF37; min-height: 120px; font-size: 1.2rem; line-height: 1.6; }
     </style>
 </head>
 <body>
-    <div id="side"><div style="padding:25px; background:#005596; color:white; font-weight:bold;">${title}</div><div id="m"></div></div>
-    <div id="main"><div class="v-img" id="v"></div><div class="diag-box" id="t"></div></div>
+    <div id="side"><div style="padding:25px; font-weight:bold; color:#D4AF37; border-bottom:1px solid #38383A; text-transform:uppercase;">\${title}</div><div id="menu"></div></div>
+    <div id="main"><div class="viewer" id="v"></div><div class="footer-desc" id="t"></div></div>
     <script>
-        const d = ${dataStr};
+        const d = \${dataStr};
         let b = Object.keys(d)[0], i = 0;
         function r(){
-            const m = document.getElementById('m'); m.innerHTML = '';
+            const m = document.getElementById('menu'); m.innerHTML = '';
             Object.keys(d).forEach(k => {
                 const btn = document.createElement('button');
                 btn.className = 'nav-btn' + (b === k ? ' active' : '');
@@ -154,10 +164,10 @@
             if (!items || items.length === 0) return;
             v.innerHTML = '<img src="' + items[i].img + '">';
             if (items.length > 1) {
-                v.innerHTML += '<button class="arr" style="left:20px" onclick="mv(-1)">❮</button>';
-                v.innerHTML += '<button class="arr" style="right:20px" onclick="mv(1)">❯</button>';
+                v.innerHTML += '<button class="arr" style="left:25px" onclick="mv(-1)">❮</button>';
+                v.innerHTML += '<button class="arr" style="right:25px" onclick="mv(1)">❯</button>';
             }
-            document.getElementById('t').innerText = items[i].txt || "Aucune observation technique.";
+            document.getElementById('t').innerHTML = "<strong>" + b + "</strong><br>" + (items[i].desc || "Aucune description pour cette photo.");
         }
         function mv(dir) { i = (i + dir + d[b].length) % d[b].length; sh(); }
         r(); sh();
@@ -165,11 +175,11 @@
 </body>
 </html>`;
 
-        const blob = new Blob([viewerCode], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
+        const finalContent = template.replace('\\${title}', title).replace('\\${dataStr}', dataStr);
+        const blob = new Blob([finalContent], { type: 'text/html' });
         const a = document.createElement('a');
-        a.href = url;
-        a.download = title.replace(/\\s/g, '_') + ".html";
+        a.href = URL.createObjectURL(blob);
+        a.download = title + ".html";
         a.click();
     }
 </script>
