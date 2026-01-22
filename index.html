@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Studio CCAS - Créateur de Diagnostic</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; display: flex; flex-direction: column; height: 100vh; }
+        header { background: #005596; color: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #editor { flex: 1; padding: 30px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 8px solid #005596; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .img-item { display: flex; gap: 15px; margin-top: 10px; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
+        .img-item img { width: 100px; height: 75px; object-fit: cover; border-radius: 4px; }
+        textarea { flex: 1; height: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: none; }
+        .footer { background: white; padding: 20px; border-top: 2px solid #ddd; text-align: center; }
+        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 5px; }
+        .btn-add { background: #005596; color: white; }
+        .btn-gen { background: #28a745; color: white; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+<header><h1>Studio de Création CCAS</h1><p>Créez et téléchargez votre présentation interactive</p></header>
+<div id="editor">
+    <div class="card">
+        <label><strong>Nom de la présentation et du fichier :</strong></label>
+        <input type="text" id="filename" style="width:100%; padding:10px; margin-top:10px;" placeholder="Ex: Diagnostic_Creches_2026">
+    </div>
+    <div id="bati-list"></div>
+    <button class="btn btn-add" onclick="addBati()">+ Ajouter un bâtiment</button>
+</div>
+<div class="footer"><button class="btn btn-gen" onclick="generate()">💾 GÉNÉRER LE FICHIER INTERACTIF (.html)</button></div>
+
+<script>
+    let db = {};
+    function addBati() {
+        const n = prompt("Nom du bâtiment :");
+        if (n) { db[n] = []; render(); }
+    }
+    function upload(n, input) {
+        Array.from(input.files).forEach(f => {
+            const r = new FileReader();
+            r.onload = e => { db[n].push({ img: e.target.result, txt: "" }); render(); };
+            r.readAsDataURL(f); // UHD data-uri
+        });
+    }
+    function render() {
+        const c = document.getElementById('bati-list'); c.innerHTML = '';
+        for (let b in db) {
+            let h = `<div class="card"><h3>${b}</h3><input type="file" multiple onchange="upload('${b}', this)">`;
+            db[b].forEach((s, i) => {
+                h += `<div class="img-item"><img src="${s.img}"><textarea onchange="db['${b}'][${i}].txt=this.value" placeholder="Diagnostic technique...">${s.txt}</textarea></div>`;
+            });
+            c.innerHTML += h + `</div>`;
+        }
+    }
+    function generate() {
+        const name = document.getElementById('filename').value || "Diagnostic_CCAS";
+        const json = JSON.stringify(db);
+        const code = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>\${name}</title>
+        <style>body{font-family:Arial;margin:0;display:flex;height:100vh;background:#1a1a1b;color:white;overflow:hidden}#side{width:320px;background:#202124;border-right:3px solid #005596;overflow-y:auto}.btn{width:100%;padding:18px;text-align:left;border:none;background:none;color:#aaa;cursor:pointer;border-bottom:1px solid #333}.btn.active{background:#005596;color:white;font-weight:bold;border-left:8px solid #ffcc00}#main{flex:1;display:flex;flex-direction:column;background:#f4f4f4;color:#333}.slider{flex:1;background:#000;position:relative;display:flex;align-items:center;justify-content:center}.slider img{max-width:100%;max-height:100%;object-fit:contain}.arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,85,150,0.8);color:white;border:none;padding:20px;cursor:pointer;border-radius:50%;font-size:24px}.diag{padding:25px;background:white;border-top:6px solid #005596;min-height:80px;font-style:italic}</style>
+        </head><body><div id="side"><div style="padding:20px;background:#005596;font-weight:bold">\${name}</div><div id="m"></div></div>
+        <div id="main"><div class="slider" id="s"></div><div class="diag" id="t"></div></div>
+        <script>const d=\${json};let b=Object.keys(d)[0],i=0;function r(){const m=document.getElementById('m');m.innerHTML='';Object.keys(d).forEach(k=>{const btn=document.createElement('button');btn.className='btn'+(b===k?' active':'');btn.innerText=k;btn.onclick=()=>{b=k;i=0;sh();r()};m.appendChild(btn)})}
+        function sh(){const c=document.getElementById('s'),it=d[b];if(!it||it.length===0)return;c.innerHTML='<img src="'+it[i].img+'">';if(it.length>1){c.innerHTML+='<button class="arr" style="left:20px" onclick="mv(-1)">❮</button><button class="arr" style="right:20px" onclick="mv(1)">❯</button>'}document.getElementById('t').innerText=it[i].txt||"Aucune observation."}
+        function mv(dir){i=(i+dir+d[b].length)%d[b].length;sh()}r();sh();<\/script></body></html>`;
+        const blob = new Blob([code], { type: 'text/html' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name + ".html"; a.click();
+    }
+</script>
+</body>
+</html>
