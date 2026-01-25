@@ -2,49 +2,44 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Diagnostic Groupé</title>
-    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+    <title>Studio CCAS - Diagnostic Interactif</title>
     <style>
-        :root { --ios-bg: #F2F2F7; --ios-gold: #D4AF37; --ios-silver: #E5E5EA; --ios-text: #1C1C1E; }
-        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        :root { --ios-bg: #F2F2F7; --ios-gold: #D4AF37; --ios-silver: #E5E5EA; --ios-card: #FFFFFF; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--ios-bg); color: #1C1C1E; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         header { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); padding: 20px; text-align: center; border-bottom: 1px solid var(--ios-silver); z-index: 100; }
-        #editor { flex: 1; padding: 30px; overflow-y: auto; max-width: 950px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        #editor { flex: 1; padding: 30px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
         
         .ios-card { background: white; border-radius: 24px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(212, 175, 55, 0.1); }
-        h2 { color: var(--ios-gold); font-size: 1.4rem; margin: 0 0 15px 0; border-bottom: 2px solid var(--ios-silver); padding-bottom: 10px; }
-        
-        .photo-grid-editor { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
-        .photo-box { background: #F9F9FB; border-radius: 18px; padding: 10px; border: 1px solid var(--ios-silver); position: relative; }
-        .photo-box img { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
-        textarea { width: 100%; height: 60px; border-radius: 10px; border: 1px solid var(--ios-silver); padding: 8px; font-size: 0.8rem; resize: none; box-sizing: border-box; }
+        .photo-item { display: flex; gap: 15px; background: #F9F9FB; padding: 15px; border-radius: 18px; margin-top: 15px; border: 1px solid var(--ios-silver); align-items: center; }
+        .photo-item img { width: 120px; height: 90px; object-fit: cover; border-radius: 10px; }
+        textarea { flex: 1; height: 70px; border-radius: 10px; border: 1px solid var(--ios-silver); padding: 10px; font-size: 0.9rem; resize: none; }
 
         .footer { padding: 25px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
         .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; }
         .btn-gold { background: linear-gradient(135deg, #D4AF37, #B4942E); color: white; box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3); }
-        .btn-gold:hover { transform: scale(1.02); }
     </style>
 </head>
 <body>
 
-<header><h1 style="margin:0; font-weight:800; letter-spacing:-1px;">STUDIO DIAGNOSTIC PAR BÂTIMENT</h1></header>
+<header><h1 style="margin:0; font-weight:800;">STUDIO DIAGNOSTIC INTERACTIF</h1></header>
 
 <div id="editor">
     <div class="ios-card">
         <label><strong>Titre du Projet :</strong></label>
-        <input type="text" id="ppt-title" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-top:10px;" placeholder="Ex: État des Crèches - Été 2026">
+        <input type="text" id="proj-title" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-top:10px;" placeholder="Ex: Plan Rafraîchissement 2026">
     </div>
     <div id="main-list"></div>
     <div style="text-align:center;"><button class="btn" style="background:white; color:var(--ios-gold); border:1px solid var(--ios-gold);" onclick="addStructure()">+ AJOUTER UN BÂTIMENT</button></div>
 </div>
 
-<div class="footer"><button class="btn btn-gold" onclick="generatePPTX()">💾 GÉNÉRER LE FICHIER GROUPÉ (.pptx)</button></div>
+<div class="footer"><button class="btn btn-gold" onclick="generateInteractive()">💾 TÉLÉCHARGER LE FICHIER INTERACTIF (.html)</button></div>
 
 <script>
     let diagnostic = {};
 
     function addStructure() {
-        const nom = prompt("Nom du bâtiment (ex: Crèche Elsa Triolet) :");
+        const nom = prompt("Nom du bâtiment :");
         if (nom) { diagnostic[nom] = []; render(); }
     }
 
@@ -59,57 +54,72 @@
     function render() {
         const list = document.getElementById('main-list'); list.innerHTML = '';
         for (let b in diagnostic) {
-            let h = `<div class="ios-card">
-                <h2>${b}</h2>
-                <input type="file" multiple onchange="upload('${b}', this)">
-                <div class="photo-grid-editor">`;
+            let h = `<div class="ios-card"><h2>${b}</h2><input type="file" multiple onchange="upload('${b}', this)">`;
             diagnostic[b].forEach((p, i) => {
-                h += `<div class="photo-box">
-                    <img src="${p.img}">
-                    <textarea onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Note technique...">${p.desc}</textarea>
-                    <button onclick="diagnostic['${b}'].splice(${i},1); render()" style="position:absolute; top:5px; right:5px; background:red; color:white; border:none; border-radius:50%; width:20px; height:20px; cursor:pointer;">×</button>
-                </div>`;
+                h += `<div class="photo-item"><img src="${p.img}"><textarea onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Description technique...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="background:none; border:none; color:red; cursor:pointer;">×</button></div>`;
             });
-            list.innerHTML += h + `</div></div>`;
+            list.innerHTML += h + `</div>`;
         }
     }
 
-    function generatePPTX() {
-        const projName = document.getElementById('ppt-title').value || "Diagnostic_CCAS";
-        let pptx = new PptxGenJS();
+    function generateInteractive() {
+        const title = document.getElementById('proj-title').value || "Diagnostic_CCAS";
+        const data = JSON.stringify(diagnostic);
         
-        // 1. Page de Garde
-        let slideGarde = pptx.addSlide();
-        slideGarde.background = { fill: "F2F2F7" };
-        slideGarde.addText(projName, { x: 1, y: 2.2, w: "80%", fontSize: 36, color: "005596", bold: true, align: "center" });
-
-        // 2. Boucle par Bâtiment
-        for (let bati in diagnostic) {
-            const photos = diagnostic[bati];
-            if (photos.length === 0) continue;
-
-            // On regroupe les photos par 2 par slide pour éviter l'étirement
-            for (let i = 0; i < photos.length; i += 2) {
-                let slide = pptx.addSlide();
-                
-                // En-tête du bâtiment
-                slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: "100%", h: 0.6, fill: { color: "D4AF37" } });
-                slide.addText(bati + " (" + (Math.floor(i/2)+1) + ")", { x: 0.5, y: 0.1, fontSize: 20, color: "FFFFFF", bold: true });
-
-                // Photo 1 (Gauche)
-                slide.addImage({ data: photos[i].img, x: 0.5, y: 0.8, w: 4.3, h: 3.2, sizing: { type: "contain" } });
-                slide.addShape(pptx.ShapeType.rect, { x: 0.5, y: 4.1, w: 4.3, h: 1.2, fill: { color: "F2F2F7" } });
-                slide.addText(photos[i].desc || "Observation 1", { x: 0.6, y: 4.2, w: 4.1, fontSize: 12, italic: true });
-
-                // Photo 2 (Droite) - si elle existe
-                if (photos[i+1]) {
-                    slide.addImage({ data: photos[i+1].img, x: 5.2, y: 0.8, w: 4.3, h: 3.2, sizing: { type: "contain" } });
-                    slide.addShape(pptx.ShapeType.rect, { x: 5.2, y: 4.1, w: 4.3, h: 1.2, fill: { color: "F2F2F7" } });
-                    slide.addText(photos[i+1].desc || "Observation 2", { x: 5.3, y: 4.2, w: 4.1, fontSize: 12, italic: true });
-                }
-            }
+        const code = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${title}</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: white; overflow: hidden; }
+        #side { width: 300px; background: #1C1C1E; border-right: 1px solid #38383A; display: flex; flex-direction: column; }
+        .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #2C2C2E; transition: 0.3s; }
+        .nav-btn.active { color: #D4AF37; background: #2C2C2E; font-weight: bold; border-left: 5px solid #D4AF37; }
+        #main { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .viewer img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 12px; }
+        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); color: white; border: none; padding: 20px; cursor: pointer; border-radius: 50%; font-size: 24px; }
+        .desc-box { padding: 30px; background: #FFFFFF; color: #000; border-top: 5px solid #D4AF37; min-height: 100px; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div id="side"><div style="padding:25px; font-weight:bold; color:#D4AF37; border-bottom:1px solid #38383A;">${title}</div><div id="menu"></div></div>
+    <div id="main"><div class="viewer" id="v"></div><div class="desc-box" id="t"></div></div>
+    <script>
+        const d = ${data};
+        let b = Object.keys(d)[0], i = 0;
+        function r(){
+            const m = document.getElementById('menu'); m.innerHTML = '';
+            Object.keys(d).forEach(k => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn' + (b === k ? ' active' : '');
+                btn.innerText = k;
+                btn.onclick = () => { b = k; i = 0; sh(); r(); };
+                m.appendChild(btn);
+            });
         }
-        pptx.writeFile({ fileName: projName + ".pptx" }).then(() => alert("PowerPoint groupé généré !"));
+        function sh(){
+            const v = document.getElementById('v'), items = d[b];
+            if (!items || items.length === 0) return;
+            v.innerHTML = '<img src="' + items[i].img + '">';
+            if (items.length > 1) {
+                v.innerHTML += '<button class="arr" style="left:20px" onclick="mv(-1)">❮</button>';
+                v.innerHTML += '<button class="arr" style="right:20px" onclick="mv(1)">❯</button>';
+            }
+            document.getElementById('t').innerText = items[i].desc || "Aucune observation technique.";
+        }
+        function mv(dir) { i = (i + dir + d[b].length) % d[b].length; sh(); }
+        r(); sh();
+    <\/script>
+</body>
+</html>`;
+
+        const blob = new Blob([code], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = title + ".html";
+        a.click();
     }
 </script>
 </body>
