@@ -75,7 +75,6 @@
 
         setTimeout(() => {
             const dataStr = JSON.stringify(diagnostic);
-            
             const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -85,20 +84,21 @@
     <style>
         :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
         body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--txt); overflow: hidden; }
-        #side { width: 300px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; }
+        #side { width: 300px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; z-index: 20; }
         .nav-btn { width: 100%; padding: 22px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #ffffff10; }
         .nav-btn.active { color: var(--gold); font-weight: 700; border-left: 5px solid var(--gold); background: rgba(255,255,255,0.05); }
         #main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; position: relative; }
-        /* MODIFICATION ICI : Images en taille maximale */
-        .viewer img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; border: 3px solid var(--gold); box-shadow: 0 20px 50px #000; }
-        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.8); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 24px; z-index: 10; }
-        .desc-box { padding: 30px; background: #050E24; border-top: 4px solid var(--gold); min-height: 120px; font-size: 1.1rem; line-height: 1.6; }
+        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding: 0; overflow: hidden; }
+        /* VERSION XXL : L'image prend toute la place possible */
+        .viewer img { width: 98%; height: 98%; object-fit: contain; border: 4px solid var(--gold); box-shadow: 0 30px 60px rgba(0,0,0,0.8); }
+        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 10; transition: 0.3s; }
+        .arr:hover { background: var(--gold); color: #000; }
+        .desc-box { padding: 40px; background: #050E24; border-top: 4px solid var(--gold); min-height: 150px; font-size: 1.3rem; line-height: 1.6; z-index: 20; }
     </style>
 </head>
 <body>
     <div id="side">
-        <div style="padding:25px; color:var(--gold); font-weight:700; text-transform:uppercase; border-bottom:1px solid #ffffff20">${title}</div>
+        <div style="padding:25px; color:var(--gold); font-weight:700; text-transform:uppercase; border-bottom:1px solid #ffffff20; letter-spacing: 1px;">${title}</div>
         <div id="menu"></div>
     </div>
     <div id="main"><div class="viewer" id="v"></div><div class="desc-box" id="t"></div></div>
@@ -120,10 +120,10 @@
             if(!items || items.length === 0) return;
             v.innerHTML = '<img src="' + items[i].img + '">';
             if (items.length > 1) {
-                v.innerHTML += '<button class="arr" style="left:30px" onclick="mv(-1)">❮</button>';
-                v.innerHTML += '<button class="arr" style="right:30px" onclick="mv(1)">❯</button>';
+                v.innerHTML += '<button class="arr" style="left:40px" onclick="mv(-1)">❮</button>';
+                v.innerHTML += '<button class="arr" style="right:40px" onclick="mv(1)">❯</button>';
             }
-            document.getElementById('t').innerHTML = '<strong style="color:#CCA43B">' + b + '</strong><br>' + (items[i].desc || "A compléter.");
+            document.getElementById('t').innerHTML = '<strong style="color:#CCA43B; font-size: 1.6rem;">' + b + '</strong><br>' + (items[i].desc || "Observation technique à compléter.");
         }
         function mv(dir) { i = (i + dir + d[b].length) % d[b].length; sh(); }
         window.addEventListener('DOMContentLoaded', () => { if(b) { r(); sh(); } });
@@ -131,9 +131,10 @@
 </body>
 </html>`;
 
-            const blob = new Blob([finalHTML], { type: 'text/html' });
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
+            a.href = url;
             a.download = title.replace(/ /g, '_') + ".html";
             a.click();
 
