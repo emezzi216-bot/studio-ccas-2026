@@ -2,10 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Édition Institutionnelle</title>
+    <title>Studio CCAS - Rapport Officiel Créteil</title>
     <style>
         :root { --royal-bg: #0A1A3C; --royal-panel: #142850; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --royal-text-light: #F4F7FD; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--royal-bg); color: #1C1C1E; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* HEADER STUDIO */
         header { background: var(--royal-panel); color: var(--royal-text-light); padding: 20px; text-align: center; border-bottom: 3px solid var(--royal-gold); z-index: 100; }
         #editor { flex: 1; padding: 40px; overflow-y: auto; max-width: 950px; margin: 0 auto; width: 100%; box-sizing: border-box; background: linear-gradient(to bottom, var(--royal-bg), #0d2249); }
         .royal-card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
@@ -15,7 +17,7 @@
         .btn { padding: 15px 35px; border-radius: 30px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; text-transform: uppercase; }
         .btn-royal { background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; }
 
-        /* ÉCRAN DE COURAGE */
+        /* OVERLAY COURAGE */
         #courage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(15px); color: var(--royal-gold); }
         #courage-photo { width: 350px; height: 350px; object-fit: cover; border-radius: 50%; border: 10px solid var(--royal-gold); box-shadow: 0 0 60px rgba(204, 164, 59, 0.4); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
@@ -55,7 +57,7 @@
         Array.from(input.files).forEach(file => {
             const reader = new FileReader();
             reader.onload = e => { diagnostic[nom].push({ img: e.target.result, desc: "" }); render(); };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(file); // UHD [cite: 2026-01-02]
         });
     }
 
@@ -85,61 +87,70 @@
     <style>
         :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
+        
         #side { width: 280px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; z-index: 100; }
         .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #ffffff10; }
         .nav-btn.active { color: var(--gold); font-weight: 700; border-left: 6px solid var(--gold); background: rgba(255,255,255,0.05); }
-        #main { flex: 1; display: flex; flex-direction: column; position: relative; background: #000; }
         
-        /* ZONE IMAGE CORRIGÉE */
-        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; background: #000; padding: 10px; }
-        .viewer img { 
-            max-width: 100%; max-height: 100%; /* L'image ne dépasse jamais */
-            object-fit: contain; /* L'image n'est jamais déformée */
-            border: 3px solid var(--gold); /* LE CADRE DORÉ */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            background: #050E24;
-        }
+        #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
         
-        /* LOGO CRÉTEIL CORRIGÉ */
-        .header-logo {
-            position: absolute; top: 25px; right: 25px; 
-            display: flex; flex-direction: column; align-items: flex-end; 
-            z-index: 200; pointer-events: none;
+        /* CADRE PHOTO FIXE ET ÉGAL */
+        .viewer-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; }
+        .photo-frame { 
+            width: 85%; height: 80%; 
+            border: 4px solid var(--gold); 
+            box-shadow: 0 0 50px rgba(0,0,0,0.8); 
+            background: #000; 
+            display: flex; align-items: center; justify-content: center; 
+            position: relative; overflow: hidden;
         }
-        /* Nom de fichier exact selon votre capture GitHub */
-        .header-logo img { width: 150px; height: auto; margin-bottom: 8px; }
-        .header-logo p { 
-            margin: 0; font-size: 0.7rem; color: var(--gold); text-align: right; 
-            font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-            max-width: 220px; line-height: 1.3;
-        }
+        .photo-frame img { width: 100%; height: 100%; object-fit: contain; }
 
-        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.6); color: var(--gold); border: 1px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 30px; z-index: 50; }
-        .desc-box { position: absolute; bottom: 0; left: 0; right: 0; padding: 35px 45px; background: rgba(5, 14, 36, 0.88); backdrop-filter: blur(15px); border-top: 3px solid var(--gold); z-index: 60; }
+        /* LOGO CRÉTEIL OFFICIEL */
+        .header-logo { position: absolute; top: 25px; right: 25px; display: flex; flex-direction: column; align-items: flex-end; z-index: 200; }
+        .header-logo img { width: 160px; height: auto; margin-bottom: 5px; }
+        .header-logo p { margin: 0; font-size: 0.7rem; color: var(--gold); text-align: right; font-weight: 600; text-transform: uppercase; max-width: 220px; }
+
+        /* FLÈCHES DE NAVIGATION FIXÉES AU CADRE */
+        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.8); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 28px; z-index: 210; transition: 0.3s; }
+        .arr:hover { background: var(--gold); color: #000; }
+        .arr-left { left: -35px; }
+        .arr-right { right: -35px; }
+
+        /* DESCRIPTION */
+        .desc-box { padding: 35px 45px; background: rgba(5, 14, 36, 0.95); border-top: 3px solid var(--gold); min-height: 120px; z-index: 100; }
         .desc-box h2 { margin: 0 0 10px 0; color: var(--gold); text-transform: uppercase; font-size: 1.5rem; }
         .desc-box p { margin: 0; font-size: 1.25rem; line-height: 1.5; font-weight: 300; }
     </style>
 </head>
 <body>
-    <div class="header-logo">
-        <img src="Logo_Créteil_Val_Marne.svg.png" alt="Ville de Créteil">
-        <p>Direction des Finances et des moyens Généraux du CCAS</p>
-    </div>
-
     <div id="side">
         <div style="padding:25px; color:var(--gold); font-weight:700; text-transform:uppercase; border-bottom:1px solid #ffffff20; font-size: 0.85rem;">${title}</div>
         <div id="menu"></div>
     </div>
+    
     <div id="main">
-        <div class="viewer" id="v"></div>
+        <div class="header-logo">
+            <img src="Logo_Créteil_Val_Marne.svg.png" alt="Créteil">
+            <p>Direction des Finances et des moyens Généraux du CCAS</p>
+        </div>
+        
+        <div class="viewer-container">
+            <div class="photo-frame" id="f">
+                <div id="v" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div>
+            </div>
+        </div>
+        
         <div class="desc-box">
             <h2 id="bti-name"></h2>
             <p id="t"></p>
         </div>
     </div>
+
     <script>
         const d = ${dataStr};
         let b = Object.keys(d)[0], i = 0;
+        
         function r(){
             const m = document.getElementById('menu'); m.innerHTML = '';
             Object.keys(d).forEach(k => {
@@ -150,17 +161,26 @@
                 m.appendChild(btn);
             });
         }
+        
         function sh(){
-            const v = document.getElementById('v'), items = d[b];
+            const v = document.getElementById('v'), f = document.getElementById('f'), items = d[b];
             if(!items || items.length === 0) return;
+            
+            // Nettoyage et injection de l'image UHD [cite: 2026-01-02]
             v.innerHTML = '<img src="' + items[i].img + '">';
+            
+            // Gestion des flèches par rapport au cadre
+            const oldArr = f.querySelectorAll('.arr'); oldArr.forEach(a => a.remove());
             if (items.length > 1) {
-                v.innerHTML += '<button class="arr" style="left:30px" onclick="mv(-1)">❮</button>';
-                v.innerHTML += '<button class="arr" style="right:30px" onclick="mv(1)">❯</button>';
+                const btnL = document.createElement('button'); btnL.className = 'arr arr-left'; btnL.innerHTML = '❮'; btnL.onclick = () => mv(-1);
+                const btnR = document.createElement('button'); btnR.className = 'arr arr-right'; btnR.innerHTML = '❯'; btnR.onclick = () => mv(1);
+                f.appendChild(btnL); f.appendChild(btnR);
             }
+            
             document.getElementById('bti-name').innerText = b;
-            document.getElementById('t').innerText = items[i].desc || "Aucune observation technique enregistrée.";
+            document.getElementById('t').innerText = items[i].desc || "Observation technique à compléter.";
         }
+        
         function mv(dir) { i = (i + dir + d[b].length) % d[b].length; sh(); }
         window.onload = () => { if(b) { r(); sh(); } };
     <\/script>
