@@ -2,19 +2,20 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Édition Royale</title>
+    <title>Studio CCAS - Édition Royale Full-Screen</title>
     <style>
         :root { --royal-bg: #0A1A3C; --royal-panel: #142850; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --royal-text-light: #F4F7FD; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--royal-bg); color: #1C1C1E; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { background: var(--royal-panel); color: var(--royal-text-light); padding: 25px; text-align: center; border-bottom: 3px solid var(--royal-gold); z-index: 100; }
+        header { background: var(--royal-panel); color: var(--royal-text-light); padding: 20px; text-align: center; border-bottom: 3px solid var(--royal-gold); z-index: 100; }
         #editor { flex: 1; padding: 40px; overflow-y: auto; max-width: 950px; margin: 0 auto; width: 100%; box-sizing: border-box; background: linear-gradient(to bottom, var(--royal-bg), #0d2249); }
-        .royal-card { background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
-        .photo-item { display: flex; gap: 20px; background: #F4F7FD; padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px solid #DAE3F0; position: relative; }
-        .photo-item img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
-        .footer { padding: 30px; background: var(--royal-panel); border-top: 3px solid var(--royal-gold); text-align: center; }
-        .btn { padding: 15px 40px; border-radius: 30px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
+        .royal-card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
+        .photo-item { display: flex; gap: 15px; background: #F4F7FD; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #DAE3F0; position: relative; }
+        .photo-item img { width: 120px; height: 80px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
+        .footer { padding: 25px; background: var(--royal-panel); border-top: 3px solid var(--royal-gold); text-align: center; }
+        .btn { padding: 15px 35px; border-radius: 30px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; text-transform: uppercase; }
         .btn-royal { background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; }
 
+        /* ÉCRAN DE COURAGE AVEC NOM DE FICHIER GITHUB RÉEL */
         #courage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(15px); color: var(--royal-gold); }
         #courage-photo { width: 350px; height: 350px; object-fit: cover; border-radius: 50%; border: 10px solid var(--royal-gold); box-shadow: 0 0 60px rgba(204, 164, 59, 0.4); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
@@ -34,7 +35,7 @@
 </div>
 
 <div class="footer">
-    <button class="btn btn-royal" onclick="lancerGeneration()">💾 GÉNÉRER LE FICHIER INTERACTIF</button>
+    <button class="btn btn-royal" onclick="lancerGeneration()">🚀 GÉNÉRER LE FICHIER PLEIN ÉCRAN</button>
 </div>
 
 <div id="courage-overlay">
@@ -63,7 +64,7 @@
         for (let b in diagnostic) {
             let h = `<div class="royal-card"><h2>${b}</h2><input type="file" multiple onchange="upload('${b}', this)">`;
             diagnostic[b].forEach((p, i) => {
-                h += `<div class="photo-item"><img src="${p.img}"><textarea style="flex:1; height:80px; margin-left:20px; padding:10px; border-radius:8px; border:1px solid #ddd;" onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Diagnostic technique...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="position:absolute; top:10px; right:10px; border:none; background:none; color:red; cursor:pointer;">×</button></div>`;
+                h += `<div class="photo-item"><img src="${p.img}"><textarea style="flex:1; height:60px; margin-left:15px; padding:10px; border-radius:8px; border:1px solid #ddd;" onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Diagnostic technique...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="position:absolute; top:10px; right:10px; border:none; background:none; color:red; cursor:pointer; font-size:1.2rem;">×</button></div>`;
             });
             list.innerHTML += h + `</div>`;
         }
@@ -83,25 +84,36 @@
     <title>${title}</title>
     <style>
         :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
-        body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--txt); overflow: hidden; }
-        #side { width: 300px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; z-index: 20; }
-        .nav-btn { width: 100%; padding: 22px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #ffffff10; }
-        .nav-btn.active { color: var(--gold); font-weight: 700; border-left: 5px solid var(--gold); background: rgba(255,255,255,0.05); }
-        #main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding: 0; overflow: hidden; }
-        /* VERSION XXL : L'image prend toute la place possible */
-        .viewer img { width: 98%; height: 98%; object-fit: contain; border: 4px solid var(--gold); box-shadow: 0 30px 60px rgba(0,0,0,0.8); }
-        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 10; transition: 0.3s; }
-        .arr:hover { background: var(--gold); color: #000; }
-        .desc-box { padding: 40px; background: #050E24; border-top: 4px solid var(--gold); min-height: 150px; font-size: 1.3rem; line-height: 1.6; z-index: 20; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
+        #side { width: 280px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; z-index: 100; }
+        .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #ffffff10; transition: 0.3s; }
+        .nav-btn.active { color: var(--gold); font-weight: 700; border-left: 6px solid var(--gold); background: rgba(255,255,255,0.05); }
+        #main { flex: 1; display: flex; flex-direction: column; position: relative; background: #000; }
+        
+        /* FULL SCREEN : L'image prend tout le reste de l'écran */
+        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; background: #000; }
+        .viewer img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.6); color: var(--gold); border: 1px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 30px; z-index: 50; backdrop-filter: blur(5px); }
+        
+        /* BANDEAU SEMI-TRANSPARENT EN BAS */
+        .desc-box { position: absolute; bottom: 0; left: 0; right: 0; padding: 30px 40px; background: rgba(5, 14, 36, 0.85); backdrop-filter: blur(15px); border-top: 3px solid var(--gold); z-index: 60; }
+        .desc-box h2 { margin: 0 0 10px 0; color: var(--gold); text-transform: uppercase; font-size: 1.4rem; }
+        .desc-box p { margin: 0; font-size: 1.2rem; line-height: 1.5; font-weight: 300; }
     </style>
 </head>
 <body>
     <div id="side">
-        <div style="padding:25px; color:var(--gold); font-weight:700; text-transform:uppercase; border-bottom:1px solid #ffffff20; letter-spacing: 1px;">${title}</div>
+        <div style="padding:25px; color:var(--gold); font-weight:700; text-transform:uppercase; border-bottom:1px solid #ffffff20; font-size: 0.9rem;">${title}</div>
         <div id="menu"></div>
     </div>
-    <div id="main"><div class="viewer" id="v"></div><div class="desc-box" id="t"></div></div>
+    <div id="main">
+        <div class="viewer" id="v"></div>
+        <div class="desc-box">
+            <h2 id="bti-name"></h2>
+            <p id="t"></p>
+        </div>
+    </div>
     <script>
         const d = ${dataStr};
         let b = Object.keys(d)[0], i = 0;
@@ -120,13 +132,14 @@
             if(!items || items.length === 0) return;
             v.innerHTML = '<img src="' + items[i].img + '">';
             if (items.length > 1) {
-                v.innerHTML += '<button class="arr" style="left:40px" onclick="mv(-1)">❮</button>';
-                v.innerHTML += '<button class="arr" style="right:40px" onclick="mv(1)">❯</button>';
+                v.innerHTML += '<button class="arr" style="left:30px" onclick="mv(-1)">❮</button>';
+                v.innerHTML += '<button class="arr" style="right:30px" onclick="mv(1)">❯</button>';
             }
-            document.getElementById('t').innerHTML = '<strong style="color:#CCA43B; font-size: 1.6rem;">' + b + '</strong><br>' + (items[i].desc || "Observation technique à compléter.");
+            document.getElementById('bti-name').innerText = b;
+            document.getElementById('t').innerText = items[i].desc || "Observation technique à compléter.";
         }
         function mv(dir) { i = (i + dir + d[b].length) % d[b].length; sh(); }
-        window.addEventListener('DOMContentLoaded', () => { if(b) { r(); sh(); } });
+        window.onload = () => { if(b) { r(); sh(); } };
     <\/script>
 </body>
 </html>`;
@@ -138,8 +151,8 @@
             a.download = title.replace(/ /g, '_') + ".html";
             a.click();
 
-            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3000);
-        }, 1000);
+            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3500);
+        }, 800);
     }
 </script>
 </body>
