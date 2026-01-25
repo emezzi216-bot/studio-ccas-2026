@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Édition Royale Full-Screen</title>
+    <title>Studio CCAS - Édition Institutionnelle</title>
     <style>
         :root { --royal-bg: #0A1A3C; --royal-panel: #142850; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --royal-text-light: #F4F7FD; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--royal-bg); color: #1C1C1E; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -15,7 +15,7 @@
         .btn { padding: 15px 35px; border-radius: 30px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; text-transform: uppercase; }
         .btn-royal { background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; }
 
-        /* ÉCRAN DE COURAGE AVEC NOM DE FICHIER GITHUB RÉEL */
+        /* ÉCRAN DE COURAGE */
         #courage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(15px); color: var(--royal-gold); }
         #courage-photo { width: 350px; height: 350px; object-fit: cover; border-radius: 50%; border: 10px solid var(--royal-gold); box-shadow: 0 0 60px rgba(204, 164, 59, 0.4); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
@@ -27,15 +27,15 @@
 
 <div id="editor">
     <div class="royal-card">
-        <label><strong>TITRE DU PROJET GLOBAL :</strong></label>
-        <input type="text" id="proj-title" placeholder="Ex: Plan Rafraîchissement 2026" style="width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ddd;">
+        <label><strong>TITRE DU PROJET (MAIRIE) :</strong></label>
+        <input type="text" id="proj-title" placeholder="Ex: Plan de Rafraîchissement 2026" style="width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ddd;">
     </div>
     <div id="main-list"></div>
     <div style="text-align:center;"><button class="btn" style="background:transparent; border:2px solid var(--royal-gold); color:var(--royal-gold);" onclick="addStructure()">+ AJOUTER UN BÂTIMENT</button></div>
 </div>
 
 <div class="footer">
-    <button class="btn btn-royal" onclick="lancerGeneration()">🚀 GÉNÉRER LE FICHIER PLEIN ÉCRAN</button>
+    <button class="btn btn-royal" onclick="lancerGeneration()">🚀 GÉNÉRER LE RAPPORT OFFICIEL</button>
 </div>
 
 <div id="courage-overlay">
@@ -55,7 +55,7 @@
         Array.from(input.files).forEach(file => {
             const reader = new FileReader();
             reader.onload = e => { diagnostic[nom].push({ img: e.target.result, desc: "" }); render(); };
-            reader.readAsDataURL(file); 
+            reader.readAsDataURL(file);
         });
     }
 
@@ -64,7 +64,7 @@
         for (let b in diagnostic) {
             let h = `<div class="royal-card"><h2>${b}</h2><input type="file" multiple onchange="upload('${b}', this)">`;
             diagnostic[b].forEach((p, i) => {
-                h += `<div class="photo-item"><img src="${p.img}"><textarea style="flex:1; height:60px; margin-left:15px; padding:10px; border-radius:8px; border:1px solid #ddd;" onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Diagnostic technique...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="position:absolute; top:10px; right:10px; border:none; background:none; color:red; cursor:pointer; font-size:1.2rem;">×</button></div>`;
+                h += `<div class="photo-item"><img src="${p.img}"><textarea style="flex:1; height:60px; margin-left:15px; padding:10px; border-radius:8px; border:1px solid #ddd;" onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Notes techniques...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="position:absolute; top:10px; right:10px; border:none; background:none; color:red; cursor:pointer;">×</button></div>`;
             });
             list.innerHTML += h + `</div>`;
         }
@@ -86,25 +86,40 @@
         :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
         #side { width: 280px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; z-index: 100; }
-        .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #ffffff10; transition: 0.3s; }
+        .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #ffffff10; }
         .nav-btn.active { color: var(--gold); font-weight: 700; border-left: 6px solid var(--gold); background: rgba(255,255,255,0.05); }
         #main { flex: 1; display: flex; flex-direction: column; position: relative; background: #000; }
         
-        /* FULL SCREEN : L'image prend tout le reste de l'écran */
         .viewer { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; background: #000; }
         .viewer img { width: 100%; height: 100%; object-fit: contain; }
         
-        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.6); color: var(--gold); border: 1px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 30px; z-index: 50; backdrop-filter: blur(5px); }
-        
-        /* BANDEAU SEMI-TRANSPARENT EN BAS */
-        .desc-box { position: absolute; bottom: 0; left: 0; right: 0; padding: 30px 40px; background: rgba(5, 14, 36, 0.85); backdrop-filter: blur(15px); border-top: 3px solid var(--gold); z-index: 60; }
-        .desc-box h2 { margin: 0 0 10px 0; color: var(--gold); text-transform: uppercase; font-size: 1.4rem; }
-        .desc-box p { margin: 0; font-size: 1.2rem; line-height: 1.5; font-weight: 300; }
+        /* LOGO CRÉTEIL FIXE EN HAUT À DROITE */
+        .header-logo {
+            position: absolute; top: 25px; right: 25px; 
+            display: flex; flex-direction: column; align-items: flex-end; 
+            z-index: 200; pointer-events: none;
+        }
+        .header-logo img { width: 150px; height: auto; margin-bottom: 8px; }
+        .header-logo p { 
+            margin: 0; font-size: 0.7rem; color: var(--gold); text-align: right; 
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+            max-width: 220px; line-height: 1.3;
+        }
+
+        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.6); color: var(--gold); border: 1px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 30px; z-index: 50; }
+        .desc-box { position: absolute; bottom: 0; left: 0; right: 0; padding: 35px 45px; background: rgba(5, 14, 36, 0.88); backdrop-filter: blur(15px); border-top: 3px solid var(--gold); z-index: 60; }
+        .desc-box h2 { margin: 0 0 10px 0; color: var(--gold); text-transform: uppercase; font-size: 1.5rem; }
+        .desc-box p { margin: 0; font-size: 1.25rem; line-height: 1.5; font-weight: 300; }
     </style>
 </head>
 <body>
+    <div class="header-logo">
+        <img src="Logo_Créteil_Val_Marne.svg" alt="Ville de Créteil">
+        <p>Direction des Finances et des moyens Généraux du CCAS</p>
+    </div>
+
     <div id="side">
-        <div style="padding:25px; color:var(--gold); font-weight:700; text-transform:uppercase; border-bottom:1px solid #ffffff20; font-size: 0.9rem;">${title}</div>
+        <div style="padding:25px; color:var(--gold); font-weight:700; text-transform:uppercase; border-bottom:1px solid #ffffff20; font-size: 0.85rem;">${title}</div>
         <div id="menu"></div>
     </div>
     <div id="main">
@@ -136,7 +151,7 @@
                 v.innerHTML += '<button class="arr" style="right:30px" onclick="mv(1)">❯</button>';
             }
             document.getElementById('bti-name').innerText = b;
-            document.getElementById('t').innerText = items[i].desc || "Observation technique à compléter.";
+            document.getElementById('t').innerText = items[i].desc || "Aucune observation technique enregistrée.";
         }
         function mv(dir) { i = (i + dir + d[b].length) % d[b].length; sh(); }
         window.onload = () => { if(b) { r(); sh(); } };
@@ -148,11 +163,11 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = title.replace(/ /g, '_') + ".html";
+            a.download = title.replace(/ /g, '_') + "_Officiel.html";
             a.click();
 
             setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3500);
-        }, 800);
+        }, 1000);
     }
 </script>
 </body>
