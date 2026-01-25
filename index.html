@@ -2,101 +2,172 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Rapport Pro PDF</title>
+    <title>Studio CCAS - Diagnostic Premium</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --ios-bg: #F2F2F7; --ios-gold: #B4941E; --ios-silver: #E5E5EA; --ios-text: #1C1C1E; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; }
-        header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); padding: 20px; text-align: center; border-bottom: 1px solid var(--ios-silver); z-index: 100; }
-        #editor { flex: 1; padding: 30px; overflow-y: auto; max-width: 850px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-        .ios-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(180, 148, 30, 0.2); }
-        .photo-entry { display: flex; gap: 15px; background: #F9F9FB; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid var(--ios-silver); }
-        .photo-entry img { width: 120px; height: 90px; object-fit: cover; border-radius: 10px; }
-        textarea { flex: 1; height: 80px; padding: 10px; border-radius: 10px; border: 1px solid #ddd; resize: none; font-size: 0.9rem; }
-        .footer { padding: 20px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
-        .btn { padding: 12px 25px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        .btn-gold { background: linear-gradient(145deg, #D4AF37, #B4941E); color: white; box-shadow: 0 4px 10px rgba(180, 148, 30, 0.3); }
+        :root {
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-gold: #D4AF37;
+            --ios-silver: #E5E5EA;
+            --ios-text: #1C1C1E;
+            --ios-gray: #8E8E93;
+        }
 
-        /* ZONE CACHÉE POUR LE RENDU DU PDF */
-        #pdf-template { display: none; width: 800px; color: black; background: white; }
-        .pdf-page { padding: 40px; page-break-after: always; min-height: 1000px; }
-        .pdf-title { color: #005596; border-bottom: 3px solid #D4AF37; padding-bottom: 10px; margin-bottom: 30px; }
-        .pdf-img { width: 100%; max-height: 500px; object-fit: contain; background: #f0f0f0; border-radius: 10px; }
-        .pdf-desc { margin-top: 20px; padding: 20px; border-left: 8px solid #005596; background: #f4f7f9; font-style: italic; font-size: 1.1rem; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; background: var(--ios-bg); color: var(--ios-text);
+            display: flex; flex-direction: column; height: 100vh;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
+            padding: 25px; text-align: center; border-bottom: 1px solid var(--ios-silver);
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        #editor {
+            flex: 1; padding: 30px; overflow-y: auto; max-width: 850px; margin: 0 auto; width: 100%; box-sizing: border-box;
+        }
+
+        .ios-card {
+            background: var(--ios-card); border-radius: 24px; padding: 25px; margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05); border: 1px solid rgba(212, 175, 55, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        h2 { color: var(--ios-gold); font-weight: 700; margin-top: 0; }
+
+        input[type="text"] {
+            width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--ios-silver);
+            font-size: 1.1rem; outline: none; margin-top: 10px;
+        }
+
+        .photo-entry {
+            display: flex; gap: 20px; background: #F9F9FB; padding: 20px; 
+            border-radius: 20px; margin-top: 15px; border: 1px solid var(--ios-silver);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .photo-entry img { width: 150px; height: 100px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        textarea {
+            flex: 1; height: 90px; padding: 12px; border-radius: 12px;
+            border: 1px solid var(--ios-silver); resize: none; font-family: inherit;
+        }
+
+        .footer { padding: 30px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
+        
+        .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn-gold { 
+            background: linear-gradient(135deg, #D4AF37, #B4942E); color: white; 
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        /* RENDU PDF (PROPRE & SANS INTERFACE) */
+        #pdf-render { display: none; background: white; width: 1000px; color: black; }
+        .pdf-page { padding: 50px; page-break-after: always; min-height: 1400px; }
+        .pdf-header { border-bottom: 5px solid #D4AF37; padding-bottom: 20px; margin-bottom: 40px; color: #005596; }
+        .pdf-img-box { width: 100%; height: 600px; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 15px; overflow: hidden; }
+        .pdf-img-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .pdf-desc { margin-top: 30px; padding: 25px; background: #F2F2F7; border-left: 10px solid #D4AF37; font-size: 1.3rem; font-style: italic; }
     </style>
 </head>
 <body>
 
-<header><h1>Studio Diagnostic CCAS</h1></header>
+<header>
+    <h1 style="margin:0; font-weight: 800; letter-spacing: -1px;">STUDIO DIAGNOSTIC PRO</h1>
+</header>
 
 <div id="editor">
     <div class="ios-card">
-        <label><strong>Titre du Rapport PDF :</strong></label>
-        <input type="text" id="report-title" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-top:10px;" placeholder="Ex: Diagnostic_Rafraichissement_2026">
+        <label><strong>Nom du Dossier (sera le nom du PDF) :</strong></label>
+        <input type="text" id="ppt-title" placeholder="Ex: Plan_Rafraichissement_2026">
     </div>
-    <div id="data-list"></div>
-    <div style="text-align:center;"><button class="btn" style="background:white; color:var(--ios-gold); border:1px solid var(--ios-gold);" onclick="addBati()">+ Ajouter un bâtiment</button></div>
+
+    <div id="structures-list"></div>
+
+    <div style="text-align:center;">
+        <button class="btn" style="background:white; color:var(--ios-gold); border: 1px solid var(--ios-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button>
+    </div>
 </div>
 
 <div class="footer">
-    <button class="btn btn-gold" onclick="generatePDF()">💾 GÉNÉRER LE RAPPORT PDF PRO</button>
+    <button class="btn btn-gold" onclick="generatePDF()">💾 GÉNÉRER LE RAPPORT PDF PRO (.pdf)</button>
 </div>
 
-<div id="pdf-template"></div>
+<div id="pdf-render"></div>
 
 <script>
-    let diagnostic = {};
+    let db = {};
 
     function addBati() {
-        const nom = prompt("Nom du bâtiment :");
-        if (nom) { diagnostic[nom] = []; render(); }
+        const nom = prompt("Nom de la structure (ex: Crèche Dolto) :");
+        if (nom) { db[nom] = []; render(); }
     }
 
     function upload(nom, input) {
-        Array.from(input.files).forEach(f => {
-            const r = new FileReader();
-            r.onload = e => { diagnostic[nom].push({ img: e.target.result, txt: "" }); render(); };
-            r.readAsDataURL(f); // UHD [cite: 2026-01-02]
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                db[nom].push({ img: e.target.result, txt: "" });
+                render();
+            };
+            reader.readAsDataURL(file); // UHD sans perte [cite: 2026-01-02]
         });
     }
 
     function render() {
-        const list = document.getElementById('data-list'); list.innerHTML = '';
-        for (let b in diagnostic) {
-            let h = `<div class="ios-card"><h3>${b}</h3><input type="file" multiple onchange="upload('${b}', this)" style="margin-bottom:10px;">`;
-            diagnostic[b].forEach((s, i) => {
-                h += `<div class="photo-entry"><img src="${s.img}"><textarea onchange="diagnostic['${b}'][${i}].txt=this.value" placeholder="Observations...">${s.txt}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="background:none; border:none; color:red; cursor:pointer;">×</button></div>`;
+        const list = document.getElementById('structures-list');
+        list.innerHTML = '';
+        for (let b in db) {
+            let h = `<div class="ios-card">
+                <h2>${b}</h2>
+                <input type="file" multiple onchange="upload('${b}', this)" style="margin-bottom:15px;">
+                <div id="imgs-${b}">`;
+            db[b].forEach((p, i) => {
+                h += `<div class="photo-entry">
+                    <img src="${p.img}">
+                    <textarea placeholder="Observations techniques..." onchange="db['${b}'][${i}].txt=this.value">${p.txt}</textarea>
+                    <button onclick="db['${b}'].splice(${i},1); render()" style="background:none; border:none; color:#FF3B30; cursor:pointer;">❌</button>
+                </div>`;
             });
-            list.innerHTML += h + `</div>`;
+            list.innerHTML += h + `</div></div>`;
         }
     }
 
     function generatePDF() {
-        const title = document.getElementById('report-title').value || "Diagnostic_CCAS";
-        const template = document.getElementById('pdf-template');
-        template.innerHTML = `<div class="pdf-page"><h1 style="font-size:3rem; text-align:center; margin-top:200px;">${title}</h1><h2 style="text-align:center; color:#666;">Rapport de Diagnostic Technique CCAS</h2></div>`;
-
-        for (let bati in diagnostic) {
-            diagnostic[bati].forEach(item => {
-                template.innerHTML += `
+        const filename = document.getElementById('ppt-title').value || "Diagnostic_CCAS";
+        const renderZone = document.getElementById('pdf-render');
+        
+        // On construit le rapport proprement
+        renderZone.innerHTML = `<div class="pdf-page"><h1 style="font-size:4rem; text-align:center; margin-top:300px; color:#005596;">${filename}</h1><h2 style="text-align:center; color:#D4AF37;">Rapport de Diagnostic CCAS</h2></div>`;
+        
+        for (let bati in db) {
+            db[bati].forEach(item => {
+                renderZone.innerHTML += `
                     <div class="pdf-page">
-                        <h2 class="pdf-title">${bati}</h2>
-                        <img src="${item.img}" class="pdf-img">
-                        <div class="pdf-desc">${item.txt || "Aucune observation technique enregistrée."}</div>
+                        <div class="pdf-header"><h1>${bati}</h1></div>
+                        <div class="pdf-img-box"><img src="${item.img}"></div>
+                        <div class="pdf-desc">${item.txt || "Aucun diagnostic technique saisi."}</div>
                     </div>`;
             });
         }
 
+        // Configuration pour éviter les pages blanches
         const opt = {
             margin: 0,
-            filename: title + '.pdf',
+            filename: filename + '.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
+            html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
         };
 
-        html2pdf().set(opt).from(template).save().then(() => {
-            alert("Votre rapport PDF a été généré avec succès !");
+        alert("Fabrication du PDF en cours... Patientez quelques secondes.");
+        html2pdf().set(opt).from(renderZone).save().then(() => {
+            alert("Rapport PDF téléchargé !");
         });
     }
 </script>
