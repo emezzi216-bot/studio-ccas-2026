@@ -2,37 +2,31 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Créateur PowerPoint Premium</title>
+    <title>Studio CCAS - PowerPoint Premium</title>
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <style>
-        :root { --ios-bg: #F2F2F7; --ios-gold: #D4AF37; --ios-silver: #E5E5EA; --ios-card: #FFFFFF; --ios-text: #1C1C1E; }
-        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* DESIGN ÉDITEUR (iOS Luxury) */
-        header { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); padding: 25px; text-align: center; border-bottom: 1px solid var(--ios-silver); z-index: 100; }
+        :root { --ios-bg: #F2F2F7; --ios-gold: #D4AF37; --ios-silver: #E5E5EA; --ios-text: #1C1C1E; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); padding: 25px; text-align: center; border-bottom: 1px solid var(--ios-silver); }
         #editor { flex: 1; padding: 40px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-        .ios-card { background: white; border-radius: 24px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); border: 1px solid rgba(212, 175, 55, 0.2); transition: 0.3s; }
-        h2 { color: var(--ios-gold); font-size: 1.3rem; margin: 0 0 15px 0; font-weight: 700; }
-        input[type="text"] { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--ios-silver); font-size: 1.1rem; outline: none; box-sizing: border-box; }
-        
+        .ios-card { background: white; border-radius: 24px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); border: 1px solid rgba(212, 175, 55, 0.2); }
+        input[type="text"] { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--ios-silver); font-size: 1.1rem; outline: none; margin-top: 10px; }
         .photo-item { display: flex; gap: 20px; background: #F9F9FB; padding: 20px; border-radius: 20px; margin-top: 20px; align-items: flex-start; border: 1px solid var(--ios-silver); }
-        .photo-item img { width: 160px; height: 110px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .photo-item img { width: 160px; height: 110px; object-fit: cover; border-radius: 12px; }
         textarea { flex: 1; height: 100px; padding: 15px; border-radius: 14px; border: 1px solid var(--ios-silver); resize: none; font-family: inherit; font-size: 1rem; }
-
         .footer { padding: 30px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
         .btn { padding: 16px 35px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; }
         .btn-gold { background: linear-gradient(135deg, #D4AF37, #B4942E); color: white; box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3); }
-        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(212, 175, 55, 0.5); }
     </style>
 </head>
 <body>
 
-<header><h1 style="margin:0; font-weight:800; letter-spacing:-1px;">STUDIO DIAGNOSTIC CCAS</h1></header>
+<header><h1 style="margin:0; font-weight:800;">STUDIO DIAGNOSTIC CCAS</h1></header>
 
 <div id="editor">
     <div class="ios-card">
-        <label><strong>Nom de la présentation PowerPoint :</strong></label>
-        <input type="text" id="ppt-title" placeholder="Ex: Plan_Rafraichissement_2026_Creteil">
+        <label><strong>Titre de la présentation :</strong></label>
+        <input type="text" id="ppt-title" placeholder="Ex: Plan_Rafraichissement_2026">
     </div>
     <div id="structures-list"></div>
     <div style="text-align:center;"><button class="btn" style="background:white; color:var(--ios-gold); border:1px solid var(--ios-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button></div>
@@ -61,7 +55,7 @@
         for (let b in diagnostic) {
             let h = `<div class="ios-card"><h2>${b}</h2><input type="file" multiple onchange="upload('${b}', this)" style="margin-bottom:15px;">`;
             diagnostic[b].forEach((p, i) => {
-                h += `<div class="photo-item"><img src="${p.img}"><textarea onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Description technique...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="background:none; border:none; color:red; cursor:pointer; font-size:1.5rem;">×</button></div>`;
+                h += `<div class="photo-item"><img src="${p.img}"><textarea onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Diagnostic technique...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="background:none; border:none; color:red; cursor:pointer; font-size:1.5rem;">×</button></div>`;
             });
             list.innerHTML += h + `</div>`;
         }
@@ -73,21 +67,22 @@
         
         // Page de Garde
         let slideGarde = pptx.addSlide();
-        slideGarde.background = { fill: "F2F2F7" };
         slideGarde.addText(filename.replace(/_/g, ' '), { x: 1, y: 2, w: "80%", fontSize: 36, color: "005596", bold: true, align: "center" });
-        slideGarde.addText("Rapport de Diagnostic - CCAS 2026", { x: 1, y: 3, w: "80%", fontSize: 18, color: "D4AF37", align: "center" });
 
         for (let bati in diagnostic) {
             diagnostic[bati].forEach(item => {
                 let slide = pptx.addSlide();
+                // Bandeau titre Or
                 slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: "100%", h: 0.7, fill: { color: "D4AF37" } });
                 slide.addText(bati, { x: 0.5, y: 0.15, fontSize: 22, color: "FFFFFF", bold: true });
-                slide.addImage({ data: item.img, x: 0.5, y: 1, w: 9, h: 4.5, sizing: { type: "contain" } }); // UHD respecté [cite: 2026-01-02]
+                // Photo UHD (centrée)
+                slide.addImage({ data: item.img, x: 0.5, y: 1, w: 9, h: 4.5, sizing: { type: "contain" } });
+                // Description technique
                 slide.addShape(pptx.ShapeType.rect, { x: 0, y: 5.7, w: "100%", h: 1.8, fill: { color: "F2F2F7" } });
-                slide.addText(item.desc || "Aucune observation technique.", { x: 0.7, y: 5.9, w: 8.6, fontSize: 14, color: "1C1C1E", italic: true });
+                slide.addText(item.desc || "Aucune observation.", { x: 0.7, y: 5.9, w: 8.6, fontSize: 14, color: "1C1C1E", italic: true });
             });
         }
-        pptx.writeFile({ fileName: filename + ".pptx" }).then(() => alert("PowerPoint généré !"));
+        pptx.writeFile({ fileName: filename + ".pptx" }).then(() => alert("Le fichier PowerPoint est prêt !"));
     }
 </script>
 </body>
