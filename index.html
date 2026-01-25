@@ -54,7 +54,7 @@
         Array.from(input.files).forEach(file => {
             const reader = new FileReader();
             reader.onload = e => { diagnostic[nom].push({ img: e.target.result, desc: "" }); render(); };
-            reader.readAsDataURL(file); // UHD [cite: 2026-01-02]
+            reader.readAsDataURL(file); 
         });
     }
 
@@ -75,7 +75,9 @@
 
         setTimeout(() => {
             const dataStr = JSON.stringify(diagnostic);
-            const finalHTML = `<!DOCTYPE html>
+            
+            const htmlContent = `
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -87,8 +89,9 @@
         .nav-btn { width: 100%; padding: 22px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #ffffff10; }
         .nav-btn.active { color: var(--gold); font-weight: 700; border-left: 5px solid var(--gold); background: rgba(255,255,255,0.05); }
         #main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
-        .viewer img { max-width: 95%; max-height: 95%; object-fit: contain; border: 3px solid var(--gold); box-shadow: 0 20px 50px #000; }
+        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; position: relative; }
+        /* MODIFICATION ICI : Images en taille maximale */
+        .viewer img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; border: 3px solid var(--gold); box-shadow: 0 20px 50px #000; }
         .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.8); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 24px; z-index: 10; }
         .desc-box { padding: 30px; background: #050E24; border-top: 4px solid var(--gold); min-height: 120px; font-size: 1.1rem; line-height: 1.6; }
     </style>
@@ -133,7 +136,8 @@
             a.href = URL.createObjectURL(blob);
             a.download = title.replace(/ /g, '_') + ".html";
             a.click();
-            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 4000);
+
+            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3000);
         }, 1000);
     }
 </script>
