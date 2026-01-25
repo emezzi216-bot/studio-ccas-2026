@@ -2,104 +2,92 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Rapport Diagnostic Pro</title>
+    <title>Studio CCAS - Créateur PowerPoint Premium</title>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <style>
-        :root { --ios-bg: #F2F2F7; --ios-gold: #B4941E; --ios-silver: #E5E5EA; --ios-card: #FFFFFF; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--ios-bg); color: #1C1C1E; display: flex; flex-direction: column; height: 100vh; }
+        :root { --ios-bg: #F2F2F7; --ios-gold: #D4AF37; --ios-silver: #E5E5EA; --ios-card: #FFFFFF; --ios-text: #1C1C1E; }
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--ios-bg); color: var(--ios-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* DESIGN ÉDITEUR (Style iOS) */
-        header { background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); padding: 20px; text-align: center; border-bottom: 1px solid var(--ios-silver); }
-        #setup { flex: 1; padding: 30px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; }
-        .ios-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(180, 148, 30, 0.2); }
-        .row { display: flex; gap: 20px; background: #F9F9FB; padding: 20px; border-radius: 15px; margin-top: 15px; align-items: flex-start; border: 1px solid var(--ios-silver); }
-        .row img { width: 150px; height: 100px; object-fit: cover; border-radius: 10px; }
-        textarea { flex: 1; height: 90px; padding: 12px; border-radius: 10px; border: 1px solid #ddd; resize: none; font-family: inherit; }
-        .footer { padding: 25px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
-        .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; }
-        .btn-gold { background: linear-gradient(135deg, #D4AF37, #B4941E); color: white; box-shadow: 0 8px 20px rgba(180, 148, 30, 0.3); }
+        /* DESIGN ÉDITEUR (iOS Luxury) */
+        header { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); padding: 25px; text-align: center; border-bottom: 1px solid var(--ios-silver); z-index: 100; }
+        #editor { flex: 1; padding: 40px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .ios-card { background: white; border-radius: 24px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); border: 1px solid rgba(212, 175, 55, 0.2); transition: 0.3s; }
+        h2 { color: var(--ios-gold); font-size: 1.3rem; margin: 0 0 15px 0; font-weight: 700; }
+        input[type="text"] { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--ios-silver); font-size: 1.1rem; outline: none; box-sizing: border-box; }
+        
+        .photo-item { display: flex; gap: 20px; background: #F9F9FB; padding: 20px; border-radius: 20px; margin-top: 20px; align-items: flex-start; border: 1px solid var(--ios-silver); }
+        .photo-item img { width: 160px; height: 110px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        textarea { flex: 1; height: 100px; padding: 15px; border-radius: 14px; border: 1px solid var(--ios-silver); resize: none; font-family: inherit; font-size: 1rem; }
 
-        /* ZONE PDF (INVISIBLE À L'ÉCRAN, VISIBLE À L'IMPRESSION) */
-        #printable-diagnostic { display: none; }
-
-        @media print {
-            /* On cache tout l'éditeur */
-            body * { display: none !important; }
-            /* On affiche uniquement le rapport pro */
-            #printable-diagnostic { display: block !important; background: white; width: 100%; }
-            .pdf-page { height: 95vh; page-break-after: always; padding: 40px; display: flex; flex-direction: column; color: black; }
-            .pdf-header { font-size: 2.2rem; color: #005596; border-bottom: 5px solid #D4AF37; margin-bottom: 30px; font-weight: bold; }
-            .pdf-img-container { flex: 1; background: #000; border-radius: 15px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-            .pdf-img-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
-            .pdf-desc { margin-top: 30px; padding: 25px; background: #F2F2F7; border-left: 12px solid #D4AF37; font-size: 1.3rem; font-style: italic; line-height: 1.4; }
-        }
+        .footer { padding: 30px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
+        .btn { padding: 16px 35px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn-gold { background: linear-gradient(135deg, #D4AF37, #B4942E); color: white; box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3); }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(212, 175, 55, 0.5); }
     </style>
 </head>
 <body>
 
-<header><h1>STUDIO DIAGNOSTIC CCAS 2026</h1></header>
+<header><h1 style="margin:0; font-weight:800; letter-spacing:-1px;">STUDIO DIAGNOSTIC CCAS</h1></header>
 
-<div id="setup">
+<div id="editor">
     <div class="ios-card">
-        <label><strong>Titre du Rapport :</strong></label>
-        <input type="text" id="diag-title" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-top:10px;" placeholder="Ex: Plan_Rafraichissement_2026">
+        <label><strong>Nom de la présentation PowerPoint :</strong></label>
+        <input type="text" id="ppt-title" placeholder="Ex: Plan_Rafraichissement_2026_Creteil">
     </div>
-    <div id="bati-list"></div>
-    <div style="text-align:center;"><button class="btn" style="background:white; color:var(--ios-gold); border: 1px solid var(--ios-gold);" onclick="addBati()">+ Ajouter un bâtiment</button></div>
+    <div id="structures-list"></div>
+    <div style="text-align:center;"><button class="btn" style="background:white; color:var(--ios-gold); border:1px solid var(--ios-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button></div>
 </div>
 
-<div class="footer">
-    <button class="btn btn-gold" onclick="preparerEtImprimer()">💾 GÉNÉRER LE RAPPORT PDF PRO</button>
-</div>
-
-<div id="printable-diagnostic"></div>
+<div class="footer"><button class="btn btn-gold" onclick="generatePPTX()">💾 GÉNÉRER LE POWERPOINT PRO (.pptx)</button></div>
 
 <script>
-    let db = {};
+    let diagnostic = {};
 
     function addBati() {
-        const n = prompt("Nom du bâtiment :");
-        if (n) { db[n] = []; render(); }
+        const nom = prompt("Nom du bâtiment :");
+        if (nom) { diagnostic[nom] = []; render(); }
     }
 
-    function upload(n, input) {
-        Array.from(input.files).forEach(f => {
-            const r = new FileReader();
-            r.onload = e => { db[n].push({ img: e.target.result, txt: "" }); render(); };
-            r.readAsDataURL(f); // UHD [cite: 2026-01-02]
+    function upload(nom, input) {
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => { diagnostic[nom].push({ img: e.target.result, desc: "" }); render(); };
+            reader.readAsDataURL(file); // UHD [cite: 2026-01-02]
         });
     }
 
     function render() {
-        const list = document.getElementById('bati-list'); list.innerHTML = '';
-        for (let b in db) {
-            let h = `<div class="ios-card"><h3>${b}</h3><input type="file" multiple onchange="upload('${b}', this)" style="margin-bottom:15px;">`;
-            db[b].forEach((s, i) => {
-                h += `<div class="row"><img src="${s.img}"><textarea onchange="db['${b}'][${i}].txt=this.value" placeholder="Description technique de la photo...">${s.txt}</textarea></div>`;
+        const list = document.getElementById('structures-list'); list.innerHTML = '';
+        for (let b in diagnostic) {
+            let h = `<div class="ios-card"><h2>${b}</h2><input type="file" multiple onchange="upload('${b}', this)" style="margin-bottom:15px;">`;
+            diagnostic[b].forEach((p, i) => {
+                h += `<div class="photo-item"><img src="${p.img}"><textarea onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Description technique...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="background:none; border:none; color:red; cursor:pointer; font-size:1.5rem;">×</button></div>`;
             });
             list.innerHTML += h + `</div>`;
         }
     }
 
-    function preparerEtImprimer() {
-        const title = document.getElementById('diag-title').value || "Diagnostic_CCAS";
-        const printZone = document.getElementById('printable-diagnostic');
-        printZone.innerHTML = ''; 
+    function generatePPTX() {
+        const filename = document.getElementById('ppt-title').value || "Diagnostic_CCAS";
+        let pptx = new PptxGenJS();
+        
+        // Page de Garde
+        let slideGarde = pptx.addSlide();
+        slideGarde.background = { fill: "F2F2F7" };
+        slideGarde.addText(filename.replace(/_/g, ' '), { x: 1, y: 2, w: "80%", fontSize: 36, color: "005596", bold: true, align: "center" });
+        slideGarde.addText("Rapport de Diagnostic - CCAS 2026", { x: 1, y: 3, w: "80%", fontSize: 18, color: "D4AF37", align: "center" });
 
-        // Création des pages (une par photo)
-        for (let bati in db) {
-            db[bati].forEach(item => {
-                printZone.innerHTML += `
-                    <div class="pdf-page">
-                        <div class="pdf-header">${bati}</div>
-                        <div class="pdf-img-container"><img src="${item.img}"></div>
-                        <div class="pdf-desc">${item.txt || "Aucun diagnostic technique saisi."}</div>
-                    </div>`;
+        for (let bati in diagnostic) {
+            diagnostic[bati].forEach(item => {
+                let slide = pptx.addSlide();
+                slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: "100%", h: 0.7, fill: { color: "D4AF37" } });
+                slide.addText(bati, { x: 0.5, y: 0.15, fontSize: 22, color: "FFFFFF", bold: true });
+                slide.addImage({ data: item.img, x: 0.5, y: 1, w: 9, h: 4.5, sizing: { type: "contain" } }); // UHD respecté [cite: 2026-01-02]
+                slide.addShape(pptx.ShapeType.rect, { x: 0, y: 5.7, w: "100%", h: 1.8, fill: { color: "F2F2F7" } });
+                slide.addText(item.desc || "Aucune observation technique.", { x: 0.7, y: 5.9, w: 8.6, fontSize: 14, color: "1C1C1E", italic: true });
             });
         }
-        
-        // On lance l'imprimante système (Sauvegarde PDF)
-        document.title = title;
-        window.print();
+        pptx.writeFile({ fileName: filename + ".pptx" }).then(() => alert("PowerPoint généré !"));
     }
 </script>
 </body>
