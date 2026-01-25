@@ -4,50 +4,20 @@
     <meta charset="UTF-8">
     <title>Studio CCAS - Édition Royale</title>
     <style>
-        :root { 
-            --royal-bg: #0A1A3C; --royal-panel: #142850; --royal-gold: #CCA43B; 
-            --royal-gold-light: #E5C365; --royal-text-light: #F4F7FD; --royal-text-dark: #0A1A3C; 
-            --card-bg: #FFFFFF; 
-        }
-        body { 
-            font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--royal-bg); 
-            color: var(--royal-text-dark); display: flex; flex-direction: column; 
-            height: 100vh; overflow: hidden; 
-        }
-        header { 
-            background: var(--royal-panel); color: var(--royal-text-light); 
-            padding: 25px; text-align: center; border-bottom: 3px solid var(--royal-gold); 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 100; 
-        }
-        #editor { 
-            flex: 1; padding: 40px; overflow-y: auto; max-width: 950px; margin: 0 auto; 
-            width: 100%; box-sizing: border-box; background: linear-gradient(to bottom, var(--royal-bg), #0d2249); 
-        }
-        .royal-card { 
-            background: var(--card-bg); border-radius: 12px; padding: 30px; margin-bottom: 30px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); 
-        }
-        .photo-item { 
-            display: flex; gap: 20px; background: #F4F7FD; padding: 20px; 
-            border-radius: 10px; margin-top: 20px; align-items: flex-start; border: 1px solid #DAE3F0; 
-        }
+        :root { --royal-bg: #0A1A3C; --royal-panel: #142850; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --royal-text-light: #F4F7FD; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--royal-bg); color: #0A1A3C; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { background: var(--royal-panel); color: var(--royal-text-light); padding: 25px; text-align: center; border-bottom: 3px solid var(--royal-gold); z-index: 100; }
+        #editor { flex: 1; padding: 40px; overflow-y: auto; max-width: 950px; margin: 0 auto; width: 100%; box-sizing: border-box; background: linear-gradient(to bottom, var(--royal-bg), #0d2249); }
+        .royal-card { background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
+        .photo-item { display: flex; gap: 20px; background: #F4F7FD; padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px solid #DAE3F0; }
         .photo-item img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
         .footer { padding: 30px; background: var(--royal-panel); border-top: 3px solid var(--royal-gold); text-align: center; }
         .btn { padding: 15px 40px; border-radius: 30px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
-        .btn-royal { background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: var(--royal-bg); }
+        .btn-royal { background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; box-shadow: 0 5px 15px rgba(204, 164, 59, 0.4); }
 
         /* ÉCRAN DE COURAGE */
-        #courage-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 26, 60, 0.98); display: none;
-            flex-direction: column; align-items: center; justify-content: center;
-            z-index: 2000; backdrop-filter: blur(15px); color: var(--royal-gold);
-        }
-        #courage-photo {
-            width: 350px; height: 350px; object-fit: cover; border-radius: 50%;
-            border: 10px solid var(--royal-gold); box-shadow: 0 0 60px rgba(204, 164, 59, 0.4);
-            animation: pulse 2s infinite;
-        }
+        #courage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(15px); color: var(--royal-gold); }
+        #courage-photo { width: 350px; height: 350px; object-fit: cover; border-radius: 50%; border: 10px solid var(--royal-gold); box-shadow: 0 0 60px rgba(204, 164, 59, 0.4); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
     </style>
 </head>
@@ -102,27 +72,74 @@
 
     function lancerGeneration() {
         const title = document.getElementById('proj-title').value || "Diagnostic_CCAS";
-        const overlay = document.getElementById('courage-overlay');
-        overlay.style.display = 'flex';
+        document.getElementById('courage-overlay').style.display = 'flex';
 
         setTimeout(() => {
             const dataStr = JSON.stringify(diagnostic);
             
-            // Le code est construit en morceaux pour éviter les erreurs de "Template Literals"
-            const head = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>:root{--bg:#0A1A3C;--gold:#CCA43B;--txt:#F4F7FD}body{font-family:sans-serif;margin:0;display:flex;height:100vh;background:var(--bg);color:var(--txt);overflow:hidden}#side{width:300px;background:#050E24;border-right:2px solid var(--gold);display:flex;flex-direction:column}.nav-btn{width:100%;padding:20px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #ffffff10}.nav-btn.active{color:var(--gold);font-weight:700;border-left:5px solid var(--gold)}#main{flex:1;display:flex;flex-direction:column;position:relative}.viewer{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}.viewer img{max-width:95%;max-height:95%;object-fit:contain;border:3px solid var(--gold);box-shadow:0 20px 50px #000}.desc-box{padding:30px;background:#050E24;border-top:4px solid var(--gold);min-height:100px;font-size:1.1rem;line-height:1.6}</style></head><body>`;
-            
-            const body = `<div id="side"><div style="padding:25px;color:var(--gold);font-weight:700;text-transform:uppercase;border-bottom:1px solid #ffffff20">${title}</div><div id="menu"></div></div><div id="main"><div class="viewer" id="v"></div><div class="desc-box" id="t"></div></div>`;
-            
-            const script = `<script>const d = ${dataStr}; let b=Object.keys(d)[0], i=0; function r(){ const m=document.getElementById('menu'); m.innerHTML=''; Object.keys(d).forEach(k=>{ const btn=document.createElement('button'); btn.className='nav-btn'+(b===k?' active':''); btn.innerText=k; btn.onclick=()=>{b=k;i=0;sh();r()}; m.appendChild(btn) }) } function sh(){ const v=document.getElementById('v'), items=d[b]; if(!items||items.length===0)return; v.innerHTML='<img src="'+items[i].img+'">'; document.getElementById('t').innerHTML='<strong style="color:#CCA43B">'+b+'</strong><br>'+(items[i].desc||"A compléter."); } r(); sh(); <\/script></body></html>`;
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${title}</title>
+    <style>
+        :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
+        body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--txt); overflow: hidden; }
+        #side { width: 300px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; }
+        .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #ffffff10; }
+        .nav-btn.active { color: var(--gold); font-weight: 700; border-left: 5px solid var(--gold); background: rgba(255,255,255,0.05); }
+        #main { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .viewer img { max-width: 95%; max-height: 95%; object-fit: contain; border: 3px solid var(--gold); box-shadow: 0 20px 50px #000; }
+        .desc-box { padding: 30px; background: #050E24; border-top: 4px solid var(--gold); min-height: 120px; font-size: 1.1rem; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div id="side">
+        <div style="padding:25px; color:var(--gold); font-weight:700; text-transform:uppercase; border-bottom:1px solid #ffffff20">${title}</div>
+        <div id="menu"></div>
+    </div>
+    <div id="main">
+        <div class="viewer" id="v"></div>
+        <div class="desc-box" id="t"></div>
+    </div>
+    <script>
+        const d = ${dataStr};
+        let b = Object.keys(d)[0], i = 0;
+        
+        function r(){
+            const m = document.getElementById('menu');
+            m.innerHTML = '';
+            Object.keys(d).forEach(k => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn' + (b === k ? ' active' : '');
+                btn.innerText = k;
+                btn.onclick = () => { b = k; i = 0; sh(); r(); };
+                m.appendChild(btn);
+            });
+        }
+        
+        function sh(){
+            const v = document.getElementById('v'), items = d[b];
+            if(!items || items.length === 0) return;
+            v.innerHTML = '<img src="' + items[i].img + '">';
+            document.getElementById('t').innerHTML = '<strong style="color:#CCA43B">' + b + '</strong><br>' + (items[i].desc || "Observation technique à compléter.");
+        }
+        
+        window.onload = () => { r(); sh(); };
+    <\/script>
+</body>
+</html>`;
 
-            const finalHTML = head + body + script;
-            const blob = new Blob([finalHTML], { type: 'text/html' });
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
+            a.href = url;
             a.download = title.replace(/ /g, '_') + ".html";
             a.click();
 
-            setTimeout(() => { overlay.style.display = 'none'; }, 3000);
+            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3000);
         }, 1000);
     }
 </script>
