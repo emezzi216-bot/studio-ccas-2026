@@ -2,38 +2,97 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Diagnostic Interactif</title>
+    <title>Studio CCAS - Édition Royale</title>
     <style>
-        :root { --ios-bg: #F2F2F7; --ios-gold: #D4AF37; --ios-silver: #E5E5EA; --ios-card: #FFFFFF; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--ios-bg); color: #1C1C1E; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        header { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); padding: 20px; text-align: center; border-bottom: 1px solid var(--ios-silver); z-index: 100; }
-        #editor { flex: 1; padding: 30px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-        
-        .ios-card { background: white; border-radius: 24px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(212, 175, 55, 0.1); }
-        .photo-item { display: flex; gap: 15px; background: #F9F9FB; padding: 15px; border-radius: 18px; margin-top: 15px; border: 1px solid var(--ios-silver); align-items: center; }
-        .photo-item img { width: 120px; height: 90px; object-fit: cover; border-radius: 10px; }
-        textarea { flex: 1; height: 70px; border-radius: 10px; border: 1px solid var(--ios-silver); padding: 10px; font-size: 0.9rem; resize: none; }
+        /* NOUVELLE PALETTE DE COULEURS : BLEU NUIT ROI & OR */
+        :root {
+            --royal-bg: #0A1A3C;       /* Fond Bleu Nuit profond */
+            --royal-panel: #142850;    /* Bleu légèrement plus clair pour les panneaux */
+            --royal-gold: #CCA43B;     /* Or riche */
+            --royal-gold-light: #E5C365; /* Or clair pour dégradés */
+            --royal-text-light: #F4F7FD; /* Blanc cassé pour texte sur fond fonce */
+            --royal-text-dark: #0A1A3C;  /* Bleu nuit pour texte sur fond clair */
+            --card-bg: #FFFFFF;        /* Cartes blanches pour contraste net */
+        }
 
-        .footer { padding: 25px; background: white; border-top: 1px solid var(--ios-silver); text-align: center; }
-        .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; }
-        .btn-gold { background: linear-gradient(135deg, #D4AF37, #B4942E); color: white; box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3); }
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+            margin: 0; background: var(--royal-bg); color: var(--royal-text-dark);
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+        }
+
+        /* Header Elegant */
+        header {
+            background: var(--royal-panel); color: var(--royal-text-light);
+            padding: 25px; text-align: center; border-bottom: 3px solid var(--royal-gold);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 100;
+        }
+        h1 { margin:0; font-weight:300; letter-spacing: 1px; text-transform: uppercase; }
+        strong { color: var(--royal-gold); font-weight: 600; }
+
+        /* Zone Éditeur */
+        #editor {
+            flex: 1; padding: 40px; overflow-y: auto; max-width: 950px; margin: 0 auto; width: 100%; box-sizing: border-box;
+            /* Fond subtil pour l'éditeur */
+            background: linear-gradient(to bottom, var(--royal-bg), #0d2249);
+        }
+
+        /* Cartes "Royales" */
+        .royal-card {
+            background: var(--card-bg); border-radius: 12px; padding: 30px; margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold);
+        }
+        
+        h2 { color: var(--royal-text-dark); margin-top: 0; font-weight: 600; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+
+        input[type="text"], textarea {
+            width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #E0E6F0;
+            font-size: 1rem; outline: none; margin-top: 10px; box-sizing: border-box; transition: 0.3s; color: var(--royal-text-dark);
+        }
+        input[type="text"]:focus, textarea:focus { border-color: var(--royal-gold); background: #FFFCF2; }
+
+        /* Items Photos */
+        .photo-item {
+            display: flex; gap: 20px; background: #F4F7FD; padding: 20px; 
+            border-radius: 10px; margin-top: 20px; align-items: flex-start;
+            border: 1px solid #DAE3F0;
+        }
+        .photo-item img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
+        textarea { flex: 1; height: 80px; resize: none; font-family: inherit; }
+
+        /* Footer et Boutons */
+        .footer { padding: 30px; background: var(--royal-panel); border-top: 3px solid var(--royal-gold); text-align: center; }
+        
+        .btn { padding: 15px 40px; border-radius: 30px; border: none; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 1.1rem; letter-spacing: 0.5px; }
+        .btn-royal {
+            background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: var(--royal-bg);
+            box-shadow: 0 5px 15px rgba(204, 164, 59, 0.4);
+        }
+        .btn-royal:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(204, 164, 59, 0.6); }
+        .btn-add { background: transparent; border: 2px solid var(--royal-gold); color: var(--royal-gold); }
+        .btn-add:hover { background: var(--royal-gold); color: var(--royal-bg); }
     </style>
 </head>
 <body>
 
-<header><h1 style="margin:0; font-weight:800;">STUDIO DIAGNOSTIC INTERACTIF</h1></header>
+<header><h1>STUDIO DIAGNOSTIC <strong>ROYAL</strong> CCAS</h1></header>
 
 <div id="editor">
-    <div class="ios-card">
-        <label><strong>Titre du Projet :</strong></label>
-        <input type="text" id="proj-title" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-top:10px;" placeholder="Ex: Plan Rafraîchissement 2026">
+    <div class="royal-card">
+        <label style="color:var(--royal-text-dark); font-weight:600;">TITRE DU PROJET GLOBAL :</label>
+        <input type="text" id="proj-title" placeholder="Ex: Bilan des Structures - Hiver 2026">
     </div>
+
     <div id="main-list"></div>
-    <div style="text-align:center;"><button class="btn" style="background:white; color:var(--ios-gold); border:1px solid var(--ios-gold);" onclick="addStructure()">+ AJOUTER UN BÂTIMENT</button></div>
+
+    <div style="text-align:center; margin-bottom: 30px;">
+        <button class="btn btn-add" onclick="addStructure()">+ AJOUTER UN BÂTIMENT</button>
+    </div>
 </div>
 
-<div class="footer"><button class="btn btn-gold" onclick="generateInteractive()">💾 TÉLÉCHARGER LE FICHIER INTERACTIF (.html)</button></div>
+<div class="footer">
+    <button class="btn btn-royal" onclick="generateInteractive()">💾 TÉLÉCHARGER LE FICHIER INTERACTIF FINAL</button>
+</div>
 
 <script>
     let diagnostic = {};
@@ -47,16 +106,16 @@
         Array.from(input.files).forEach(file => {
             const reader = new FileReader();
             reader.onload = e => { diagnostic[nom].push({ img: e.target.result, desc: "" }); render(); };
-            reader.readAsDataURL(file); // UHD [cite: 2026-01-02]
+            reader.readAsDataURL(file); // Qualité UHD conservée
         });
     }
 
     function render() {
         const list = document.getElementById('main-list'); list.innerHTML = '';
         for (let b in diagnostic) {
-            let h = `<div class="ios-card"><h2>${b}</h2><input type="file" multiple onchange="upload('${b}', this)">`;
+            let h = `<div class="royal-card"><h2>${b}</h2><input type="file" multiple onchange="upload('${b}', this)" style="color:var(--royal-text-dark)">`;
             diagnostic[b].forEach((p, i) => {
-                h += `<div class="photo-item"><img src="${p.img}"><textarea onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Description technique...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="background:none; border:none; color:red; cursor:pointer;">×</button></div>`;
+                h += `<div class="photo-item"><img src="${p.img}"><textarea onchange="diagnostic['${b}'][${i}].desc = this.value" placeholder="Saisir le diagnostic technique ici...">${p.desc}</textarea><button onclick="diagnostic['${b}'].splice(${i},1); render()" style="background:none; border:none; color:#C0392B; cursor:pointer; font-size:1.5rem;">×</button></div>`;
             });
             list.innerHTML += h + `</div>`;
         }
@@ -66,25 +125,41 @@
         const title = document.getElementById('proj-title').value || "Diagnostic_CCAS";
         const data = JSON.stringify(diagnostic);
         
+        // LE DESIGN DU FICHIER FINAL (Généré)
         const code = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>${title}</title>
     <style>
-        body { font-family: -apple-system, sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: white; overflow: hidden; }
-        #side { width: 300px; background: #1C1C1E; border-right: 1px solid #38383A; display: flex; flex-direction: column; }
-        .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #2C2C2E; transition: 0.3s; }
-        .nav-btn.active { color: #D4AF37; background: #2C2C2E; font-weight: bold; border-left: 5px solid #D4AF37; }
-        #main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .viewer img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 12px; }
-        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); color: white; border: none; padding: 20px; cursor: pointer; border-radius: 50%; font-size: 24px; }
-        .desc-box { padding: 30px; background: #FFFFFF; color: #000; border-top: 5px solid #D4AF37; min-height: 100px; font-style: italic; }
+        /* Palette Bleu Nuit & Or pour le lecteur final */
+        :root { --bg-dark: #0A1A3C; --bg-darker: #050E24; --accent-gold: #CCA43B; --text-light: #F4F7FD; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg-dark); color: var(--text-light); overflow: hidden; }
+        
+        /* Barre latérale élégante */
+        #side { width: 320px; background: var(--bg-darker); border-right: 2px solid var(--accent-gold); display: flex; flex-direction: column; box-shadow: 5px 0 20px rgba(0,0,0,0.5); z-index:10; }
+        .side-header { padding: 30px; font-size: 1.2rem; font-weight: 300; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #ffffff20; color: var(--accent-gold); text-align: center; }
+        
+        /* Boutons de navigation */
+        .nav-btn { width: 100%; padding: 25px; text-align: left; border: none; background: none; color: #A0AEC0; cursor: pointer; border-bottom: 1px solid #ffffff10; transition: 0.4s; font-size: 1rem; }
+        .nav-btn:hover { background: #ffffff05; color: var(--text-light); }
+        .nav-btn.active { background: var(--bg-dark); color: var(--accent-gold); font-weight: 600; border-left: 6px solid var(--accent-gold); box-shadow: inset 0 0 20px rgba(204, 164, 59, 0.1); }
+        
+        /* Zone principale */
+        #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850 0%, #0A1A3C 100%); }
+        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .viewer img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 4px; border: 3px solid var(--accent-gold); box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        
+        /* Flèches de navigation */
+        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.8); color: var(--accent-gold); border: 2px solid var(--accent-gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 24px; transition: 0.3s; }
+        .arr:hover { background: var(--accent-gold); color: var(--bg-dark); }
+        
+        /* Boîte de description en bas */
+        .desc-box { padding: 30px; background: var(--bg-darker); color: var(--text-light); border-top: 4px solid var(--accent-gold); min-height: 120px; font-size: 1.1rem; line-height: 1.6; font-weight: 300; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
-    <div id="side"><div style="padding:25px; font-weight:bold; color:#D4AF37; border-bottom:1px solid #38383A;">${title}</div><div id="menu"></div></div>
+    <div id="side"><div class="side-header">${title}</div><div id="menu"></div></div>
     <div id="main"><div class="viewer" id="v"></div><div class="desc-box" id="t"></div></div>
     <script>
         const d = ${data};
@@ -104,10 +179,10 @@
             if (!items || items.length === 0) return;
             v.innerHTML = '<img src="' + items[i].img + '">';
             if (items.length > 1) {
-                v.innerHTML += '<button class="arr" style="left:20px" onclick="mv(-1)">❮</button>';
-                v.innerHTML += '<button class="arr" style="right:20px" onclick="mv(1)">❯</button>';
+                v.innerHTML += '<button class="arr" style="left:30px" onclick="mv(-1)">❮</button>';
+                v.innerHTML += '<button class="arr" style="right:30px" onclick="mv(1)">❯</button>';
             }
-            document.getElementById('t').innerText = items[i].desc || "Aucune observation technique.";
+            document.getElementById('t').innerHTML = "<strong style='color:#CCA43B'>" + b + "</strong><br>" + (items[i].desc || "Aucune observation technique enregistrée pour cette vue.");
         }
         function mv(dir) { i = (i + dir + d[b].length) % d[b].length; sh(); }
         r(); sh();
@@ -118,7 +193,7 @@
         const blob = new Blob([code], { type: 'text/html' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = title + ".html";
+        a.download = title.replace(/\\s/g, '_') + "_Interactif_Royal.html";
         a.click();
     }
 </script>
