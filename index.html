@@ -2,192 +2,159 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Rapport Institutionnel</title>
+    <title>Studio CCAS - Édition Expertise</title>
     <style>
         :root { --royal-bg: #0A1A3C; --royal-panel: #142850; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --royal-text-light: #F4F7FD; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--royal-bg); color: #1C1C1E; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { background: var(--royal-panel); color: var(--royal-text-light); padding: 20px; text-align: center; border-bottom: 3px solid var(--royal-gold); z-index: 100; }
-        #editor { flex: 1; padding: 40px; overflow-y: auto; max-width: 950px; margin: 0 auto; width: 100%; box-sizing: border-box; background: linear-gradient(to bottom, var(--royal-bg), #0d2249); }
-        .royal-card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
+        header { background: var(--royal-panel); color: var(--royal-text-light); padding: 15px; text-align: center; border-bottom: 3px solid var(--royal-gold); z-index: 100; }
+        #editor { flex: 1; padding: 20px; overflow-y: auto; max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; background: linear-gradient(to bottom, var(--royal-bg), #0d2249); }
+        .royal-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
         
-        /* Zone Façades */
-        .facade-container { display: flex; gap: 15px; margin-top: 15px; }
-        .facade-slot { flex: 1; border: 2px dashed var(--royal-gold); border-radius: 8px; height: 100px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f9f9f9; cursor: pointer; position: relative; }
+        /* Façades */
+        .facade-container { display: flex; gap: 10px; margin-top: 10px; }
+        .facade-slot { flex: 1; border: 2px dashed var(--royal-gold); border-radius: 8px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f9f9f9; cursor: pointer; font-size: 0.8rem; color: #666; }
         .facade-slot img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Éditeur de texte */
-        .toolbar { display: flex; gap: 5px; margin-bottom: 5px; }
-        .toolbar button { cursor: pointer; padding: 2px 8px; border: 1px solid #ddd; border-radius: 4px; background: white; font-weight: bold; }
-        .rich-note { border: 1px solid #ddd; padding: 10px; border-radius: 8px; min-height: 60px; background: #fff; overflow-y: auto; }
 
-        .photo-item { display: flex; gap: 15px; background: #F4F7FD; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #DAE3F0; position: relative; }
-        .photo-item img { width: 120px; height: 80px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
-        
-        .footer { padding: 25px; background: var(--royal-panel); border-top: 3px solid var(--royal-gold); text-align: center; }
-        .btn { padding: 15px 35px; border-radius: 30px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; text-transform: uppercase; }
-        .btn-royal { background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; }
+        /* Barre d'outils Éditeur */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; background: #eee; padding: 5px; border-radius: 6px; }
+        .toolbar button, .toolbar select, .toolbar input { cursor: pointer; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; background: white; font-size: 0.85rem; font-weight: bold; }
+        .toolbar button:hover { background: #ddd; }
+        .rich-note { border: 1px solid #ccc; padding: 12px; border-radius: 8px; min-height: 100px; background: #fff; overflow-y: auto; font-size: 1rem; line-height: 1.4; }
 
-        #courage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(15px); color: var(--royal-gold); }
-        #courage-photo { width: 350px; height: 350px; object-fit: cover; border-radius: 50%; border: 10px solid var(--royal-gold); box-shadow: 0 0 60px rgba(204, 164, 59, 0.4); animation: pulse 2s infinite; }
+        .photo-item { display: flex; gap: 15px; background: #F4F7FD; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #DAE3F0; }
+        .photo-item img { width: 150px; height: 110px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
+        
+        .footer { padding: 20px; background: var(--royal-panel); border-top: 3px solid var(--royal-gold); text-align: center; }
+        .btn-royal { padding: 12px 30px; border-radius: 30px; border: none; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; text-transform: uppercase; }
+
+        #courage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(15px); }
+        #courage-photo { width: 300px; height: 300px; object-fit: cover; border-radius: 50%; border: 8px solid var(--royal-gold); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-<header><h1>STUDIO DIAGNOSTIC <strong>ROYAL</strong> CCAS</h1></header>
+<header><h1 style="margin:0; font-size: 1.2rem;">STUDIO CCAS - DIRECTION DES FINANCES</h1></header>
 
 <div id="editor">
     <div class="royal-card">
-        <label><strong>PROJET ET PHOTOS DE FAÇADE :</strong></label>
-        <input type="text" id="proj-title" placeholder="Nom de la structure..." style="width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
+        <label><strong>IDENTIFICATION DU PROJET & FAÇADES :</strong></label>
+        <input type="text" id="proj-title" placeholder="Nom de l'équipement..." style="width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ddd; box-sizing: border-box;">
         <div class="facade-container">
             <div class="facade-slot" onclick="document.getElementById('f1').click()">
-                <input type="file" id="f1" hidden onchange="prevF(this, 'p1')">
-                <div id="p1">Photo Façade 1</div>
+                <input type="file" id="f1" hidden onchange="pFac(this, 0)">
+                <div id="p1">Façade 1</div>
             </div>
             <div class="facade-slot" onclick="document.getElementById('f2').click()">
-                <input type="file" id="f2" hidden onchange="prevF(this, 'p2')">
-                <div id="p2">Photo Façade 2</div>
+                <input type="file" id="f2" hidden onchange="pFac(this, 1)">
+                <div id="p2">Façade 2</div>
             </div>
         </div>
     </div>
     <div id="main-list"></div>
-    <div style="text-align:center;"><button class="btn" style="background:transparent; border:2px solid var(--royal-gold); color:var(--royal-gold);" onclick="addStructure()">+ AJOUTER UN BÂTIMENT</button></div>
+    <div style="text-align:center;"><button class="btn-royal" style="background:transparent; border:2px solid var(--royal-gold); color:var(--royal-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button></div>
 </div>
 
-<div class="footer"><button class="btn btn-royal" onclick="lancerGeneration()">🚀 GÉNÉRER LE RAPPORT OFFICIEL</button></div>
+<div class="footer"><button class="btn-royal" onclick="gen()">🚀 GÉNÉRER LE RAPPORT OFFICIEL</button></div>
 
 <div id="courage-overlay">
     <img src="courage.jpg.JPG" id="courage-photo">
-    <div style="margin-top:30px; font-size:2.2rem; text-align:center; font-weight:300; color:white;">COURAGE MAMAN ! ❤️</div>
+    <div style="margin-top:20px; font-size:1.8rem; color:white;">COURAGE ! ❤️</div>
 </div>
 
 <script>
     let diagnostic = { facades: [null, null], buildings: {} };
 
-    function prevF(input, id) {
+    function pFac(input, idx) {
         const reader = new FileReader();
         reader.onload = e => {
-            diagnostic.facades[id === 'p1' ? 0 : 1] = e.target.result;
-            document.getElementById(id).innerHTML = `<img src="${e.target.result}">`;
+            diagnostic.facades[idx] = e.target.result;
+            document.getElementById('p'+(idx+1)).innerHTML = `<img src="${e.target.result}">`;
         };
         reader.readAsDataURL(input.files[0]);
     }
 
-    function addStructure() {
-        const nom = prompt("Nom du bâtiment :");
-        if (nom) { diagnostic.buildings[nom] = []; render(); }
+    function addBati() {
+        const n = prompt("Nom du bâtiment :");
+        if (n) { diagnostic.buildings[n] = []; render(); }
     }
 
-    function upload(nom, input) {
-        Array.from(input.files).forEach(file => {
+    function up(n, input) {
+        Array.from(input.files).forEach(f => {
             const reader = new FileReader();
-            reader.onload = e => { diagnostic.buildings[nom].push({ img: e.target.result, desc: "" }); render(); };
-            reader.readAsDataURL(file);
+            reader.onload = e => { diagnostic.buildings[n].push({ img: e.target.result, desc: "" }); render(); };
+            reader.readAsDataURL(f);
         });
     }
 
-    function exec(cmd, val = null) { document.execCommand(cmd, false, val); }
+    function cmd(c, v = null) { document.execCommand(c, false, v); }
 
     function render() {
         const list = document.getElementById('main-list'); list.innerHTML = '';
         for (let b in diagnostic.buildings) {
-            let h = `<div class="royal-card"><h2>${b}</h2><input type="file" multiple onchange="upload('${b}', this)">`;
+            let h = `<div class="royal-card"><h3>${b}</h3><input type="file" multiple onchange="up('${b}', this)">`;
             diagnostic.buildings[b].forEach((p, i) => {
                 h += `<div class="photo-item"><img src="${p.img}">
                     <div style="flex:1">
                         <div class="toolbar">
-                            <button onclick="exec('underline')"><u>U</u></button>
-                            <button onclick="exec('foreColor', '#FF0000')" style="color:red">A</button>
-                            <button onclick="exec('removeFormat')">✕</button>
+                            <button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button><button onclick="cmd('underline')">U</button><button onclick="cmd('strikeThrough')">S</button>
+                            <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">Petit</option><option value="3">Normal</option><option value="5">Grand</option><option value="7">Titre</option></select>
+                            <input type="color" title="Couleur Texte" onchange="cmd('foreColor', this.value)">
+                            <input type="color" title="Surlignage" value="#ffff00" onchange="cmd('hiliteColor', this.value)">
                         </div>
                         <div class="rich-note" contenteditable="true" oninput="diagnostic.buildings['${b}'][${i}].desc = this.innerHTML">${p.desc}</div>
                     </div>
-                <button onclick="diagnostic.buildings['${b}'].splice(${i},1); render()" style="background:none; border:none; color:red; cursor:pointer;">×</button></div>`;
+                </div>`;
             });
             list.innerHTML += h + `</div>`;
         }
     }
 
-    function lancerGeneration() {
-        const title = document.getElementById('proj-title').value || "Diagnostic";
+    function gen() {
+        const t = document.getElementById('proj-title').value || "Diagnostic";
         document.getElementById('courage-overlay').style.display = 'flex';
         setTimeout(() => {
-            const dataStr = JSON.stringify(diagnostic);
-            const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
-        #side { width: 280px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; z-index: 100; }
-        .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #ffffff10; }
-        .nav-btn.active { color: var(--gold); font-weight: 700; border-left: 6px solid var(--gold); background: rgba(255,255,255,0.05); }
-        #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
-        .header-logo { position: absolute; top: 25px; right: 25px; display: flex; flex-direction: column; align-items: flex-end; z-index: 200; }
-        .header-logo img { width: 160px; height: auto; margin-bottom: 5px; }
-        .header-logo p { margin: 0; font-size: 0.7rem; color: var(--gold); text-align: right; font-weight: 600; text-transform: uppercase; max-width: 220px; }
-        .photo-frame { width: 85%; height: 75%; border: 4px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
-        .photo-frame img { width: 100%; height: 100%; object-fit: contain; }
-        .desc-box { padding: 30px; background: rgba(5, 14, 36, 0.95); border-top: 3px solid var(--gold); min-height: 120px; }
-        .facade-mini { display: flex; gap: 10px; margin-top: 10px; }
-        .facade-mini img { width: 80px; height: 50px; border: 1px solid var(--gold); object-fit: cover; }
-    </style>
-</head>
-<body>
-    <div id="side">
-        <div style="padding:20px; color:var(--gold); font-weight:700; border-bottom:1px solid #333;">${title}</div>
-        <div id="facades-menu" class="facade-mini" style="padding:10px"></div>
-        <div id="menu"></div>
-    </div>
-    <div id="main">
-        <div class="header-logo">
-            <img src="Logo_Créteil_Val_Marne.svg.png" alt="Créteil">
-            <p>Direction des Finances et des moyens Généraux du CCAS</p>
-        </div>
-        <div style="flex:1; display:flex; align-items:center; justify-content:center;">
-            <div class="photo-frame" id="v"></div>
-        </div>
-        <div class="desc-box">
-            <h2 id="bti-name" style="margin:0; color:var(--gold)"></h2>
-            <p id="t" style="font-size:1.2rem;"></p>
-        </div>
-    </div>
-    <script>
-        const d = ${dataStr};
-        let currentB = Object.keys(d.buildings)[0], currentI = 0;
-        
-        function renderNav() {
-            const m = document.getElementById('menu'); m.innerHTML = '';
-            Object.keys(d.buildings).forEach(k => {
-                const btn = document.createElement('button');
-                btn.className = 'nav-btn' + (currentB === k ? ' active' : '');
-                btn.innerText = k;
-                btn.onclick = () => { currentB = k; currentI = 0; show(); renderNav(); };
-                m.appendChild(btn);
-            });
-            const fMenu = document.getElementById('facades-menu');
-            d.facades.forEach(f => { if(f) fMenu.innerHTML += '<img src="'+f+'">'; });
-        }
-
-        function show() {
-            const v = document.getElementById('v'), items = d.buildings[currentB];
-            if(!items || items.length === 0) return;
-            v.innerHTML = '<img src="' + items[currentI].img + '">';
-            document.getElementById('bti-name').innerText = currentB;
-            document.getElementById('t').innerHTML = items[currentI].desc || "Aucun diagnostic saisi.";
-        }
-        window.onload = () => { renderNav(); show(); };
-    <\/script>
-</body>
-</html>`;
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+                :root { --gold: #CCA43B; --txt: #F4F7FD; }
+                body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
+                #side { width: 260px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; }
+                .nav-btn { width: 100%; padding: 15px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #222; }
+                .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 4px solid var(--gold); }
+                #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle, #142850, #0A1A3C); }
+                .logo-box { position: absolute; top: 20px; right: 20px; text-align: right; z-index: 10; }
+                .logo-box img { width: 140px; }
+                .logo-box p { margin: 5px 0 0; font-size: 0.6rem; color: var(--gold); font-weight: bold; text-transform: uppercase; }
+                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+                .viewer img { max-width: 100%; max-height: 100%; object-fit: contain; border: 3px solid var(--gold); box-shadow: 0 0 40px #000; }
+                .desc-box { padding: 25px; background: rgba(5, 14, 36, 0.9); border-top: 3px solid var(--gold); min-height: 100px; font-size: 1.1rem; }
+            </style></head><body>
+            <div id="side"><div style="padding:15px; color:var(--gold); border-bottom:1px solid #333;">${t}</div><div id="m"></div></div>
+            <div id="main"><div class="logo-box"><img src="Logo_Créteil_Val_Marne.svg.png"><p>Direction des Finances et des moyens Généraux du CCAS</p></div>
+            <div class="viewer" id="v"></div><div class="desc-box"><h2 id="bn" style="margin:0 0 10px; color:var(--gold)"></h2><div id="txt"></div></div></div>
+            <script>
+                const d = ${JSON.stringify(diagnostic)}; let cb = Object.keys(d.buildings)[0], ci = 0;
+                function rNav() {
+                    const m = document.getElementById('m'); m.innerHTML = '';
+                    Object.keys(d.buildings).forEach(k => {
+                        const b = document.createElement('button'); b.className = 'nav-btn' + (cb === k ? ' active' : '');
+                        b.innerText = k; b.onclick = () => { cb = k; ci = 0; s(); rNav(); }; m.appendChild(b);
+                    });
+                }
+                function s() {
+                    const v = document.getElementById('v'), its = d.buildings[cb];
+                    if(!its || its.length === 0) return;
+                    v.innerHTML = '<img src="' + its[ci].img + '">';
+                    document.getElementById('bn').innerText = cb;
+                    document.getElementById('txt').innerHTML = its[ci].desc || "...";
+                }
+                window.onload = () => { rNav(); s(); };
+            <\/script></body></html>`;
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([htmlContent], { type: 'text/html' }));
-            a.download = title.replace(/ /g, '_') + "_Rapport.html";
+            a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+            a.download = t.replace(/ /g, '_') + ".html";
             a.click();
-            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3500);
-        }, 1000);
+            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3000);
+        }, 800);
     }
 </script>
 </body>
