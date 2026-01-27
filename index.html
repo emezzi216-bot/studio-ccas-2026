@@ -9,13 +9,13 @@
         header { background: var(--royal-panel); color: var(--royal-text-light); padding: 15px; text-align: center; border-bottom: 3px solid var(--royal-gold); z-index: 100; }
         #editor { flex: 1; padding: 20px; overflow-y: auto; max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; background: linear-gradient(to bottom, var(--royal-bg), #0d2249); }
         .royal-card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
-        .toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; background: #eee; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
-        .toolbar button, .toolbar input { cursor: pointer; border: 1px solid #bbb; border-radius: 4px; background: white; font-size: 0.85rem; font-weight: bold; height: 32px; padding: 0 10px; }
-        .rich-note { border: 1px solid #ccc; padding: 15px; border-radius: 8px; min-height: 100px; background: #fff; font-size: 1rem; line-height: 1.5; outline: none; }
+        .toolbar { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; background: #eee; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
+        .toolbar button, .toolbar select, .toolbar input { cursor: pointer; border: 1px solid #bbb; border-radius: 4px; background: white; font-size: 0.85rem; font-weight: bold; height: 32px; padding: 0 10px; }
+        .rich-note { border: 1px solid #ccc; padding: 15px; border-radius: 8px; min-height: 120px; background: #fff; font-size: 1rem; line-height: 1.5; outline: none; }
         .photo-list { display: flex; flex-direction: column; gap: 15px; }
         .photo-item { display: flex; gap: 20px; background: #F4F7FD; padding: 20px; border-radius: 12px; border: 1px solid #DAE3F0; position: relative; cursor: grab; transition: 0.2s; }
-        .photo-item.dragging { opacity: 0.5; background: #e0eafc; }
-        .photo-item img { width: 160px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid var(--royal-gold); pointer-events: none; }
+        .photo-item.dragging { opacity: 0.5; transform: scale(0.98); }
+        .photo-item img { width: 180px; height: 140px; object-fit: cover; border-radius: 8px; border: 2px solid var(--royal-gold); pointer-events: none; }
         .footer { padding: 20px; background: var(--royal-panel); border-top: 3px solid var(--royal-gold); text-align: center; }
         .btn-royal { padding: 14px 40px; border-radius: 40px; border: none; font-weight: 800; cursor: pointer; background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; text-transform: uppercase; }
         #courage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(15px); }
@@ -28,9 +28,9 @@
 
 <div id="editor">
     <div class="royal-card">
-        <label><strong>1. PARAMÈTRES GÉNÉRAUX :</strong></label>
+        <label><strong>1. PARAMÈTRES ET LOGO :</strong></label>
         <div style="display: flex; align-items: center; gap: 15px; margin: 15px 0;">
-            <img src="Logo_Créteil_Val_Marne.svg.png" style="height: 50px; border: 1px solid #ccc; padding: 5px;">
+            <img src="Logo_Créteil_Val_Marne.svg.png" style="height: 60px; border: 1px solid #ccc; padding: 5px;" id="logo-main">
             <input type="text" id="proj-title" placeholder="Titre du Diagnostic..." style="flex:1; padding:12px; border-radius:8px; border:1px solid #ccc;">
         </div>
     </div>
@@ -47,6 +47,7 @@
 
 <script>
     let diagnostic = { buildings: {} };
+    let dragSource = null;
 
     function addBati() {
         const n = prompt("Nom du bâtiment :");
@@ -78,7 +79,8 @@
                 item.className = 'photo-item';
                 item.draggable = true;
                 item.dataset.index = i;
-                item.innerHTML = `<img src="${p.img}"><div style="flex:1" onpointerdown="event.stopPropagation()"><div class="toolbar"><button onclick="cmd('bold')">B</button><button onclick="cmd('underline')">U</button><input type="color" onchange="cmd('foreColor', this.value)"><input type="color" value="#ffff00" onchange="cmd('hiliteColor', this.value)"></div><div class="rich-note" contenteditable="true" oninput="diagnostic.buildings['${b}'][${i}].desc=this.innerHTML">${p.desc}</div></div>`;
+                item.innerHTML = `<img src="${p.img}"><div style="flex:1" onpointerdown="event.stopPropagation()"><div class="toolbar"><button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button><button onclick="cmd('underline')">U</button><button onclick="cmd('strikeThrough')">S</button><select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option></select><input type="color" onchange="cmd('foreColor', this.value)"><input type="color" value="#ffff00" onchange="cmd('hiliteColor', this.value)"></div><div class="rich-note" contenteditable="true" oninput="diagnostic.buildings['${b}'][${i}].desc=this.innerHTML">${p.desc}</div></div>`;
+                
                 item.addEventListener('dragstart', e => { dragSource = item; item.classList.add('dragging'); });
                 item.addEventListener('dragover', e => e.preventDefault());
                 item.addEventListener('drop', e => {
@@ -89,15 +91,12 @@
                     diagnostic.buildings[bld].splice(to, 0, moved);
                     render();
                 });
-                item.addEventListener('dragend', () => item.classList.remove('dragging'));
                 pList.appendChild(item);
             });
             card.appendChild(pList);
             list.appendChild(card);
         }
     }
-
-    let dragSource = null;
 
     function gen() {
         const t = document.getElementById('proj-title').value || "Diagnostic";
@@ -113,8 +112,8 @@
                 .header-official { position: absolute; top: 30px; right: 30px; text-align: right; z-index: 200; }
                 .header-official img { width: 170px; margin-bottom: 8px; }
                 .header-official p { margin: 0; font-size: 0.7rem; color: var(--gold); font-weight: 700; text-transform: uppercase; }
-                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 50px; }
-                .frame { width: 90%; height: 85%; border: 5px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
+                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+                .frame { width: 85%; height: 80%; border: 4px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
                 .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
                 .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.85); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 210; }
                 .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 150px; }
@@ -123,7 +122,7 @@
             <div id="main">
                 <div class="header-official"><img src="Logo_Créteil_Val_Marne.svg.png"><p>Direction des Finances et des moyens Généraux du CCAS</p></div>
                 <div class="viewer"><div class="frame" id="v_fr"><div id="v_img" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div></div></div>
-                <div class="desc-box"><h2 id="bn" style="color:var(--gold)"></h2><div id="txt" style="font-size: 1.3rem;"></div></div>
+                <div class="desc-box"><h2 id="bn" style="color:var(--gold)"></h2><div id="txt" style="font-size: 1.25rem;"></div></div>
             </div>
             <script>
                 const d = ${JSON.stringify(diagnostic)}; let cb = Object.keys(d.buildings)[0], ci = 0;
@@ -142,8 +141,8 @@
                     document.getElementById('txt').innerHTML = its[ci].desc || "...";
                     fr.querySelectorAll('.arr').forEach(a => a.remove());
                     if (its.length > 1) {
-                        const bL = document.createElement('button'); bL.className = 'arr'; bL.style.left = '-40px'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
-                        const bR = document.createElement('button'); bR.className = 'arr'; bR.style.right = '-40px'; bR.innerHTML = '❯'; bR.onclick = () => { ci=(ci+1)%its.length; s(); };
+                        const bL = document.createElement('button'); bL.className = 'arr'; bL.style.left = '-35px'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
+                        const bR = document.createElement('button'); bR.className = 'arr'; bR.style.right = '-35px'; bR.innerHTML = '❯'; bR.onclick = () => { ci=(ci+1)%its.length; s(); };
                         fr.appendChild(bL); fr.appendChild(bR);
                     }
                 }
@@ -151,7 +150,7 @@
             <\/script></body></html>`;
             const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' })); a.download = t.replace(/ /g, '_') + ".html"; a.click();
             setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3000);
-        }, 800);
+        }, 1000);
     }
 </script>
 </body>
