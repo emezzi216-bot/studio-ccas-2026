@@ -12,8 +12,8 @@
         
         .toolbar { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; background: #eee; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
         .toolbar button, .toolbar select, .toolbar input { cursor: pointer; border: 1px solid #bbb; border-radius: 4px; background: white; font-size: 0.85rem; font-weight: bold; height: 32px; padding: 0 10px; }
-        .rich-note { border: 1px solid #ccc; padding: 15px; border-radius: 8px; min-height: 120px; background: #fff; font-size: 1rem; line-height: 1.5; outline: none; }
         
+        .rich-note { border: 1px solid #ccc; padding: 15px; border-radius: 8px; min-height: 120px; background: #fff; font-size: 1rem; line-height: 1.5; outline: none; }
         .photo-list { display: flex; flex-direction: column; gap: 15px; }
         .photo-item { display: flex; gap: 20px; background: #F4F7FD; padding: 20px; border-radius: 12px; border: 1px solid #DAE3F0; position: relative; cursor: grab; transition: 0.2s; }
         .photo-item.dragging { opacity: 0.5; transform: scale(0.98); }
@@ -34,7 +34,7 @@
     <div class="royal-card">
         <label><strong>1. PARAMÈTRES ET LOGO :</strong></label>
         <div style="display: flex; align-items: center; gap: 15px; margin: 15px 0;">
-            <img id="official-logo" src="Logo_Créteil_Val_Marne.svg.png" style="height: 60px; border: 1px solid #ccc; padding: 5px;" crossorigin="anonymous">
+            <img id="logo-ref" src="Logo_Créteil_Val_Marne.svg.png" style="height: 60px; border: 1px solid #ccc; padding: 5px;" crossorigin="anonymous">
             <input type="text" id="proj-title" placeholder="Titre du Diagnostic..." style="flex:1; padding:12px; border-radius:8px; border:1px solid #ccc;">
         </div>
     </div>
@@ -83,7 +83,18 @@
                 item.className = 'photo-item';
                 item.draggable = true;
                 item.dataset.index = i;
-                item.innerHTML = `<img src="${p.img}"><div style="flex:1" onpointerdown="event.stopPropagation()"><div class="toolbar"><button onclick="cmd('bold')">B</button><button onclick="cmd('underline')">U</button><input type="color" onchange="cmd('foreColor', this.value)"><input type="color" value="#ffff00" onchange="cmd('hiliteColor', this.value)"></div><div class="rich-note" contenteditable="true" oninput="diagnostic.buildings['${b}'][${i}].desc=this.innerHTML">${p.desc}</div></div>`;
+                item.innerHTML = `
+                    <img src="${p.img}">
+                    <div style="flex:1" onpointerdown="event.stopPropagation()">
+                        <div class="toolbar">
+                            <button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button>
+                            <button onclick="cmd('underline')">U</button><button onclick="cmd('strikeThrough')">S</button>
+                            <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option></select>
+                            <input type="color" onchange="cmd('foreColor', this.value)" title="Couleur">
+                            <input type="color" value="#ffff00" onchange="cmd('hiliteColor', this.value)" title="Surlignage">
+                        </div>
+                        <div class="rich-note" contenteditable="true" oninput="diagnostic.buildings['${b}'][${i}].desc=this.innerHTML">${p.desc}</div>
+                    </div>`;
                 
                 item.addEventListener('dragstart', e => { dragSource = item; item.classList.add('dragging'); });
                 item.addEventListener('dragover', e => e.preventDefault());
@@ -104,10 +115,9 @@
     }
 
     function getBase64Logo() {
-        const img = document.getElementById('official-logo');
+        const img = document.getElementById('logo-ref');
         const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
+        canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
         return canvas.toDataURL('image/png');
@@ -117,12 +127,11 @@
         const t = document.getElementById('proj-title').value || "Diagnostic";
         document.getElementById('courage-overlay').style.display = 'flex';
         
-        // On capture le logo en Base64 avant de générer
-        let embeddedLogo = "";
-        try { embeddedLogo = getBase64Logo(); } catch(e) { embeddedLogo = "Logo_Créteil_Val_Marne.svg.png"; }
+        let logoB64 = "";
+        try { logoB64 = getBase64Logo(); } catch(e) { logoB64 = "Logo_Créteil_Val_Marne.svg.png"; }
 
         setTimeout(() => {
-            const dataStr = JSON.stringify(diagnostic).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            const dataStr = JSON.stringify(diagnostic).replace(/</g, '\\u003c');
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
                 :root { --gold: #CCA43B; --txt: #F4F7FD; }
                 body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
@@ -130,23 +139,20 @@
                 .nav-btn { width: 100%; padding: 22px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
                 .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 6px solid var(--gold); }
                 #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
-                .header-official { position: absolute; top: 30px; right: 30px; text-align: right; z-index: 200; }
-                .header-official img { width: 170px; margin-bottom: 8px; }
-                .header-official p { margin: 0; font-size: 0.7rem; color: var(--gold); font-weight: 700; text-transform: uppercase; }
-                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px; }
-                .frame { width: 85%; height: 75%; aspect-ratio: 4/3; border: 4px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 40px #000; }
-                .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
-                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.85); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 28px; z-index: 210; }
-                .desc-box { padding: 35px 45px; background: rgba(5, 14, 36, 0.98); border-top: 3px solid var(--gold); min-height: 140px; }
+                .header-off { position: absolute; top: 30px; right: 30px; text-align: right; z-index: 200; }
+                .header-off img { width: 170px; margin-bottom: 8px; }
+                .header-off p { margin: 0; font-size: 0.7rem; color: var(--gold); font-weight: 700; text-transform: uppercase; }
+                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+                .frame { width: 90%; max-width: 1200px; aspect-ratio: 4/3; border: 4px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 50px #000; }
+                .frame img { width: 100%; height: 100%; object-fit: contain; }
+                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.85); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 210; }
+                .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 150px; }
             </style></head><body>
             <div id="side"><div style="padding:25px; color:var(--gold); font-weight:800; border-bottom:1px solid #333;">${t}</div><div id="m"></div></div>
             <div id="main">
-                <div class="header-official">
-                    <img src="${embeddedLogo}">
-                    <p>Direction des Finances et des moyens Généraux du CCAS</p>
-                </div>
+                <div class="header-off"><img src="${logoB64}"><p>Direction des Finances et des moyens Généraux du CCAS</p></div>
                 <div class="viewer"><div class="frame" id="v_fr"><div id="v_img" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div></div></div>
-                <div class="desc-box"><h2 id="bn" style="color:var(--gold); margin:0 0 10px 0;"></h2><div id="txt" style="font-size: 1.25rem;"></div></div>
+                <div class="desc-box"><h2 id="bn" style="color:var(--gold); margin:0 0 10px 0; text-transform:uppercase;"></h2><div id="txt" style="font-size: 1.25rem;"></div></div>
             </div>
             <script>
                 const d = ${dataStr}; let cb = Object.keys(d.buildings)[0], ci = 0;
@@ -170,12 +176,10 @@
                         fr.appendChild(bL); fr.appendChild(bR);
                     }
                 }
-                window.onload = () => { if(Object.keys(d.buildings).length > 0) { rNav(); s(); } };
+                window.onload = () => { if(cb) { rNav(); s(); } };
             <\/script></body></html>`;
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-            a.download = t.replace(/ /g, '_') + ".html";
-            a.click();
+            
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' })); a.download = t.replace(/ /g, '_') + ".html"; a.click();
             setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3500);
         }, 1000);
     }
