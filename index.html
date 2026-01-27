@@ -2,74 +2,83 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS - Édition Expertise</title>
+    <title>Studio CCAS - Direction des Finances</title>
     <style>
         :root { --royal-bg: #0A1A3C; --royal-panel: #142850; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --royal-text-light: #F4F7FD; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--royal-bg); color: #1C1C1E; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { background: var(--royal-panel); color: var(--royal-text-light); padding: 15px; text-align: center; border-bottom: 3px solid var(--royal-gold); z-index: 100; }
+        
         #editor { flex: 1; padding: 20px; overflow-y: auto; max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; background: linear-gradient(to bottom, var(--royal-bg), #0d2249); }
         .royal-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
         
-        /* Façades */
-        .facade-container { display: flex; gap: 10px; margin-top: 10px; }
-        .facade-slot { flex: 1; border: 2px dashed var(--royal-gold); border-radius: 8px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f9f9f9; cursor: pointer; font-size: 0.8rem; color: #666; }
-        .facade-slot img { width: 100%; height: 100%; object-fit: cover; }
+        /* Configuration Logo & Façades */
+        .config-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-top: 10px; }
+        .upload-zone { border: 2px dashed var(--royal-gold); border-radius: 8px; padding: 10px; text-align: center; background: #f9f9f9; cursor: pointer; font-size: 0.8rem; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .upload-zone img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* Barre d'outils Éditeur */
-        .toolbar { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; background: #eee; padding: 5px; border-radius: 6px; }
-        .toolbar button, .toolbar select, .toolbar input { cursor: pointer; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; background: white; font-size: 0.85rem; font-weight: bold; }
-        .toolbar button:hover { background: #ddd; }
-        .rich-note { border: 1px solid #ccc; padding: 12px; border-radius: 8px; min-height: 100px; background: #fff; overflow-y: auto; font-size: 1rem; line-height: 1.4; }
+        /* Éditeur Riche */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; background: #eee; padding: 5px; border-radius: 6px; }
+        .toolbar button, .toolbar select, .toolbar input { cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: white; font-size: 0.8rem; font-weight: bold; height: 30px; }
+        .rich-note { border: 1px solid #ccc; padding: 12px; border-radius: 8px; min-height: 100px; background: #fff; font-size: 1rem; line-height: 1.4; }
 
-        .photo-item { display: flex; gap: 15px; background: #F4F7FD; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #DAE3F0; }
-        .photo-item img { width: 150px; height: 110px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
+        .photo-item { display: flex; gap: 15px; background: #F4F7FD; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #DAE3F0; position: relative; }
+        .photo-item img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
         
         .footer { padding: 20px; background: var(--royal-panel); border-top: 3px solid var(--royal-gold); text-align: center; }
         .btn-royal { padding: 12px 30px; border-radius: 30px; border: none; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; text-transform: uppercase; }
 
         #courage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(15px); }
-        #courage-photo { width: 300px; height: 300px; object-fit: cover; border-radius: 50%; border: 8px solid var(--royal-gold); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        /* Correction du nom du fichier selon GitHub */
+        #courage-photo { width: 320px; height: 320px; object-fit: cover; border-radius: 50%; border: 8px solid var(--royal-gold); }
     </style>
 </head>
 <body>
 
-<header><h1 style="margin:0; font-size: 1.2rem;">STUDIO CCAS - DIRECTION DES FINANCES</h1></header>
+<header><h1 style="margin:0; font-size: 1.1rem;">STUDIO CCAS - DIRECTION DES FINANCES</h1></header>
 
 <div id="editor">
     <div class="royal-card">
-        <label><strong>IDENTIFICATION DU PROJET & FAÇADES :</strong></label>
-        <input type="text" id="proj-title" placeholder="Nom de l'équipement..." style="width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ddd; box-sizing: border-box;">
-        <div class="facade-container">
-            <div class="facade-slot" onclick="document.getElementById('f1').click()">
-                <input type="file" id="f1" hidden onchange="pFac(this, 0)">
-                <div id="p1">Façade 1</div>
+        <label><strong>1. TITRE & LOGO OFFICIEL :</strong></label>
+        <input type="text" id="proj-title" placeholder="Nom du Diagnostic (ex: RAFFRAICHISSEMENT)..." style="width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ddd; box-sizing: border-box;">
+        
+        <div class="config-grid">
+            <div class="upload-zone" onclick="document.getElementById('logo-in').click()">
+                <input type="file" id="logo-in" hidden onchange="hdlImg(this, 'logo')">
+                <div id="logo-pre">Charger Logo Ville</div>
             </div>
-            <div class="facade-slot" onclick="document.getElementById('f2').click()">
-                <input type="file" id="f2" hidden onchange="pFac(this, 1)">
-                <div id="p2">Façade 2</div>
+            <div style="display:flex; gap:10px;">
+                <div class="upload-zone" style="flex:1" onclick="document.getElementById('f1').click()">
+                    <input type="file" id="f1" hidden onchange="hdlImg(this, 'f1')">
+                    <div id="f1-pre">Façade 1</div>
+                </div>
+                <div class="upload-zone" style="flex:1" onclick="document.getElementById('f2').click()">
+                    <input type="file" id="f2" hidden onchange="hdlImg(this, 'f2')">
+                    <div id="f2-pre">Façade 2</div>
+                </div>
             </div>
         </div>
     </div>
+    
     <div id="main-list"></div>
     <div style="text-align:center;"><button class="btn-royal" style="background:transparent; border:2px solid var(--royal-gold); color:var(--royal-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button></div>
 </div>
 
-<div class="footer"><button class="btn-royal" onclick="gen()">🚀 GÉNÉRER LE RAPPORT OFFICIEL</button></div>
+<div class="footer"><button class="btn-royal" onclick="gen()">🚀 GÉNÉRER LE RAPPORT OFFICIEL (.HTML)</button></div>
 
 <div id="courage-overlay">
     <img src="courage.jpg.JPG" id="courage-photo">
-    <div style="margin-top:20px; font-size:1.8rem; color:white;">COURAGE ! ❤️</div>
+    <div style="margin-top:20px; font-size:2rem; color:white; text-align:center;">COURAGE MAMAN ! ❤️</div>
 </div>
 
 <script>
-    let diagnostic = { facades: [null, null], buildings: {} };
+    let diagnostic = { logo: null, facades: [null, null], buildings: {} };
 
-    function pFac(input, idx) {
+    function hdlImg(input, type) {
         const reader = new FileReader();
         reader.onload = e => {
-            diagnostic.facades[idx] = e.target.result;
-            document.getElementById('p'+(idx+1)).innerHTML = `<img src="${e.target.result}">`;
+            if(type === 'logo') { diagnostic.logo = e.target.result; document.getElementById('logo-pre').innerHTML = `<img src="${e.target.result}">`; }
+            else if(type === 'f1') { diagnostic.facades[0] = e.target.result; document.getElementById('f1-pre').innerHTML = `<img src="${e.target.result}">`; }
+            else if(type === 'f2') { diagnostic.facades[1] = e.target.result; document.getElementById('f2-pre').innerHTML = `<img src="${e.target.result}">`; }
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -83,7 +92,7 @@
         Array.from(input.files).forEach(f => {
             const reader = new FileReader();
             reader.onload = e => { diagnostic.buildings[n].push({ img: e.target.result, desc: "" }); render(); };
-            reader.readAsDataURL(f);
+            reader.readAsDataURL(f); // UHD [cite: 2026-01-02]
         });
     }
 
@@ -97,10 +106,10 @@
                 h += `<div class="photo-item"><img src="${p.img}">
                     <div style="flex:1">
                         <div class="toolbar">
-                            <button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button><button onclick="cmd('underline')">U</button><button onclick="cmd('strikeThrough')">S</button>
-                            <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">Petit</option><option value="3">Normal</option><option value="5">Grand</option><option value="7">Titre</option></select>
-                            <input type="color" title="Couleur Texte" onchange="cmd('foreColor', this.value)">
-                            <input type="color" title="Surlignage" value="#ffff00" onchange="cmd('hiliteColor', this.value)">
+                            <button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button><button onclick="cmd('underline')">U</button>
+                            <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option></select>
+                            <input type="color" title="Texte" onchange="cmd('foreColor', this.value)">
+                            <input type="color" title="Surligné" value="#ffff00" onchange="cmd('hiliteColor', this.value)">
                         </div>
                         <div class="rich-note" contenteditable="true" oninput="diagnostic.buildings['${b}'][${i}].desc = this.innerHTML">${p.desc}</div>
                     </div>
@@ -118,19 +127,39 @@
                 :root { --gold: #CCA43B; --txt: #F4F7FD; }
                 body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
                 #side { width: 260px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; }
-                .nav-btn { width: 100%; padding: 15px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #222; }
-                .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 4px solid var(--gold); }
+                .nav-btn { width: 100%; padding: 18px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #222; }
+                .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 5px solid var(--gold); }
                 #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle, #142850, #0A1A3C); }
-                .logo-box { position: absolute; top: 20px; right: 20px; text-align: right; z-index: 10; }
-                .logo-box img { width: 140px; }
-                .logo-box p { margin: 5px 0 0; font-size: 0.6rem; color: var(--gold); font-weight: bold; text-transform: uppercase; }
-                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
-                .viewer img { max-width: 100%; max-height: 100%; object-fit: contain; border: 3px solid var(--gold); box-shadow: 0 0 40px #000; }
-                .desc-box { padding: 25px; background: rgba(5, 14, 36, 0.9); border-top: 3px solid var(--gold); min-height: 100px; font-size: 1.1rem; }
+                
+                /* LOGO FIXÉ ET EMBARQUÉ */
+                .logo-box { position: absolute; top: 25px; right: 25px; text-align: right; z-index: 200; pointer-events: none; }
+                .logo-box img { width: 150px; height: auto; margin-bottom: 5px; }
+                .logo-box p { margin: 0; font-size: 0.65rem; color: var(--gold); font-weight: bold; text-transform: uppercase; line-height: 1.2; max-width: 220px; }
+                
+                /* CADRE PRÉDÉFINI XXL */
+                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; }
+                .frame { width: 90%; height: 80%; border: 5px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px #000; position: relative; }
+                .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+                /* FLÈCHES FIXÉES AU CADRE */
+                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 30px; z-index: 210; }
+                .arr:hover { background: var(--gold); color: #000; }
+
+                .desc-box { padding: 30px 45px; background: rgba(5, 14, 36, 0.95); border-top: 3px solid var(--gold); min-height: 120px; font-size: 1.2rem; }
             </style></head><body>
-            <div id="side"><div style="padding:15px; color:var(--gold); border-bottom:1px solid #333;">${t}</div><div id="m"></div></div>
-            <div id="main"><div class="logo-box"><img src="Logo_Créteil_Val_Marne.svg.png"><p>Direction des Finances et des moyens Généraux du CCAS</p></div>
-            <div class="viewer" id="v"></div><div class="desc-box"><h2 id="bn" style="margin:0 0 10px; color:var(--gold)"></h2><div id="txt"></div></div></div>
+            <div id="side"><div style="padding:20px; color:var(--gold); border-bottom:1px solid #333; font-weight:700;">${t}</div><div id="m"></div></div>
+            <div id="main">
+                <div class="logo-box">
+                    <img src="${diagnostic.logo || ''}">
+                    <p>Direction des Finances et des moyens Généraux du CCAS</p>
+                </div>
+                <div class="viewer">
+                    <div class="frame" id="v_fr">
+                        <div id="v_img" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div>
+                    </div>
+                </div>
+                <div class="desc-box"><h2 id="bn" style="margin:0 0 10px; color:var(--gold); text-transform:uppercase;"></h2><div id="txt"></div></div>
+            </div>
             <script>
                 const d = ${JSON.stringify(diagnostic)}; let cb = Object.keys(d.buildings)[0], ci = 0;
                 function rNav() {
@@ -141,20 +170,27 @@
                     });
                 }
                 function s() {
-                    const v = document.getElementById('v'), its = d.buildings[cb];
+                    const vi = document.getElementById('v_img'), fr = document.getElementById('v_fr'), its = d.buildings[cb];
                     if(!its || its.length === 0) return;
-                    v.innerHTML = '<img src="' + its[ci].img + '">';
+                    vi.innerHTML = '<img src="' + its[ci].img + '">';
                     document.getElementById('bn').innerText = cb;
                     document.getElementById('txt').innerHTML = its[ci].desc || "...";
+                    
+                    const old = fr.querySelectorAll('.arr'); old.forEach(a => a.remove());
+                    if (its.length > 1) {
+                        const bL = document.createElement('button'); bL.className = 'arr'; bL.style.left = '-35px'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
+                        const bR = document.createElement('button'); bR.className = 'arr'; bR.style.right = '-35px'; bR.innerHTML = '❯'; bR.onclick = () => { ci=(ci+1)%its.length; s(); };
+                        fr.appendChild(bL); fr.appendChild(bR);
+                    }
                 }
                 window.onload = () => { rNav(); s(); };
             <\/script></body></html>`;
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-            a.download = t.replace(/ /g, '_') + ".html";
+            a.download = t.replace(/ /g, '_') + "_Officiel.html";
             a.click();
-            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3000);
-        }, 800);
+            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3500);
+        }, 1000);
     }
 </script>
 </body>
