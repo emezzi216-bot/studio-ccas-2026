@@ -9,76 +9,75 @@
         header { background: var(--royal-panel); color: var(--royal-text-light); padding: 15px; text-align: center; border-bottom: 3px solid var(--royal-gold); z-index: 100; }
         
         #editor { flex: 1; padding: 20px; overflow-y: auto; max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; background: linear-gradient(to bottom, var(--royal-bg), #0d2249); }
-        .royal-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
+        .royal-card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border-top: 4px solid var(--royal-gold); }
         
-        /* Configuration Logo & Façades */
-        .config-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-top: 10px; }
-        .upload-zone { border: 2px dashed var(--royal-gold); border-radius: 8px; padding: 10px; text-align: center; background: #f9f9f9; cursor: pointer; font-size: 0.8rem; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .upload-zone img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        /* Configuration Logo & Titre */
+        .logo-config { display: flex; align-items: center; gap: 20px; background: #f0f4f8; padding: 15px; border-radius: 10px; border: 1px solid var(--royal-gold); margin-bottom: 20px; }
+        .logo-preview { width: 100px; height: 60px; border: 1px solid #ccc; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .logo-preview img { max-width: 100%; max-height: 100%; }
 
-        /* Éditeur Riche */
-        .toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; background: #eee; padding: 5px; border-radius: 6px; }
-        .toolbar button, .toolbar select, .toolbar input { cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: white; font-size: 0.8rem; font-weight: bold; height: 30px; }
-        .rich-note { border: 1px solid #ccc; padding: 12px; border-radius: 8px; min-height: 100px; background: #fff; font-size: 1rem; line-height: 1.4; }
+        /* Barre d'outils Expert */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; background: #eee; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
+        .toolbar button, .toolbar select, .toolbar input { cursor: pointer; border: 1px solid #bbb; border-radius: 4px; background: white; font-size: 0.85rem; font-weight: bold; height: 32px; padding: 0 10px; }
+        .rich-note { border: 1px solid #ccc; padding: 15px; border-radius: 8px; min-height: 100px; background: #fff; font-size: 1rem; line-height: 1.5; outline: none; }
 
-        .photo-item { display: flex; gap: 15px; background: #F4F7FD; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid #DAE3F0; position: relative; }
-        .photo-item img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
+        /* Draggable Photo Items */
+        .photo-list { display: flex; flex-direction: column; gap: 15px; }
+        .photo-item { 
+            display: flex; gap: 20px; background: #F4F7FD; padding: 20px; 
+            border-radius: 12px; border: 1px solid #DAE3F0; position: relative;
+            cursor: grab; transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .photo-item:active { cursor: grabbing; transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .photo-item.dragging { opacity: 0.5; background: #e0eafc; border: 2px dashed var(--royal-gold); }
+        .photo-item img { width: 160px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid var(--royal-gold); pointer-events: none; }
         
         .footer { padding: 20px; background: var(--royal-panel); border-top: 3px solid var(--royal-gold); text-align: center; }
-        .btn-royal { padding: 12px 30px; border-radius: 30px; border: none; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; text-transform: uppercase; }
+        .btn-royal { padding: 14px 40px; border-radius: 40px; border: none; font-weight: 800; cursor: pointer; background: linear-gradient(135deg, var(--royal-gold), var(--royal-gold-light)); color: #0A1A3C; text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
         #courage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(15px); }
-        /* Correction du nom du fichier selon GitHub */
-        #courage-photo { width: 320px; height: 320px; object-fit: cover; border-radius: 50%; border: 8px solid var(--royal-gold); }
+        #courage-photo { width: 320px; height: 320px; object-fit: cover; border-radius: 50%; border: 8px solid var(--royal-gold); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-<header><h1 style="margin:0; font-size: 1.1rem;">STUDIO CCAS - DIRECTION DES FINANCES</h1></header>
+<header><h1 style="margin:0; font-size: 1.2rem;">STUDIO DIAGNOSTIC - VILLE DE CRÉTEIL</h1></header>
 
 <div id="editor">
     <div class="royal-card">
-        <label><strong>1. TITRE & LOGO OFFICIEL :</strong></label>
-        <input type="text" id="proj-title" placeholder="Nom du Diagnostic (ex: RAFFRAICHISSEMENT)..." style="width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ddd; box-sizing: border-box;">
-        
-        <div class="config-grid">
-            <div class="upload-zone" onclick="document.getElementById('logo-in').click()">
-                <input type="file" id="logo-in" hidden onchange="hdlImg(this, 'logo')">
-                <div id="logo-pre">Charger Logo Ville</div>
+        <label><strong>1. LOGO & TITRE :</strong></label>
+        <div class="logo-config">
+            <div class="logo-preview" id="logo-pre">
+                <img src="Logo_Créteil_Val_Marne.svg.png" onerror="this.parentElement.innerHTML='Charger Logo'">
             </div>
-            <div style="display:flex; gap:10px;">
-                <div class="upload-zone" style="flex:1" onclick="document.getElementById('f1').click()">
-                    <input type="file" id="f1" hidden onchange="hdlImg(this, 'f1')">
-                    <div id="f1-pre">Façade 1</div>
-                </div>
-                <div class="upload-zone" style="flex:1" onclick="document.getElementById('f2').click()">
-                    <input type="file" id="f2" hidden onchange="hdlImg(this, 'f2')">
-                    <div id="f2-pre">Façade 2</div>
-                </div>
-            </div>
+            <input type="file" id="logo-in" onchange="loadLogo(this)">
+            <p style="font-size: 0.8rem; color: #555;">Chargez le logo ici pour l'intégrer définitivement.</p>
         </div>
+        <input type="text" id="proj-title" placeholder="Titre du Diagnostic..." style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc; box-sizing: border-box;">
     </div>
     
     <div id="main-list"></div>
-    <div style="text-align:center;"><button class="btn-royal" style="background:transparent; border:2px solid var(--royal-gold); color:var(--royal-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button></div>
+    <div style="text-align:center; margin-bottom:20px;">
+        <button class="btn-royal" style="background:transparent; border:2px solid var(--royal-gold); color:var(--royal-gold);" onclick="addBati()">+ AJOUTER UN BÂTIMENT</button>
+    </div>
 </div>
 
 <div class="footer"><button class="btn-royal" onclick="gen()">🚀 GÉNÉRER LE RAPPORT OFFICIEL (.HTML)</button></div>
 
 <div id="courage-overlay">
     <img src="courage.jpg.JPG" id="courage-photo">
-    <div style="margin-top:20px; font-size:2rem; color:white; text-align:center;">COURAGE MAMAN ! ❤️</div>
+    <div style="margin-top:25px; font-size:2rem; color:white; text-align:center;">COURAGE MAMAN ! ❤️</div>
 </div>
 
 <script>
-    let diagnostic = { logo: null, facades: [null, null], buildings: {} };
+    let diagnostic = { logo: null, buildings: {} };
 
-    function hdlImg(input, type) {
+    function loadLogo(input) {
         const reader = new FileReader();
         reader.onload = e => {
-            if(type === 'logo') { diagnostic.logo = e.target.result; document.getElementById('logo-pre').innerHTML = `<img src="${e.target.result}">`; }
-            else if(type === 'f1') { diagnostic.facades[0] = e.target.result; document.getElementById('f1-pre').innerHTML = `<img src="${e.target.result}">`; }
-            else if(type === 'f2') { diagnostic.facades[1] = e.target.result; document.getElementById('f2-pre').innerHTML = `<img src="${e.target.result}">`; }
+            diagnostic.logo = e.target.result;
+            document.getElementById('logo-pre').innerHTML = `<img src="${e.target.result}">`;
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -91,7 +90,7 @@
     function up(n, input) {
         Array.from(input.files).forEach(f => {
             const reader = new FileReader();
-            reader.onload = e => { diagnostic.buildings[n].push({ img: e.target.result, desc: "" }); render(); };
+            reader.onload = e => { diagnostic.buildings[n].push({ id: Date.now() + Math.random(), img: e.target.result, desc: "" }); render(); };
             reader.readAsDataURL(f); // UHD [cite: 2026-01-02]
         });
     }
@@ -101,67 +100,112 @@
     function render() {
         const list = document.getElementById('main-list'); list.innerHTML = '';
         for (let b in diagnostic.buildings) {
-            let h = `<div class="royal-card"><h3>${b}</h3><input type="file" multiple onchange="up('${b}', this)">`;
+            let batiCard = document.createElement('div');
+            batiCard.className = 'royal-card';
+            batiCard.innerHTML = `<h3>${b}</h3><input type="file" multiple onchange="up('${b}', this)" style="margin-bottom:15px;">`;
+            
+            let photoList = document.createElement('div');
+            photoList.className = 'photo-list';
+            photoList.dataset.building = b;
+
             diagnostic.buildings[b].forEach((p, i) => {
-                h += `<div class="photo-item"><img src="${p.img}">
-                    <div style="flex:1">
+                let item = document.createElement('div');
+                item.className = 'photo-item';
+                item.draggable = true;
+                item.dataset.index = i;
+                item.innerHTML = `
+                    <img src="${p.img}">
+                    <div style="flex:1" onpointerdown="event.stopPropagation()">
                         <div class="toolbar">
                             <button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button><button onclick="cmd('underline')">U</button>
-                            <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option></select>
-                            <input type="color" title="Texte" onchange="cmd('foreColor', this.value)">
-                            <input type="color" title="Surligné" value="#ffff00" onchange="cmd('hiliteColor', this.value)">
+                            <input type="color" onchange="cmd('foreColor', this.value)">
+                            <input type="color" value="#ffff00" onchange="cmd('hiliteColor', this.value)">
                         </div>
-                        <div class="rich-note" contenteditable="true" oninput="diagnostic.buildings['${b}'][${i}].desc = this.innerHTML">${p.desc}</div>
+                        <div class="rich-note" contenteditable="true" oninput="saveDesc('${b}', ${i}, this.innerHTML)">${p.desc}</div>
                     </div>
-                </div>`;
+                `;
+                
+                // Drag and Drop Events
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('drop', handleDrop);
+                item.addEventListener('dragend', handleDragEnd);
+                
+                photoList.appendChild(item);
             });
-            list.innerHTML += h + `</div>`;
+            
+            batiCard.appendChild(photoList);
+            list.appendChild(batiCard);
         }
     }
+
+    function saveDesc(building, index, content) { diagnostic.buildings[building][index].desc = content; }
+
+    let dragSource = null;
+
+    function handleDragStart(e) {
+        dragSource = this;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        return false;
+    }
+
+    function handleDrop(e) {
+        e.stopPropagation();
+        if (dragSource !== this) {
+            const building = this.parentNode.dataset.building;
+            const fromIndex = parseInt(dragSource.dataset.index);
+            const toIndex = parseInt(this.dataset.index);
+            
+            const list = diagnostic.buildings[building];
+            const movedItem = list.splice(fromIndex, 1)[0];
+            list.splice(toIndex, 0, movedItem);
+            
+            render();
+        }
+        return false;
+    }
+
+    function handleDragEnd() { this.classList.remove('dragging'); }
 
     function gen() {
         const t = document.getElementById('proj-title').value || "Diagnostic";
         document.getElementById('courage-overlay').style.display = 'flex';
+        
         setTimeout(() => {
+            const dataStr = JSON.stringify(diagnostic);
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
                 :root { --gold: #CCA43B; --txt: #F4F7FD; }
-                body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
-                #side { width: 260px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; }
-                .nav-btn { width: 100%; padding: 18px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #222; }
-                .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 5px solid var(--gold); }
-                #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle, #142850, #0A1A3C); }
-                
-                /* LOGO FIXÉ ET EMBARQUÉ */
-                .logo-box { position: absolute; top: 25px; right: 25px; text-align: right; z-index: 200; pointer-events: none; }
-                .logo-box img { width: 150px; height: auto; margin-bottom: 5px; }
-                .logo-box p { margin: 0; font-size: 0.65rem; color: var(--gold); font-weight: bold; text-transform: uppercase; line-height: 1.2; max-width: 220px; }
-                
-                /* CADRE PRÉDÉFINI XXL */
-                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; }
-                .frame { width: 90%; height: 80%; border: 5px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px #000; position: relative; }
+                body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
+                #side { width: 280px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; z-index: 100; }
+                .nav-btn { width: 100%; padding: 22px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #1a1a1a; transition: 0.3s; }
+                .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 6px solid var(--gold); }
+                #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
+                .header-official { position: absolute; top: 30px; right: 30px; display: flex; flex-direction: column; align-items: flex-end; z-index: 200; }
+                .header-official img { width: 170px; height: auto; margin-bottom: 8px; filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5)); }
+                .header-official p { margin: 0; font-size: 0.7rem; color: var(--gold); text-align: right; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; max-width: 250px; line-height: 1.3; }
+                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 50px; position: relative; }
+                .frame { width: 90%; height: 85%; border: 5px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 60px rgba(0,0,0,0.9); position: relative; }
                 .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-                /* FLÈCHES FIXÉES AU CADRE */
-                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 30px; z-index: 210; }
-                .arr:hover { background: var(--gold); color: #000; }
-
-                .desc-box { padding: 30px 45px; background: rgba(5, 14, 36, 0.95); border-top: 3px solid var(--gold); min-height: 120px; font-size: 1.2rem; }
+                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.85); color: var(--gold); border: 2.5px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 210; }
+                .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 150px; z-index: 100; }
+                .desc-box h2 { margin: 0 0 15px 0; color: var(--gold); text-transform: uppercase; font-size: 1.6rem; letter-spacing: 1px; }
             </style></head><body>
-            <div id="side"><div style="padding:20px; color:var(--gold); border-bottom:1px solid #333; font-weight:700;">${t}</div><div id="m"></div></div>
+            <div id="side"><div style="padding:25px; color:var(--gold); font-weight:800; border-bottom:1px solid #333; font-size: 0.9rem; text-transform: uppercase;">${t}</div><div id="m"></div></div>
             <div id="main">
-                <div class="logo-box">
-                    <img src="${diagnostic.logo || ''}">
+                <div class="header-official">
+                    <img src="Logo_Créteil_Val_Marne.svg.png">
                     <p>Direction des Finances et des moyens Généraux du CCAS</p>
                 </div>
-                <div class="viewer">
-                    <div class="frame" id="v_fr">
-                        <div id="v_img" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div>
-                    </div>
-                </div>
-                <div class="desc-box"><h2 id="bn" style="margin:0 0 10px; color:var(--gold); text-transform:uppercase;"></h2><div id="txt"></div></div>
+                <div class="viewer"><div class="frame" id="v_fr"><div id="v_img" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div></div></div>
+                <div class="desc-box"><h2 id="bn"></h2><div id="txt" style="font-size: 1.3rem; line-height: 1.6;"></div></div>
             </div>
             <script>
-                const d = ${JSON.stringify(diagnostic)}; let cb = Object.keys(d.buildings)[0], ci = 0;
+                const d = ${dataStr}; let cb = Object.keys(d.buildings)[0], ci = 0;
                 function rNav() {
                     const m = document.getElementById('m'); m.innerHTML = '';
                     Object.keys(d.buildings).forEach(k => {
@@ -174,23 +218,23 @@
                     if(!its || its.length === 0) return;
                     vi.innerHTML = '<img src="' + its[ci].img + '">';
                     document.getElementById('bn').innerText = cb;
-                    document.getElementById('txt').innerHTML = its[ci].desc || "...";
-                    
+                    document.getElementById('txt').innerHTML = its[ci].desc || "Aucune observation technique.";
                     const old = fr.querySelectorAll('.arr'); old.forEach(a => a.remove());
                     if (its.length > 1) {
-                        const bL = document.createElement('button'); bL.className = 'arr'; bL.style.left = '-35px'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
-                        const bR = document.createElement('button'); bR.className = 'arr'; bR.style.right = '-35px'; bR.innerHTML = '❯'; bR.onclick = () => { ci=(ci+1)%its.length; s(); };
+                        const bL = document.createElement('button'); bL.className = 'arr'; bL.style.left = '-40px'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
+                        const bR = document.createElement('button'); bR.className = 'arr'; bR.style.right = '-40px'; bR.innerHTML = '❯'; bR.onclick = () => { ci=(ci+1)%its.length; s(); };
                         fr.appendChild(bL); fr.appendChild(bR);
                     }
                 }
                 window.onload = () => { rNav(); s(); };
             <\/script></body></html>`;
+            
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-            a.download = t.replace(/ /g, '_') + "_Officiel.html";
+            a.download = t.replace(/ /g, '_') + "_Officiel_Final.html";
             a.click();
             setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 3500);
-        }, 1000);
+        }, 800);
     }
 </script>
 </body>
