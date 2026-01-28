@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Prep-Studio CCAS | Direction des Finances</title>
+    <title>Prep-Studio CCAS | Version Finale</title>
     <style>
         :root { --royal-bg: #0A1A3C; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --white: #FFFFFF; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: #f0f2f5; color: #333; display: flex; height: 100vh; overflow: hidden; }
@@ -21,27 +21,23 @@
         #top-nav { background: white; padding: 15px 30px; border-bottom: 1px solid #e3e6f0; display: flex; justify-content: space-between; align-items: center; }
         #editor-workspace { flex: 1; overflow-y: auto; padding: 30px; }
 
-        /* MEGA TOOLBAR WORD-STYLE */
+        /* MEGA TOOLBAR */
         .mega-toolbar { display: flex; flex-wrap: wrap; gap: 4px; background: #f8f9fa; padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #ccc; border-bottom: none; position: sticky; top: 0; z-index: 50; }
         .tool-group { display: flex; gap: 2px; border-right: 1px solid #ddd; padding-right: 5px; margin-right: 5px; }
-        .mega-toolbar button, .mega-toolbar select { padding: 6px; cursor: pointer; border: 1px solid transparent; background: transparent; border-radius: 4px; font-size: 13px; min-width: 30px; }
+        .mega-toolbar button { padding: 6px; cursor: pointer; border: 1px solid transparent; background: transparent; border-radius: 4px; font-size: 13px; min-width: 30px; font-weight: bold; }
         .mega-toolbar button:hover { background: #e2e6ea; border-color: #adb5bd; }
-        .mega-toolbar input[type="color"] { width: 30px; height: 30px; padding: 0; border: none; cursor: pointer; background: none; }
+        .mega-toolbar input[type="color"] { width: 30px; height: 30px; border: none; cursor: pointer; background: none; }
         
-        .rich-box { border: 1px solid #ccc; padding: 25px; background: white; min-height: 180px; border-radius: 0 0 8px 8px; outline: none; font-size: 15px; line-height: 1.6; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .rich-box { border: 1px solid #ccc; padding: 25px; background: white; min-height: 180px; border-radius: 0 0 8px 8px; outline: none; font-size: 15px; line-height: 1.6; }
 
-        /* PHOTO MGMT */
-        .photo-entry { background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; border: 1px solid #e3e6f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .drag-handle { cursor: grab; color: var(--royal-gold); font-size: 20px; margin-bottom: 10px; display: inline-block; }
+        .photo-entry { background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; border: 1px solid #e3e6f0; }
         .preview-img { width: 240px; height: 135px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
 
-        /* SUPABASE */
         #sb-config { padding: 15px; background: #07142e; border-top: 1px solid rgba(255,255,255,0.1); }
         .sb-input { width: 100%; padding: 8px; margin-bottom: 6px; border-radius: 4px; border: none; font-size: 11px; background: rgba(255,255,255,0.1); color: white; }
 
         #courage-overlay { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
-        #courage-photo { width: 320px; height: 320px; border-radius: 50%; border: 8px solid var(--royal-gold); animation: pulse 2s infinite; object-fit: cover; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+        #courage-photo { width: 320px; height: 320px; border-radius: 50%; border: 8px solid var(--royal-gold); object-fit: cover; }
     </style>
 </head>
 <body>
@@ -50,13 +46,13 @@
     <div class="side-header"><h1>Studio Expertise CCAS</h1></div>
     <div id="building-list"></div>
     <div style="padding: 15px;">
-        <button onclick="addBati()" style="width:100%; padding:12px; border-radius:8px; border: 2px dashed var(--royal-gold); background:transparent; color:white; cursor:pointer; font-weight:bold;">+ Ajouter un Bâtiment</button>
+        <button onclick="addBati()" style="width:100%; padding:12px; border-radius:8px; border: 2px dashed var(--royal-gold); background:transparent; color:white; cursor:pointer; font-weight:bold;">+ Ajouter Structure</button>
     </div>
     <div id="sb-config">
-        <label style="font-size:10px; color:var(--royal-gold); font-weight:bold; text-transform:uppercase;">Archivage Cloud Supabase</label>
-        <input type="text" id="sb-url" placeholder="URL Supabase" class="sb-input">
-        <input type="password" id="sb-key" placeholder="API Key" class="sb-input">
-        <button onclick="alert('Connexion établie. Prêt pour archivage.')" style="width:100%; padding:8px; background:var(--royal-gold); border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">☁️ Connecter Base</button>
+        <label style="font-size:10px; color:var(--royal-gold); font-weight:bold;">ARCHIVAGE SUPABASE</label>
+        <input type="text" id="sb-url" placeholder="URL" class="sb-input">
+        <input type="password" id="sb-key" placeholder="Key" class="sb-input">
+        <button onclick="alert('Connecté')" style="width:100%; padding:8px; background:var(--royal-gold); border:none; border-radius:4px; font-weight:bold; cursor:pointer;">☁️ Sync</button>
     </div>
 </div>
 
@@ -64,49 +60,41 @@
     <div id="top-nav">
         <div style="display:flex; align-items:center; gap:15px;">
             <img src="Logo_Créteil_Val_Marne.svg.png" id="main-logo-src" style="height:45px;" crossorigin="anonymous">
-            <input type="text" id="project-title" placeholder="TITRE DU RAPPORT..." style="width:350px; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold; color:var(--royal-bg);">
+            <input type="text" id="project-title" placeholder="TITRE DU RAPPORT..." style="width:350px; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold;">
         </div>
-        <button onclick="generateReport()" style="padding:12px 35px; background:var(--royal-bg); color:white; border:none; border-radius:30px; font-weight:900; cursor:pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">💾 GÉNÉRER (.HTML)</button>
+        <button onclick="generateReport()" style="padding:12px 35px; background:var(--royal-bg); color:white; border:none; border-radius:30px; font-weight:900; cursor:pointer;">💾 GÉNÉRER (.HTML)</button>
     </div>
     
     <div id="editor-workspace">
-        <div id="active-title" style="margin-bottom:25px; font-size:1.8rem; font-weight:900; color:var(--royal-bg);">Bienvenue dans le Studio</div>
+        <div id="active-title" style="margin-bottom:25px; font-size:1.8rem; font-weight:900; color:var(--royal-bg);">Sélectionnez un bâtiment</div>
         <div id="photo-container"></div>
     </div>
 </div>
 
 <div id="courage-overlay">
     <img src="courage.jpg.JPG" id="courage-photo">
-    <h2 style="color:white; margin-top:30px; font-size: 2.2rem; font-weight:300;">COURAGE MAMIE ! ❤️</h2>
+    <h2 style="color:white; margin-top:30px; font-size: 2.2rem;">COURAGE MAMIE ! ❤️</h2>
 </div>
 
 <script>
     let diagnostic = { buildings: {} };
     let activeB = null;
-    let dragSrc = null;
 
     function addBati() {
         const name = prompt("Nom de la structure :");
-        if (name) {
-            diagnostic.buildings[name] = [];
-            renderSide();
-            switchB(name);
-        }
+        if (name) { diagnostic.buildings[name] = []; renderSide(); switchB(name); }
     }
 
     function renderSide() {
-        const list = document.getElementById('building-list');
-        list.innerHTML = '';
+        const list = document.getElementById('building-list'); list.innerHTML = '';
         Object.keys(diagnostic.buildings).forEach(b => {
             const div = document.createElement('div');
             div.className = `b-item ${activeB === b ? 'active' : ''}`;
-            div.innerHTML = `<span>${b}</span><span onclick="deleteB('${b}', event)" style="color:red; font-weight:bold; padding:5px;">×</span>`;
+            div.innerHTML = `<span>${b}</span>`;
             div.onclick = () => switchB(b);
             list.appendChild(div);
         });
     }
-
-    function deleteB(name, e) { e.stopPropagation(); if(confirm('Supprimer '+name+'?')) { delete diagnostic.buildings[name]; activeB = null; renderSide(); renderPhotos(); } }
 
     function switchB(name) { activeB = name; document.getElementById('active-title').innerText = name; renderSide(); renderPhotos(); }
 
@@ -114,62 +102,37 @@
         if (!activeB) return;
         Array.from(input.files).forEach(file => {
             const reader = new FileReader();
-            reader.onload = e => { diagnostic.buildings[activeB].push({ id: Date.now()+Math.random(), img: e.target.result, desc: "" }); renderPhotos(); };
-            reader.readAsDataURL(file); // UHD [cite: 2026-01-02]
+            reader.onload = e => { diagnostic.buildings[activeB].push({ img: e.target.result, desc: "" }); renderPhotos(); };
+            reader.readAsDataURL(file);
         });
     }
 
     function renderPhotos() {
         const cont = document.getElementById('photo-container');
-        cont.innerHTML = activeB ? `<input type="file" multiple onchange="upPhotos(this)" style="margin-bottom:30px; padding:20px; border:2px dashed #ccc; width:100%; box-sizing:border-box; background:white; cursor:pointer;">` : '';
-        
+        cont.innerHTML = activeB ? `<input type="file" multiple onchange="upPhotos(this)" style="margin-bottom:30px; padding:20px; border:2px dashed #ccc; width:100%; box-sizing:border-box; background:white;">` : '';
         if (!activeB) return;
 
         diagnostic.buildings[activeB].forEach((p, i) => {
             const card = document.createElement('div');
             card.className = 'photo-entry';
-            card.draggable = true;
-            card.dataset.index = i;
-            
             card.innerHTML = `
-                <div class="drag-handle">⠿ <span style="font-size:12px; font-weight:bold; vertical-align:middle;">GLISSER POUR RÉORDONNER</span></div>
                 <div style="display:flex; gap:25px;">
                     <img src="${p.img}" class="preview-img">
-                    <div style="flex:1" onpointerdown="event.stopPropagation()">
+                    <div style="flex:1">
                         <div class="mega-toolbar">
-                            <div class="tool-group"><button onclick="cmd('bold')"><b>B</b></button><button onclick="cmd('italic')"><i>I</i></button><button onclick="cmd('underline')"><u>U</u></button><button onclick="cmd('strikeThrough')"><s>S</s></button></div>
+                            <div class="tool-group"><button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button><button onclick="cmd('underline')">U</button></div>
                             <div class="tool-group">
-                                <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">Petit</option><option value="3">Normal</option><option value="5">Grand</option><option value="7">Titre</option></select>
-                                <select onchange="cmd('fontName', this.value)"><option value="Segoe UI">Police</option><option value="Arial">Arial</option><option value="Courier New">Code</option><option value="Georgia">Serif</option></select>
-                            </div>
-                            <div class="tool-group">
-                                <button onclick="cmd('justifyLeft')">⬅</button><button onclick="cmd('justifyCenter')">⬆</button><button onclick="cmd('justifyRight')">➡</button>
-                                <button onclick="cmd('insertUnorderedList')">• Liste</button>
+                                <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option></select>
                             </div>
                             <div class="tool-group">
                                 <label style="font-size:10px;">Texte:</label><input type="color" onchange="cmd('foreColor', this.value)">
                                 <label style="font-size:10px; margin-left:5px;">Surligne:</label><input type="color" value="#ffff00" onchange="cmd('hiliteColor', this.value)">
-                                <button onclick="cmd('removeFormat')" title="Effacer styles">🧹</button>
                             </div>
+                            <button onclick="cmd('insertUnorderedList')">• Liste</button>
                         </div>
                         <div class="rich-box" contenteditable="true" oninput="diagnostic.buildings['${activeB}'][${i}].desc = this.innerHTML">${p.desc}</div>
                     </div>
-                </div>
-            `;
-            
-            card.addEventListener('dragstart', () => { dragSrc = card; card.classList.add('dragging'); });
-            card.addEventListener('dragover', e => e.preventDefault());
-            card.addEventListener('drop', () => {
-                if (dragSrc !== card) {
-                    const list = diagnostic.buildings[activeB];
-                    const from = parseInt(dragSrc.dataset.index);
-                    const to = parseInt(card.dataset.index);
-                    const moved = list.splice(from, 1)[0];
-                    list.splice(to, 0, moved);
-                    renderPhotos();
-                }
-            });
-            card.addEventListener('dragend', () => card.classList.remove('dragging'));
+                </div>`;
             cont.appendChild(card);
         });
     }
@@ -186,7 +149,7 @@
     }
 
     function generateReport() {
-        const title = document.getElementById('project-title').value || "Diagnostic_CCAS";
+        const title = document.getElementById('project-title').value || "Diagnostic";
         document.getElementById('courage-overlay').style.display = 'flex';
         let b64Logo = "";
         try { b64Logo = getB64Logo(); } catch(e) { b64Logo = "Logo_Créteil_Val_Marne.svg.png"; }
@@ -197,24 +160,26 @@
                 :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
                 body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
                 #side { width: 280px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; }
-                .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #1a1a1a; font-size: 14px; }
+                .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
                 .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 6px solid var(--gold); }
                 #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
                 .logo-box { position: absolute; top: 30px; right: 30px; text-align: right; z-index: 200; }
                 .logo-box img { width: 170px; margin-bottom: 8px; }
-                .logo-box p { margin: 0; font-size: 0.72rem; color: var(--gold); font-weight: 700; text-transform: uppercase; line-height: 1.4; white-space: pre-line; width: 220px; letter-spacing: 0.5px; }
+                .logo-box p { margin: 0; font-size: 0.75rem; color: var(--gold); font-weight: 700; text-transform: uppercase; line-height: 1.4; letter-spacing: 0.5px; }
                 .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
                 .frame { width: 80%; aspect-ratio: 16/9; border: 5px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 60px #000; }
                 .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
-                .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 160px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
-                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2.5px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 210; }
-                .arr:hover { background: var(--gold); color: #000; }
+                .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 160px; }
+                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2.5px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 32px; }
             </style></head><body>
-            <div id="side"><div style="padding:25px; color:var(--gold); font-weight:800; border-bottom:1px solid #333; text-transform:uppercase; font-size:13px;">${title}</div><div id="m"></div></div>
+            <div id="side"><div style="padding:25px; color:var(--gold); font-weight:800; border-bottom:1px solid #333; text-transform:uppercase;">${title}</div><div id="m"></div></div>
             <div id="main">
-                <div class="logo-box"><img src="${b64Logo}"><p>DIRECTION DES FINANCES ET DES\\nMOYENS GÉNÉRAUX DU CCAS</p></div>
+                <div class="logo-box">
+                    <img src="${b64Logo}">
+                    <p>DIRECTION DES FINANCES ET DES<br>MOYENS GÉNÉRAUX DU CCAS</p>
+                </div>
                 <div class="viewer"><div class="frame" id="v_fr"><div id="v_img" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div></div></div>
-                <div class="desc-box"><h2 id="bn" style="color:var(--gold); margin:0 0 15px 0; text-transform:uppercase; letter-spacing:1px;"></h2><div id="txt" style="font-size:1.25rem;"></div></div>
+                <div class="desc-box"><h2 id="bn" style="color:var(--gold); margin:0 0 15px 0; text-transform:uppercase;"></h2><div id="txt" style="font-size:1.25rem;"></div></div>
             </div>
             <script>
                 const d = ${dataStr}; let cb = Object.keys(d.buildings)[0], ci = 0;
@@ -230,7 +195,7 @@
                     if(!its || its.length === 0) return;
                     vi.innerHTML = '<img src="' + its[ci].img + '">';
                     document.getElementById('bn').innerText = cb;
-                    document.getElementById('txt').innerHTML = its[ci].desc || "<i>Aucun diagnostic.</i>";
+                    document.getElementById('txt').innerHTML = its[ci].desc || "";
                     fr.querySelectorAll('.arr').forEach(a => a.remove());
                     if (its.length > 1) {
                         const bL = document.createElement('button'); bL.className = 'arr'; bL.style.left = '-40px'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
@@ -240,7 +205,6 @@
                 }
                 window.onload = () => { rN(); s(); };
             <\/script></body></html>`;
-            
             const a = document.createElement('a');
             const safe = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
             a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
