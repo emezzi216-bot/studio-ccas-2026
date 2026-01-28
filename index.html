@@ -2,229 +2,395 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | Direction des Finances</title>
+    <title>Studio CCAS | Master Edition</title>
     <style>
-        :root { --royal-bg: #0A1A3C; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --white: #FFFFFF; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; display: flex; height: 100vh; overflow: hidden; }
+        :root { --royal-bg: #0A1A3C; --royal-gold: #CCA43B; --royal-gold-light: #F4D03F; --white: #FFFFFF; --danger: #e74c3c; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: #eaeff2; display: flex; height: 100vh; overflow: hidden; color: #333; }
         
-        /* SIDEBAR */
-        #sidebar { width: 340px; background: var(--royal-bg); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.2); z-index: 100; }
-        .side-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .side-header h1 { font-size: 1.1rem; color: var(--royal-gold); margin: 0; text-transform: uppercase; }
+        /* --- SIDEBAR (GAUCHE) --- */
+        #sidebar { width: 320px; background: var(--royal-bg); color: white; display: flex; flex-direction: column; box-shadow: 5px 0 20px rgba(0,0,0,0.3); z-index: 100; flex-shrink: 0; }
+        .side-header { padding: 30px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; background: linear-gradient(to bottom, #0d2249, #0A1A3C); }
+        .side-header h1 { font-size: 1.2rem; color: var(--royal-gold); margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
+        
         #building-list { flex: 1; overflow-y: auto; padding: 15px; }
-        .b-item { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
-        .b-item:hover { background: rgba(255,255,255,0.1); border-color: var(--royal-gold); }
-        .b-item.active { background: var(--royal-gold); color: var(--royal-bg); font-weight: bold; }
+        .b-item { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 15px; margin-bottom: 8px; cursor: pointer; border-left: 4px solid transparent; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .b-item:hover { background: rgba(255,255,255,0.1); }
+        .b-item.active { background: rgba(204, 164, 59, 0.15); border-left-color: var(--royal-gold); color: var(--royal-gold); font-weight: bold; }
+        .del-b-btn { color: #ff6b6b; font-weight: bold; padding: 5px 10px; border-radius: 4px; transition: 0.2s; }
+        .del-b-btn:hover { background: rgba(255,0,0,0.2); }
 
-        /* MAIN */
-        #main { flex: 1; display: flex; flex-direction: column; background: #f8f9fc; }
-        #top-nav { background: white; padding: 15px 30px; border-bottom: 1px solid #e3e6f0; display: flex; justify-content: space-between; align-items: center; }
+        /* --- MAIN (DROITE) --- */
+        #main { flex: 1; display: flex; flex-direction: column; background: #f4f6f8; min-width: 0; }
+        
+        /* TOP NAV */
+        #top-nav { background: white; padding: 15px 30px; border-bottom: 1px solid #dce1e6; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .input-title { width: 400px; padding: 12px; border-radius: 6px; border: 2px solid #e2e8f0; font-weight: bold; font-size: 14px; transition: 0.2s; }
+        .input-title:focus { border-color: var(--royal-bg); outline: none; }
+        
+        .btn-gen { padding: 12px 30px; background: linear-gradient(135deg, var(--royal-bg), #1a3a6e); color: white; border: none; border-radius: 30px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(10, 26, 60, 0.4); transition: transform 0.2s; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
+        .btn-gen:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(10, 26, 60, 0.5); }
 
-        /* WORD-STYLE TOOLBAR */
-        .word-toolbar { display: flex; flex-wrap: wrap; gap: 4px; background: #f8f9fa; padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #ccc; border-bottom: none; position: sticky; top: 0; z-index: 50; }
-        .word-toolbar button, .word-toolbar select { padding: 6px; cursor: pointer; border: 1px solid #ddd; background: white; border-radius: 4px; font-weight: bold; font-size: 13px; }
-        .rich-box { border: 1px solid #ccc; padding: 20px; background: white; min-height: 150px; border-radius: 0 0 8px 8px; outline: none; font-size: 15px; }
+        /* --- EDITOR AREA --- */
+        #editor-workspace { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
+        #active-title { font-size: 2rem; color: var(--royal-bg); margin-bottom: 30px; border-bottom: 3px solid var(--royal-gold); display: inline-block; padding-bottom: 5px; }
 
-        /* ENTRIES */
-        .photo-entry { background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; border: 1px solid #e3e6f0; }
-        .preview-img { width: 240px; height: 135px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
-        .drag-handle { cursor: grab; color: var(--royal-gold); font-size: 20px; margin-bottom: 10px; display: block; }
+        /* PHOTO CARDS */
+        .photo-entry { background: white; border-radius: 12px; padding: 20px; margin-bottom: 30px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); position: relative; transition: transform 0.2s, box-shadow 0.2s; }
+        .photo-entry:hover { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: translateY(-2px); }
+        .photo-entry.dragging { opacity: 0.5; border: 2px dashed var(--royal-gold); transform: scale(0.98); }
 
-        #sb-config { padding: 15px; background: #07142e; border-top: 1px solid rgba(255,255,255,0.1); }
-        .sb-input { width: 100%; padding: 8px; margin-bottom: 6px; border-radius: 4px; border: none; font-size: 11px; background: rgba(255,255,255,0.1); color: white; }
+        .card-layout { display: flex; gap: 25px; align-items: flex-start; }
+        .preview-img { width: 260px; height: 160px; object-fit: cover; border-radius: 8px; border: 2px solid var(--royal-bg); background: #eee; flex-shrink: 0; }
+        
+        /* TOOLS */
+        .delete-btn { position: absolute; top: -12px; right: -12px; background: var(--danger); color: white; border: 3px solid white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.2s; z-index: 10; }
+        .delete-btn:hover { transform: scale(1.15) rotate(90deg); background: #c0392b; }
+        
+        .drag-handle { cursor: grab; color: #a0aec0; padding: 5px; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid #edf2f7; padding-right: 15px; margin-right: 5px; }
+        .drag-handle:hover { color: var(--royal-gold); }
+        .drag-handle span { font-size: 24px; line-height: 20px; }
 
-        #courage-overlay { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
-        #courage-photo { width: 320px; height: 320px; border-radius: 50%; border: 8px solid var(--royal-gold); object-fit: cover; }
+        /* RICH EDITOR */
+        .editor-wrapper { flex: 1; display: flex; flex-direction: column; border: 1px solid #cbd5e0; border-radius: 8px; overflow: hidden; }
+        .word-toolbar { background: #f7fafc; padding: 8px; border-bottom: 1px solid #cbd5e0; display: flex; gap: 5px; flex-wrap: wrap; }
+        .tool-grp { display: flex; gap: 2px; border-right: 1px solid #cbd5e0; padding-right: 8px; margin-right: 3px; align-items: center; }
+        .word-toolbar button, .word-toolbar select { padding: 6px 10px; border: 1px solid transparent; background: transparent; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; color: #4a5568; }
+        .word-toolbar button:hover { background: #edf2f7; color: var(--royal-bg); }
+        .rich-box { padding: 15px; min-height: 120px; outline: none; font-size: 14px; line-height: 1.6; color: #2d3748; overflow-y: auto; background: white; }
+        .rich-box:focus { background: #fffdf5; }
+
+        /* OVERLAY LOADING */
+        #courage-overlay { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(10px); }
+        #courage-photo { width: 350px; height: 350px; border-radius: 50%; border: 10px solid var(--royal-gold); object-fit: cover; box-shadow: 0 0 50px rgba(204, 164, 59, 0.5); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        .upload-label { display: block; padding: 40px; border: 3px dashed #cbd5e0; border-radius: 12px; text-align: center; background: white; cursor: pointer; color: #718096; font-weight: bold; font-size: 1.1rem; transition: 0.2s; }
+        .upload-label:hover { border-color: var(--royal-gold); color: var(--royal-bg); background: #fffdf0; }
     </style>
 </head>
 <body>
 
 <div id="sidebar">
-    <div class="side-header"><h1>Studio Expertise CCAS</h1></div>
+    <div class="side-header"><h1>STUDIO CCAS v5</h1><div style="font-size:0.7rem; opacity:0.7; margin-top:5px;">DIRECTION DES FINANCES</div></div>
     <div id="building-list"></div>
-    <div style="padding: 15px;">
-        <button onclick="addBati()" style="width:100%; padding:12px; border-radius:8px; border: 2px dashed var(--royal-gold); background:transparent; color:white; cursor:pointer; font-weight:bold;">+ Ajouter Structure</button>
-    </div>
-    <div id="sb-config">
-        <label style="font-size:10px; color:var(--royal-gold); font-weight:bold;">ARCHIVAGE CLOUD</label>
-        <input type="text" id="sb-url" placeholder="URL Supabase" class="sb-input">
-        <input type="password" id="sb-key" placeholder="Clé API" class="sb-input">
-        <button onclick="alert('Configuration prête.')" style="width:100%; padding:8px; background:var(--royal-gold); border:none; border-radius:4px; font-weight:bold; cursor:pointer;">☁️ Connecter</button>
+    <div style="padding: 20px; background: #08142b;">
+        <button onclick="addBati()" style="width:100%; padding:14px; border-radius:8px; border: 2px dashed var(--royal-gold); background:transparent; color:var(--royal-gold); cursor:pointer; font-weight:bold; font-size:14px; margin-bottom: 12px; transition:0.2s;">+ NOUVEAU BÂTIMENT</button>
+        <button onclick="resetData()" style="width:100%; padding:10px; border-radius:8px; background: #c0392b; border: none; color:white; cursor:pointer; font-size: 11px; font-weight:bold;">⚠️ TOUT REMETTRE À ZÉRO</button>
     </div>
 </div>
 
 <div id="main">
     <div id="top-nav">
-        <div style="display:flex; align-items:center; gap:15px;">
-            <img src="Logo_Créteil_Val_Marne.svg.png" id="main-logo-src" style="height:45px;" crossorigin="anonymous">
-            <input type="text" id="project-title" placeholder="NOM DU RAPPORT..." style="width:350px; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold;">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <img src="Logo_Créteil_Val_Marne.svg.png" id="main-logo-src" style="height:50px; display:block;" crossorigin="anonymous" onerror="this.src=''; this.alt='⚠️ LOGO MANQUANT SUR GITHUB'; this.style.color='red';">
+            <input type="text" id="project-title" class="input-title" placeholder="NOM DU DOSSIER (ex: PLAN FROID 2026)..." oninput="save()">
         </div>
-        <button onclick="generateReport()" style="padding:12px 35px; background:var(--royal-bg); color:white; border:none; border-radius:30px; font-weight:900; cursor:pointer;">💾 GÉNÉRER (.HTML)</button>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <span id="save-indicator" style="font-size:11px; font-weight:bold; color:#27ae60; opacity:0; transition: opacity 0.5s;">💾 SAUVEGARDÉ</span>
+            <button onclick="generateReport()" class="btn-gen"><span>GÉNÉRER LE FICHIER</span> 🚀</button>
+        </div>
     </div>
     
-    <div id="editor-workspace" style="flex:1; overflow-y:auto; padding:30px;">
-        <div id="active-title" style="margin-bottom:25px; font-size:1.8rem; font-weight:900; color:var(--royal-bg);">Sélectionnez un bâtiment</div>
+    <div id="editor-workspace">
+        <div id="active-title">Bienvenue au Studio</div>
         <div id="photo-container"></div>
     </div>
 </div>
 
 <div id="courage-overlay">
     <img src="courage.jpg.JPG" id="courage-photo">
-    <h2 style="color:white; margin-top:30px; font-size: 2.2rem;">COURAGE MAMIE ! ❤️</h2>
+    <h2 style="color:var(--royal-gold); margin-top:40px; font-size: 3rem; text-transform: uppercase; font-weight: 900; letter-spacing: 3px; text-shadow: 0 5px 15px rgba(0,0,0,0.5);">COURAGE MAMIE ! ❤️</h2>
+    <p style="color:white; font-size: 1.2rem; opacity: 0.8;">Finalisation du document officiel...</p>
 </div>
 
 <script>
-    let diagnostic = { buildings: {} };
+    // --- 1. COEUR DU SYSTÈME (Données & Sauvegarde) ---
+    let diagnostic = JSON.parse(localStorage.getItem('ccas_master_v5')) || { buildings: {} };
     let activeB = null;
     let dragSrc = null;
+    let logoBase64 = "";
 
+    // Chargement initial
+    window.onload = () => {
+        const img = document.getElementById('main-logo-src');
+        if(img.complete) convertLogo(img); else img.onload = () => convertLogo(img);
+        
+        if(diagnostic.title) document.getElementById('project-title').value = diagnostic.title;
+        renderSide();
+    };
+
+    function convertLogo(img) {
+        try {
+            const c = document.createElement('canvas');
+            c.width = img.naturalWidth; c.height = img.naturalHeight;
+            c.getContext('2d').drawImage(img, 0, 0);
+            logoBase64 = c.toDataURL('image/png');
+        } catch(e) { console.warn("Logo non converti (local/cors) :", e); }
+    }
+
+    function save() {
+        diagnostic.title = document.getElementById('project-title').value;
+        localStorage.setItem('ccas_master_v5', JSON.stringify(diagnostic));
+        const ind = document.getElementById('save-indicator');
+        ind.style.opacity = 1; setTimeout(() => ind.style.opacity = 0, 1500);
+    }
+
+    function resetData() {
+        if(confirm("ATTENTION : Vous allez tout effacer pour recommencer à zéro.\n\nConfirmer ?")) {
+            localStorage.removeItem('ccas_master_v5');
+            location.reload();
+        }
+    }
+
+    // --- 2. GESTION DES STRUCTURES (Gauche) ---
     function addBati() {
-        const name = prompt("Nom de la structure :");
-        if (name) { diagnostic.buildings[name] = []; renderSide(); switchB(name); }
+        const name = prompt("Nom du Bâtiment / Structure :");
+        if (name && name.trim()) {
+            if(!diagnostic.buildings[name]) {
+                diagnostic.buildings[name] = [];
+                renderSide();
+                switchB(name);
+                save();
+            } else alert("Ce bâtiment existe déjà !");
+        }
     }
 
     function renderSide() {
         const list = document.getElementById('building-list'); list.innerHTML = '';
         Object.keys(diagnostic.buildings).forEach(b => {
-            const div = document.createElement('div');
-            div.className = `b-item ${activeB === b ? 'active' : ''}`;
-            div.innerHTML = `<span>${b}</span><span onclick="delB('${b}', event)" style="color:red; font-weight:bold;">×</span>`;
-            div.onclick = () => switchB(b);
-            list.appendChild(div);
+            const item = document.createElement('div');
+            item.className = `b-item ${activeB === b ? 'active' : ''}`;
+            item.innerHTML = `<span>${b}</span><span class="del-b-btn" onclick="delB('${b}', event)">×</span>`;
+            item.onclick = () => switchB(b);
+            list.appendChild(item);
         });
     }
 
-    function delB(n, e) { e.stopPropagation(); if(confirm('Supprimer '+n+'?')){ delete diagnostic.buildings[n]; activeB=null; renderSide(); renderPhotos(); }}
+    function delB(n, e) {
+        e.stopPropagation();
+        if(confirm("Supprimer définitivement le dossier : " + n + " ?")) {
+            delete diagnostic.buildings[n];
+            if(activeB === n) { activeB = null; document.getElementById('photo-container').innerHTML = ''; document.getElementById('active-title').innerText = "Accueil"; }
+            renderSide(); save();
+        }
+    }
 
-    function switchB(name) { activeB = name; document.getElementById('active-title').innerText = name; renderSide(); renderPhotos(); }
+    function switchB(name) {
+        activeB = name;
+        document.getElementById('active-title').innerText = name;
+        renderSide();
+        renderPhotos();
+    }
 
+    // --- 3. GESTION DES PHOTOS (Centre) ---
     function upPhotos(input) {
         if (!activeB) return;
         Array.from(input.files).forEach(file => {
             const reader = new FileReader();
-            reader.onload = e => { diagnostic.buildings[activeB].push({ img: e.target.result, desc: "" }); renderPhotos(); };
+            reader.onload = e => {
+                diagnostic.buildings[activeB].push({ img: e.target.result, desc: "" });
+                renderPhotos(); save();
+            };
             reader.readAsDataURL(file);
         });
     }
 
+    function delPhoto(idx) {
+        if(confirm("Supprimer cette photo ?")) {
+            diagnostic.buildings[activeB].splice(idx, 1);
+            renderPhotos(); save();
+        }
+    }
+
     function renderPhotos() {
         const cont = document.getElementById('photo-container');
-        cont.innerHTML = activeB ? `<input type="file" multiple onchange="upPhotos(this)" style="margin-bottom:30px; padding:20px; border:2px dashed #ccc; width:100%; box-sizing:border-box; background:white;">` : '';
-        if (!activeB) return;
+        if (!activeB) { cont.innerHTML = '<div style="text-align:center; color:#888; font-style:italic;">Cliquez sur "+ NOUVEAU BÂTIMENT" à gauche pour commencer.</div>'; return; }
+        
+        cont.innerHTML = `<label class="upload-label">+ AJOUTER DES PHOTOS ICI (Sélection multiple possible)<input type="file" multiple onchange="upPhotos(this)" style="display:none;"></label>`;
 
         diagnostic.buildings[activeB].forEach((p, i) => {
             const card = document.createElement('div');
             card.className = 'photo-entry';
             card.draggable = true;
             card.dataset.index = i;
+            
             card.innerHTML = `
-                <div class="drag-handle" onpointerdown="event.stopPropagation()">⠿ <span style="font-size:12px;">RÉORDONNER</span></div>
-                <div style="display:flex; gap:25px;">
+                <div class="delete-btn" onclick="delPhoto(${i})" title="Supprimer">×</div>
+                <div class="card-layout">
+                    <div class="drag-handle" title="Maintenir pour déplacer"><span>⠿</span></div>
                     <img src="${p.img}" class="preview-img">
-                    <div style="flex:1" onpointerdown="event.stopPropagation()">
+                    <div class="editor-wrapper" onpointerdown="event.stopPropagation()">
                         <div class="word-toolbar">
-                            <button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button><button onclick="cmd('underline')">U</button>
-                            <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">Petit</option><option value="3">Normal</option><option value="5">Grand</option></select>
-                            <input type="color" onchange="cmd('foreColor', this.value)">
-                            <button onclick="cmd('hiliteColor', '#FFFF00')">Surligner</button>
+                            <div class="tool-grp"><button onclick="cmd('bold')"><b>G</b></button><button onclick="cmd('italic')"><i>I</i></button><button onclick="cmd('underline')"><u>S</u></button></div>
+                            <div class="tool-grp"><select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="2">Petit</option><option value="5">Grand</option><option value="6">Titre</option></select></div>
+                            <div class="tool-grp">
+                                <button onclick="cmd('justifyLeft')">⇤</button><button onclick="cmd('justifyCenter')">⇹</button>
+                                <button onclick="cmd('insertUnorderedList')">• Liste</button>
+                            </div>
+                            <div class="tool-grp">
+                                <input type="color" onchange="cmd('foreColor', this.value)" title="Couleur Texte">
+                                <button onclick="cmd('hiliteColor', '#FFFF00')" title="Surligneur Jaune" style="background:#FFFF00; color:black;">🖍️</button>
+                            </div>
                         </div>
-                        <div class="rich-box" contenteditable="true" oninput="diagnostic.buildings['${activeB}'][${i}].desc = this.innerHTML">${p.desc}</div>
+                        <div class="rich-box" contenteditable="true" 
+                             oninput="diagnostic.buildings['${activeB}'][${i}].desc = this.innerHTML; save()"
+                             onpaste="setTimeout(save, 100)">${p.desc}</div>
                     </div>
                 </div>`;
-            card.addEventListener('dragstart', () => { dragSrc = card; card.style.opacity = '0.5'; });
+            
+            // Drag & Drop Robuste
+            card.addEventListener('dragstart', () => { dragSrc = card; card.classList.add('dragging'); });
             card.addEventListener('dragover', e => e.preventDefault());
             card.addEventListener('drop', () => {
-                const list = diagnostic.buildings[activeB];
-                const from = parseInt(dragSrc.dataset.index);
-                const to = parseInt(card.dataset.index);
-                const moved = list.splice(from, 1)[0];
-                list.splice(to, 0, moved);
-                renderPhotos();
+                if (dragSrc !== card) {
+                    const list = diagnostic.buildings[activeB];
+                    const from = parseInt(dragSrc.dataset.index);
+                    const to = parseInt(card.dataset.index);
+                    const moved = list.splice(from, 1)[0];
+                    list.splice(to, 0, moved);
+                    renderPhotos(); save();
+                }
             });
+            card.addEventListener('dragend', () => card.classList.remove('dragging'));
+            
             cont.appendChild(card);
         });
     }
 
     function cmd(c, v = null) { document.execCommand(c, false, v); }
 
-    function getB64Logo() {
-        const img = document.getElementById('main-logo-src');
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        return canvas.toDataURL('image/png');
-    }
-
+    // --- 4. MOTEUR DE GÉNÉRATION (Le Rapport Final) ---
     function generateReport() {
         const title = document.getElementById('project-title').value || "Diagnostic_CCAS";
         document.getElementById('courage-overlay').style.display = 'flex';
-        let b64Logo = "";
-        try { b64Logo = getB64Logo(); } catch(e) { b64Logo = "Logo_Créteil_Val_Marne.svg.png"; }
+        
+        // Utilisation du logo sécurisé ou repli sur le fichier
+        const finalLogo = logoBase64 || "Logo_Créteil_Val_Marne.svg.png";
 
         setTimeout(() => {
-            const dataStr = JSON.stringify(diagnostic).replace(/</g, '\\u003c');
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>
+            const dataStr = JSON.stringify(diagnostic).replace(/</g, '\\u003c'); // Sécurité script
+            
+            // TEMPLATE HTML FINAL INJECTÉ
+            const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${title}</title><style>
                 :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
-                body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
-                #side { width: 280px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; }
-                .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
-                .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 6px solid var(--gold); }
+                body { font-family: 'Segoe UI', 'Helvetica Neue', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
+                
+                /* NAVIGATION GAUCHE */
+                #side { width: 280px; background: #050E24; border-right: 3px solid var(--gold); display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+                .nav-title { padding: 25px; color: var(--gold); font-weight: 800; border-bottom: 1px solid #1f2d40; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; text-align:center; }
+                .nav-scroll { flex:1; overflow-y:auto; }
+                .nav-btn { width: 100%; padding: 20px 25px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #111; font-size: 14px; transition: 0.3s; }
+                .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 30px; }
+                .nav-btn.active { color: var(--gold); background: rgba(204, 164, 59, 0.1); border-left: 5px solid var(--gold); font-weight: bold; }
+
+                /* ZONE PRINCIPALE */
                 #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
                 
-                /* POSITION LOGO REMONTÉE ET DÉCALLÉE TOUT À DROITE */
-                .logo-box { position: absolute; top: 15px; right: 15px; text-align: right; z-index: 500; pointer-events: none; }
-                .logo-box img { width: 160px; margin-bottom: 5px; }
-                .logo-box p { margin: 0; font-size: 0.7rem; color: var(--gold); font-weight: 700; text-transform: uppercase; line-height: 1.3; width: 220px; letter-spacing: 0.5px; }
+                /* --- ZONE SANCTUARISÉE (Logo + Texte) --- 
+                   Position absolue Top Right.
+                   Padding Right sur le Viewer garantit que l'image ne touche jamais cette zone.
+                */
+                .header-zone { position: absolute; top: 25px; right: 25px; text-align: right; z-index: 50; pointer-events: none; }
+                .header-logo { width: 180px; margin-bottom: 10px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
+                .header-text { margin: 0; font-size: 0.75rem; color: var(--gold); font-weight: 700; text-transform: uppercase; line-height: 1.4; letter-spacing: 0.5px; width: 250px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
-                /* CADRE RÉDUIT ET DÉCALLÉ POUR ÉVITER LE TEXTE */
-                .viewer { flex: 1; display: flex; align-items: center; justify-content: flex-start; padding: 40px; padding-right: 280px; }
-                .frame { width: 100%; aspect-ratio: 16/9; border: 4px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 50px #000; }
-                .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                /* VIEWER AVEC COULOIR DE SÉCURITÉ À DROITE */
+                .viewer-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; padding-right: 300px; /* <--- LE COULOIR DE SÉCURITÉ */ }
                 
-                .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 160px; z-index: 100; }
-                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2.5px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 210; }
+                /* CADRE 16:9 FIXE ET ÉLÉGANT */
+                .frame { width: 100%; max-width: 1400px; aspect-ratio: 16/9; border: 4px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.8); border-radius: 2px; }
+                .frame img { width: 100%; height: 100%; object-fit: contain; } /* L'image s'adapte sans déformer */
+
+                /* NAVIGATION FLÈCHES */
+                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.8); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 30px; z-index: 60; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; }
+                .arr:hover { background: var(--gold); color: #000; scale: 1.1; }
+                .arr-left { left: -35px; } .arr-right { right: -35px; }
+
+                /* DESCRIPTION BASSE */
+                .desc-box { padding: 35px 50px; background: rgba(5, 14, 36, 0.95); border-top: 4px solid var(--gold); min-height: 150px; z-index: 40; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+                .desc-title { margin: 0 0 15px 0; color: var(--gold); font-size: 1.8rem; text-transform: uppercase; font-weight: 300; letter-spacing: 2px; border-bottom: 1px solid rgba(204, 164, 59, 0.3); padding-bottom: 10px; display: inline-block; }
+                .desc-content { font-size: 1.3rem; line-height: 1.6; font-weight: 300; color: #eef; }
+                /* Preservation du formatage riche */
+                .desc-content ul { padding-left: 20px; } .desc-content strong { color: white; font-weight: 600; }
             </style></head><body>
-            <div id="side"><div style="padding:25px; color:var(--gold); font-weight:800; border-bottom:1px solid #333; text-transform:uppercase;">${title}</div><div id="m"></div></div>
+            <div id="side">
+                <div class="nav-title">${title}</div>
+                <div id="nav-list" class="nav-scroll"></div>
+            </div>
             <div id="main">
-                <div class="logo-box">
-                    <img src="${b64Logo}">
-                    <p>DIRECTION DES FINANCES ET DES<br>MOYENS GÉNÉRAUX DU CCAS</p>
+                <div class="header-zone">
+                    <img src="${finalLogo}" class="header-logo">
+                    <p class="header-text">DIRECTION DES FINANCES ET DES<br>MOYENS GÉNÉRAUX DU CCAS</p>
                 </div>
-                <div class="viewer"><div class="frame" id="v_fr"><div id="v_img" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div></div></div>
-                <div class="desc-box"><h2 id="bn" style="color:var(--gold); margin:0 0 10px 0; text-transform:uppercase;"></h2><div id="txt" style="font-size:1.25rem;"></div></div>
+                <div class="viewer-container">
+                    <div class="frame" id="frame-box">
+                        <div id="img-slot" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div>
+                    </div>
+                </div>
+                <div class="desc-box">
+                    <h2 id="b-name" class="desc-title"></h2>
+                    <div id="txt-content" class="desc-content"></div>
+                </div>
             </div>
             <script>
-                const d = ${dataStr}; let cb = Object.keys(d.buildings)[0], ci = 0;
-                function rN() {
-                    const m = document.getElementById('m'); m.innerHTML = '';
-                    Object.keys(d.buildings).forEach(k => {
-                        const b = document.createElement('button'); b.className = 'nav-btn' + (cb === k ? ' active' : '');
-                        b.innerText = k; b.onclick = () => { cb = k; ci = 0; s(); rN(); }; m.appendChild(b);
+                const data = ${dataStr}; 
+                let curB = Object.keys(data.buildings)[0]; 
+                let curI = 0;
+
+                function renderNav() {
+                    const list = document.getElementById('nav-list'); list.innerHTML = '';
+                    Object.keys(data.buildings).forEach(k => {
+                        const btn = document.createElement('button');
+                        btn.className = 'nav-btn' + (curB === k ? ' active' : '');
+                        btn.innerText = k;
+                        btn.onclick = () => { curB = k; curI = 0; show(); renderNav(); };
+                        list.appendChild(btn);
                     });
                 }
-                function s() {
-                    const vi = document.getElementById('v_img'), fr = document.getElementById('v_fr'), its = d.buildings[cb];
-                    if(!its || its.length === 0) return;
-                    vi.innerHTML = '<img src="' + its[ci].img + '">';
-                    document.getElementById('bn').innerText = cb;
-                    document.getElementById('txt').innerHTML = its[ci].desc || "";
-                    fr.querySelectorAll('.arr').forEach(a => a.remove());
-                    if (its.length > 1) {
-                        const bL = document.createElement('button'); bL.className = 'arr'; bL.style.left = '-40px'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
-                        const bR = document.createElement('button'); bR.className = 'arr'; bR.style.right = '-40px'; bR.innerHTML = '❯'; bR.onclick = () => { ci=(ci+1)%its.length; s(); };
-                        fr.appendChild(bL); fr.appendChild(bR);
+
+                function show() {
+                    const slot = document.getElementById('img-slot');
+                    const frame = document.getElementById('frame-box');
+                    const items = data.buildings[curB];
+
+                    if(!items || items.length === 0) { 
+                        slot.innerHTML = '<div style="color:#666; font-style:italic;">Aucune photo dans ce dossier</div>';
+                        document.getElementById('b-name').innerText = curB;
+                        document.getElementById('txt-content').innerHTML = "";
+                        frame.querySelectorAll('.arr').forEach(a => a.remove());
+                        return; 
+                    }
+
+                    // Injection image
+                    slot.innerHTML = '<img src="' + items[curI].img + '">';
+                    document.getElementById('b-name').innerText = curB;
+                    document.getElementById('txt-content').innerHTML = items[curI].desc || "<i>Aucune observation saisie.</i>";
+
+                    // Gestion Flèches
+                    frame.querySelectorAll('.arr').forEach(a => a.remove());
+                    if (items.length > 1) {
+                        const l = document.createElement('div'); l.className = 'arr arr-left'; l.innerHTML = '❮';
+                        l.onclick = () => { curI = (curI - 1 + items.length) % items.length; show(); };
+                        const r = document.createElement('div'); r.className = 'arr arr-right'; r.innerHTML = '❯';
+                        r.onclick = () => { curI = (curI + 1) % items.length; show(); };
+                        frame.appendChild(l); frame.appendChild(r);
                     }
                 }
-                window.onload = () => { rN(); s(); };
+
+                window.onload = () => { if(curB) { renderNav(); show(); } };
             <\/script></body></html>`;
+            
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            const safe = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-            a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-            a.download = safe + ".html";
+            a.href = url;
+            // Nettoyage nom de fichier
+            const safeName = title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || "rapport_ccas";
+            a.download = safeName + ".html";
             a.click();
-            document.getElementById('courage-overlay').style.display = 'none';
-        }, 1200);
+            
+            setTimeout(() => { document.getElementById('courage-overlay').style.display = 'none'; }, 2000);
+        }, 1000);
     }
 </script>
 </body>
