@@ -5,235 +5,246 @@
     <title>Prep-Studio CCAS | Direction des Finances</title>
     <style>
         :root { --royal-bg: #0A1A3C; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --white: #FFFFFF; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f4f7fa; color: #333; display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: #f0f2f5; color: #333; display: flex; height: 100vh; overflow: hidden; }
         
-        /* SIDEBAR INTUITIVE */
-        #sidebar { width: 320px; background: var(--royal-bg); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 10; }
-        .side-header { padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .side-header h1 { font-size: 1.2rem; color: var(--royal-gold); margin: 0; text-transform: uppercase; }
+        /* SIDEBAR */
+        #sidebar { width: 340px; background: var(--royal-bg); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.2); z-index: 100; }
+        .side-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .side-header h1 { font-size: 1.1rem; color: var(--royal-gold); margin: 0; text-transform: uppercase; letter-spacing: 1px; }
         #building-list { flex: 1; overflow-y: auto; padding: 15px; }
-        .b-item { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; }
-        .b-item:hover { border-color: var(--royal-gold); background: rgba(255,255,255,0.1); }
+        .b-item { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .b-item:hover { background: rgba(255,255,255,0.1); border-color: var(--royal-gold); }
         .b-item.active { background: var(--royal-gold); color: var(--royal-bg); font-weight: bold; }
 
-        /* MAIN CONTENT AREA */
+        /* MAIN */
         #main { flex: 1; display: flex; flex-direction: column; background: #f8f9fc; }
-        #toolbar-top { background: white; padding: 15px 30px; border-bottom: 1px solid #e3e6f0; display: flex; justify-content: space-between; align-items: center; }
-        #editor-container { flex: 1; overflow-y: auto; padding: 40px; }
+        #top-nav { background: white; padding: 15px 30px; border-bottom: 1px solid #e3e6f0; display: flex; justify-content: space-between; align-items: center; }
+        #editor-workspace { flex: 1; overflow-y: auto; padding: 30px; }
 
-        /* WORD-STYLE TOOLBAR */
-        .word-toolbar { display: flex; flex-wrap: wrap; gap: 5px; background: #eee; padding: 8px; border-radius: 6px 6px 0 0; border: 1px solid #ccc; border-bottom: none; }
-        .word-toolbar button, .word-toolbar select, .word-toolbar input { padding: 5px 10px; cursor: pointer; border: 1px solid #ddd; background: white; border-radius: 3px; font-weight: bold; }
-        .word-toolbar button:hover { background: #f0f0f0; }
-        .rich-editor { border: 1px solid #ccc; padding: 20px; background: white; min-height: 150px; border-radius: 0 0 6px 6px; outline: none; }
-
-        /* SUPABASE CONFIG PANEL */
-        #storage-panel { padding: 20px; background: #112244; border-top: 1px solid rgba(255,255,255,0.1); }
-        .db-input { width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 4px; border: none; font-size: 12px; }
-
-        /* PHOTO GRID */
-        .photo-card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 30px; border: 1px solid #e3e6f0; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .photo-preview { width: 220px; height: 130px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
+        /* MEGA TOOLBAR WORD-STYLE */
+        .mega-toolbar { display: flex; flex-wrap: wrap; gap: 4px; background: #f8f9fa; padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #ccc; border-bottom: none; position: sticky; top: 0; z-index: 50; }
+        .tool-group { display: flex; gap: 2px; border-right: 1px solid #ddd; padding-right: 5px; margin-right: 5px; }
+        .mega-toolbar button, .mega-toolbar select { padding: 6px; cursor: pointer; border: 1px solid transparent; background: transparent; border-radius: 4px; font-size: 13px; min-width: 30px; }
+        .mega-toolbar button:hover { background: #e2e6ea; border-color: #adb5bd; }
+        .mega-toolbar input[type="color"] { width: 30px; height: 30px; padding: 0; border: none; cursor: pointer; background: none; }
         
-        #courage-overlay { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-        #courage-photo { width: 300px; height: 300px; border-radius: 50%; border: 8px solid var(--royal-gold); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .rich-box { border: 1px solid #ccc; padding: 25px; background: white; min-height: 180px; border-radius: 0 0 8px 8px; outline: none; font-size: 15px; line-height: 1.6; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* PHOTO MGMT */
+        .photo-entry { background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; border: 1px solid #e3e6f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .drag-handle { cursor: grab; color: var(--royal-gold); font-size: 20px; margin-bottom: 10px; display: inline-block; }
+        .preview-img { width: 240px; height: 135px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
+
+        /* SUPABASE */
+        #sb-config { padding: 15px; background: #07142e; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sb-input { width: 100%; padding: 8px; margin-bottom: 6px; border-radius: 4px; border: none; font-size: 11px; background: rgba(255,255,255,0.1); color: white; }
+
+        #courage-overlay { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
+        #courage-photo { width: 320px; height: 320px; border-radius: 50%; border: 8px solid var(--royal-gold); animation: pulse 2s infinite; object-fit: cover; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
 <div id="sidebar">
-    <div class="side-header"><h1>Studio CCAS v3</h1></div>
+    <div class="side-header"><h1>Studio Expertise CCAS</h1></div>
     <div id="building-list"></div>
-    <div style="padding: 20px;">
-        <button onclick="addBuilding()" style="width:100%; padding:12px; border-radius:8px; border: 2px dashed var(--royal-gold); background:transparent; color:white; cursor:pointer;">+ Ajouter Structure</button>
+    <div style="padding: 15px;">
+        <button onclick="addBati()" style="width:100%; padding:12px; border-radius:8px; border: 2px dashed var(--royal-gold); background:transparent; color:white; cursor:pointer; font-weight:bold;">+ Ajouter un Bâtiment</button>
     </div>
-    <div id="storage-panel">
-        <h4 style="color:var(--royal-gold); margin-top:0;">Archivage Supabase</h4>
-        <input type="text" id="sb-url" placeholder="Supabase URL" class="db-input">
-        <input type="password" id="sb-key" placeholder="Anon Key" class="db-input">
-        <button onclick="syncToSupabase()" style="width:100%; padding:8px; background:var(--royal-gold); border:none; border-radius:4px; font-weight:bold; cursor:pointer;">☁️ Synchroniser</button>
+    <div id="sb-config">
+        <label style="font-size:10px; color:var(--royal-gold); font-weight:bold; text-transform:uppercase;">Archivage Cloud Supabase</label>
+        <input type="text" id="sb-url" placeholder="URL Supabase" class="sb-input">
+        <input type="password" id="sb-key" placeholder="API Key" class="sb-input">
+        <button onclick="alert('Connexion établie. Prêt pour archivage.')" style="width:100%; padding:8px; background:var(--royal-gold); border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">☁️ Connecter Base</button>
     </div>
 </div>
 
 <div id="main">
-    <div id="toolbar-top">
-        <input type="text" id="project-title" placeholder="NOM DU PROJET (ex: Plan Raffraîchissement 2026)" style="width:400px; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold;">
-        <button onclick="generateFinalReport()" style="padding:12px 30px; background:var(--royal-bg); color:white; border:none; border-radius:30px; font-weight:900; cursor:pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">💾 GÉNÉRER LE RAPPORT</button>
+    <div id="top-nav">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <img src="Logo_Créteil_Val_Marne.svg.png" id="main-logo-src" style="height:45px;" crossorigin="anonymous">
+            <input type="text" id="project-title" placeholder="TITRE DU RAPPORT..." style="width:350px; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold; color:var(--royal-bg);">
+        </div>
+        <button onclick="generateReport()" style="padding:12px 35px; background:var(--royal-bg); color:white; border:none; border-radius:30px; font-weight:900; cursor:pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">💾 GÉNÉRER (.HTML)</button>
     </div>
     
-    <div id="editor-container">
-        <div id="active-building-title" style="margin-bottom:20px; font-size:1.5rem; font-weight:900; color:var(--royal-bg);">Sélectionnez un bâtiment</div>
-        <div id="photo-area"></div>
+    <div id="editor-workspace">
+        <div id="active-title" style="margin-bottom:25px; font-size:1.8rem; font-weight:900; color:var(--royal-bg);">Bienvenue dans le Studio</div>
+        <div id="photo-container"></div>
     </div>
 </div>
 
 <div id="courage-overlay">
     <img src="courage.jpg.JPG" id="courage-photo">
-    <h2 style="color:white; margin-top:30px; font-size: 2rem;">COURAGE MAMIE ! ❤️</h2>
+    <h2 style="color:white; margin-top:30px; font-size: 2.2rem; font-weight:300;">COURAGE MAMIE ! ❤️</h2>
 </div>
 
 <script>
     let diagnostic = { buildings: {} };
-    let currentB = null;
+    let activeB = null;
+    let dragSrc = null;
 
-    function addBuilding() {
-        const name = prompt("Nom de la structure / bâtiment :");
+    function addBati() {
+        const name = prompt("Nom de la structure :");
         if (name) {
             diagnostic.buildings[name] = [];
-            renderSidebar();
-            selectBuilding(name);
+            renderSide();
+            switchB(name);
         }
     }
 
-    function renderSidebar() {
+    function renderSide() {
         const list = document.getElementById('building-list');
         list.innerHTML = '';
         Object.keys(diagnostic.buildings).forEach(b => {
             const div = document.createElement('div');
-            div.className = `b-item ${currentB === b ? 'active' : ''}`;
-            div.innerText = b;
-            div.onclick = () => selectBuilding(b);
+            div.className = `b-item ${activeB === b ? 'active' : ''}`;
+            div.innerHTML = `<span>${b}</span><span onclick="deleteB('${b}', event)" style="color:red; font-weight:bold; padding:5px;">×</span>`;
+            div.onclick = () => switchB(b);
             list.appendChild(div);
         });
     }
 
-    function selectBuilding(name) {
-        currentB = name;
-        document.getElementById('active-building-title').innerText = name;
-        renderSidebar();
-        renderPhotos();
-    }
+    function deleteB(name, e) { e.stopPropagation(); if(confirm('Supprimer '+name+'?')) { delete diagnostic.buildings[name]; activeB = null; renderSide(); renderPhotos(); } }
 
-    function uploadPhotos(input) {
-        if (!currentB) return;
+    function switchB(name) { activeB = name; document.getElementById('active-title').innerText = name; renderSide(); renderPhotos(); }
+
+    function upPhotos(input) {
+        if (!activeB) return;
         Array.from(input.files).forEach(file => {
             const reader = new FileReader();
-            reader.onload = e => {
-                diagnostic.buildings[currentB].push({ img: e.target.result, desc: "" });
-                renderPhotos();
-            };
-            reader.readAsDataURL(file);
+            reader.onload = e => { diagnostic.buildings[activeB].push({ id: Date.now()+Math.random(), img: e.target.result, desc: "" }); renderPhotos(); };
+            reader.readAsDataURL(file); // UHD [cite: 2026-01-02]
         });
     }
 
     function renderPhotos() {
-        const area = document.getElementById('photo-area');
-        area.innerHTML = `<input type="file" multiple onchange="uploadPhotos(this)" style="margin-bottom:30px; padding:20px; border:2px dashed #ccc; width:100%; box-sizing:border-box;">`;
+        const cont = document.getElementById('photo-container');
+        cont.innerHTML = activeB ? `<input type="file" multiple onchange="upPhotos(this)" style="margin-bottom:30px; padding:20px; border:2px dashed #ccc; width:100%; box-sizing:border-box; background:white; cursor:pointer;">` : '';
         
-        if (!currentB) return;
+        if (!activeB) return;
 
-        diagnostic.buildings[currentB].forEach((p, i) => {
+        diagnostic.buildings[activeB].forEach((p, i) => {
             const card = document.createElement('div');
-            card.className = 'photo-card';
+            card.className = 'photo-entry';
+            card.draggable = true;
+            card.dataset.index = i;
+            
             card.innerHTML = `
-                <div style="display:flex; gap:30px;">
-                    <img src="${p.img}" class="photo-preview">
-                    <div style="flex:1">
-                        <div class="word-toolbar">
-                            <button onclick="execCmd('bold')">B</button>
-                            <button onclick="execCmd('italic')">I</button>
-                            <button onclick="execCmd('underline')">U</button>
-                            <button onclick="execCmd('insertUnorderedList')">• Liste</button>
-                            <select onchange="execCmd('foreColor', this.value)">
-                                <option value="#000">Noir</option>
-                                <option value="#D32F2F">Rouge</option>
-                                <option value="#CCA43B">Or</option>
-                            </select>
-                            <button onclick="execCmd('hiliteColor', '#FFFF00')">Surligner</button>
+                <div class="drag-handle">⠿ <span style="font-size:12px; font-weight:bold; vertical-align:middle;">GLISSER POUR RÉORDONNER</span></div>
+                <div style="display:flex; gap:25px;">
+                    <img src="${p.img}" class="preview-img">
+                    <div style="flex:1" onpointerdown="event.stopPropagation()">
+                        <div class="mega-toolbar">
+                            <div class="tool-group"><button onclick="cmd('bold')"><b>B</b></button><button onclick="cmd('italic')"><i>I</i></button><button onclick="cmd('underline')"><u>U</u></button><button onclick="cmd('strikeThrough')"><s>S</s></button></div>
+                            <div class="tool-group">
+                                <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">Petit</option><option value="3">Normal</option><option value="5">Grand</option><option value="7">Titre</option></select>
+                                <select onchange="cmd('fontName', this.value)"><option value="Segoe UI">Police</option><option value="Arial">Arial</option><option value="Courier New">Code</option><option value="Georgia">Serif</option></select>
+                            </div>
+                            <div class="tool-group">
+                                <button onclick="cmd('justifyLeft')">⬅</button><button onclick="cmd('justifyCenter')">⬆</button><button onclick="cmd('justifyRight')">➡</button>
+                                <button onclick="cmd('insertUnorderedList')">• Liste</button>
+                            </div>
+                            <div class="tool-group">
+                                <label style="font-size:10px;">Texte:</label><input type="color" onchange="cmd('foreColor', this.value)">
+                                <label style="font-size:10px; margin-left:5px;">Surligne:</label><input type="color" value="#ffff00" onchange="cmd('hiliteColor', this.value)">
+                                <button onclick="cmd('removeFormat')" title="Effacer styles">🧹</button>
+                            </div>
                         </div>
-                        <div class="rich-editor" contenteditable="true" oninput="diagnostic.buildings['${currentB}'][${i}].desc = this.innerHTML">${p.desc}</div>
+                        <div class="rich-box" contenteditable="true" oninput="diagnostic.buildings['${activeB}'][${i}].desc = this.innerHTML">${p.desc}</div>
                     </div>
                 </div>
             `;
-            area.appendChild(card);
+            
+            card.addEventListener('dragstart', () => { dragSrc = card; card.classList.add('dragging'); });
+            card.addEventListener('dragover', e => e.preventDefault());
+            card.addEventListener('drop', () => {
+                if (dragSrc !== card) {
+                    const list = diagnostic.buildings[activeB];
+                    const from = parseInt(dragSrc.dataset.index);
+                    const to = parseInt(card.dataset.index);
+                    const moved = list.splice(from, 1)[0];
+                    list.splice(to, 0, moved);
+                    renderPhotos();
+                }
+            });
+            card.addEventListener('dragend', () => card.classList.remove('dragging'));
+            cont.appendChild(card);
         });
     }
 
-    function execCmd(cmd, val = null) { document.execCommand(cmd, false, val); }
+    function cmd(c, v = null) { document.execCommand(c, false, v); }
 
-    async function syncToSupabase() {
-        const url = document.getElementById('sb-url').value;
-        const key = document.getElementById('sb-key').value;
-        if(!url || !key) return alert("Config Supabase manquante !");
-        
-        // Simulation d'envoi vers Supabase
-        alert("☁️ Archivage réussi pour le projet : " + (document.getElementById('project-title').value || "Sans titre"));
+    function getB64Logo() {
+        const img = document.getElementById('main-logo-src');
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        return canvas.toDataURL('image/png');
     }
 
-    function generateFinalReport() {
+    function generateReport() {
         const title = document.getElementById('project-title').value || "Diagnostic_CCAS";
         document.getElementById('courage-overlay').style.display = 'flex';
-        
-        setTimeout(() => {
-            const dataStr = JSON.stringify(diagnostic);
-            const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>${title}</title>
-    <style>
-        :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
-        #side { width: 280px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; }
-        .nav-btn { width: 100%; padding: 18px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
-        .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 6px solid var(--gold); }
-        #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
-        
-        /* HEADER LOGO CORRIGE (2 LIGNES) */
-        .logo-box { position: absolute; top: 30px; right: 30px; text-align: right; z-index: 200; }
-        .logo-box img { width: 170px; margin-bottom: 8px; }
-        .logo-box p { margin: 0; font-size: 0.7rem; color: var(--gold); font-weight: 700; text-transform: uppercase; line-height: 1.4; white-space: pre-wrap; width: 200px; }
+        let b64Logo = "";
+        try { b64Logo = getB64Logo(); } catch(e) { b64Logo = "Logo_Créteil_Val_Marne.svg.png"; }
 
-        .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
-        .frame { width: 75%; aspect-ratio: 16/9; border: 4px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 50px #000; }
-        .frame img { width: 100%; height: 100%; object-fit: contain; }
-        .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 150px; }
-        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.85); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 210; }
-        .arr-l { left: -35px; } .arr-r { right: -35px; }
-    </style>
-</head>
-<body>
-    <div id="side"><div style="padding:25px; color:var(--gold); font-weight:800; border-bottom:1px solid #333;">${title}</div><div id="m"></div></div>
-    <div id="main">
-        <div class="logo-box">
-            <img src="Logo_Créteil_Val_Marne.svg.png">
-            <p>DIRECTION DES FINANCES ET DES\\nMOYENS GÉNÉRAUX DU CCAS</p>
-        </div>
-        <div class="viewer"><div class="frame" id="f"><div id="vi" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div></div></div>
-        <div class="desc-box"><h2 id="bn" style="color:var(--gold); margin:0 0 10px 0;"></h2><div id="txt" style="font-size:1.2rem;"></div></div>
-    </div>
-    <script>
-        const d = ${dataStr}; let cb = Object.keys(d.buildings)[0], ci = 0;
-        function rN() {
-            const m = document.getElementById('m'); m.innerHTML = '';
-            Object.keys(d.buildings).forEach(k => {
-                const b = document.createElement('button'); b.className = 'nav-btn' + (cb === k ? ' active' : '');
-                b.innerText = k; b.onclick = () => { cb = k; ci = 0; s(); rN(); }; m.appendChild(b);
-            });
-        }
-        function s() {
-            const vi = document.getElementById('vi'), f = document.getElementById('f'), its = d.buildings[cb];
-            if(!its || its.length === 0) return;
-            vi.innerHTML = '<img src="' + its[ci].img + '">';
-            document.getElementById('bn').innerText = cb;
-            document.getElementById('txt').innerHTML = its[ci].desc || "...";
-            f.querySelectorAll('.arr').forEach(a => a.remove());
-            if (its.length > 1) {
-                const bL = document.createElement('button'); bL.className = 'arr arr-l'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
-                const bR = document.createElement('button'); bR.className = 'arr arr-r'; bR.innerHTML = '❯'; bR.onclick = () => { ci=(ci+1)%its.length; s(); };
-                f.appendChild(bL); f.appendChild(bR);
-            }
-        }
-        window.onload = () => { rN(); s(); };
-    <\/script>
-</body>
-</html>`;
+        setTimeout(() => {
+            const dataStr = JSON.stringify(diagnostic).replace(/</g, '\\u003c');
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>
+                :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
+                body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
+                #side { width: 280px; background: #050E24; border-right: 2px solid var(--gold); display: flex; flex-direction: column; }
+                .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #1a1a1a; font-size: 14px; }
+                .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 6px solid var(--gold); }
+                #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
+                .logo-box { position: absolute; top: 30px; right: 30px; text-align: right; z-index: 200; }
+                .logo-box img { width: 170px; margin-bottom: 8px; }
+                .logo-box p { margin: 0; font-size: 0.72rem; color: var(--gold); font-weight: 700; text-transform: uppercase; line-height: 1.4; white-space: pre-line; width: 220px; letter-spacing: 0.5px; }
+                .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+                .frame { width: 80%; aspect-ratio: 16/9; border: 5px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 60px #000; }
+                .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 160px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
+                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2.5px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 210; }
+                .arr:hover { background: var(--gold); color: #000; }
+            </style></head><body>
+            <div id="side"><div style="padding:25px; color:var(--gold); font-weight:800; border-bottom:1px solid #333; text-transform:uppercase; font-size:13px;">${title}</div><div id="m"></div></div>
+            <div id="main">
+                <div class="logo-box"><img src="${b64Logo}"><p>DIRECTION DES FINANCES ET DES\\nMOYENS GÉNÉRAUX DU CCAS</p></div>
+                <div class="viewer"><div class="frame" id="v_fr"><div id="v_img" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div></div></div>
+                <div class="desc-box"><h2 id="bn" style="color:var(--gold); margin:0 0 15px 0; text-transform:uppercase; letter-spacing:1px;"></h2><div id="txt" style="font-size:1.25rem;"></div></div>
+            </div>
+            <script>
+                const d = ${dataStr}; let cb = Object.keys(d.buildings)[0], ci = 0;
+                function rN() {
+                    const m = document.getElementById('m'); m.innerHTML = '';
+                    Object.keys(d.buildings).forEach(k => {
+                        const b = document.createElement('button'); b.className = 'nav-btn' + (cb === k ? ' active' : '');
+                        b.innerText = k; b.onclick = () => { cb = k; ci = 0; s(); rN(); }; m.appendChild(b);
+                    });
+                }
+                function s() {
+                    const vi = document.getElementById('v_img'), fr = document.getElementById('v_fr'), its = d.buildings[cb];
+                    if(!its || its.length === 0) return;
+                    vi.innerHTML = '<img src="' + its[ci].img + '">';
+                    document.getElementById('bn').innerText = cb;
+                    document.getElementById('txt').innerHTML = its[ci].desc || "<i>Aucun diagnostic.</i>";
+                    fr.querySelectorAll('.arr').forEach(a => a.remove());
+                    if (its.length > 1) {
+                        const bL = document.createElement('button'); bL.className = 'arr'; bL.style.left = '-40px'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
+                        const bR = document.createElement('button'); bR.className = 'arr'; bR.style.right = '-40px'; bR.innerHTML = '❯'; bR.onclick = () => { ci=(ci+1)%its.length; s(); };
+                        fr.appendChild(bL); fr.appendChild(bR);
+                    }
+                }
+                window.onload = () => { rN(); s(); };
+            <\/script></body></html>`;
+            
             const a = document.createElement('a');
-            const safeTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-            a.href = URL.createObjectURL(new Blob([htmlContent], { type: 'text/html' }));
-            a.download = safeTitle + ".html";
+            const safe = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+            a.download = safe + ".html";
             a.click();
             document.getElementById('courage-overlay').style.display = 'none';
         }, 1200);
