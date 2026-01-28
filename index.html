@@ -2,15 +2,15 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Prep-Studio CCAS | Version Finale</title>
+    <title>Studio CCAS | Direction des Finances</title>
     <style>
         :root { --royal-bg: #0A1A3C; --royal-gold: #CCA43B; --royal-gold-light: #E5C365; --white: #FFFFFF; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: #f0f2f5; color: #333; display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; display: flex; height: 100vh; overflow: hidden; }
         
         /* SIDEBAR */
         #sidebar { width: 340px; background: var(--royal-bg); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.2); z-index: 100; }
         .side-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .side-header h1 { font-size: 1.1rem; color: var(--royal-gold); margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+        .side-header h1 { font-size: 1.1rem; color: var(--royal-gold); margin: 0; text-transform: uppercase; }
         #building-list { flex: 1; overflow-y: auto; padding: 15px; }
         .b-item { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
         .b-item:hover { background: rgba(255,255,255,0.1); border-color: var(--royal-gold); }
@@ -19,19 +19,17 @@
         /* MAIN */
         #main { flex: 1; display: flex; flex-direction: column; background: #f8f9fc; }
         #top-nav { background: white; padding: 15px 30px; border-bottom: 1px solid #e3e6f0; display: flex; justify-content: space-between; align-items: center; }
-        #editor-workspace { flex: 1; overflow-y: auto; padding: 30px; }
 
-        /* MEGA TOOLBAR */
-        .mega-toolbar { display: flex; flex-wrap: wrap; gap: 4px; background: #f8f9fa; padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #ccc; border-bottom: none; position: sticky; top: 0; z-index: 50; }
-        .tool-group { display: flex; gap: 2px; border-right: 1px solid #ddd; padding-right: 5px; margin-right: 5px; }
-        .mega-toolbar button { padding: 6px; cursor: pointer; border: 1px solid transparent; background: transparent; border-radius: 4px; font-size: 13px; min-width: 30px; font-weight: bold; }
-        .mega-toolbar button:hover { background: #e2e6ea; border-color: #adb5bd; }
-        .mega-toolbar input[type="color"] { width: 30px; height: 30px; border: none; cursor: pointer; background: none; }
-        
-        .rich-box { border: 1px solid #ccc; padding: 25px; background: white; min-height: 180px; border-radius: 0 0 8px 8px; outline: none; font-size: 15px; line-height: 1.6; }
+        /* MEGA TOOLBAR WORD-STYLE */
+        .word-toolbar { display: flex; flex-wrap: wrap; gap: 4px; background: #f8f9fa; padding: 10px; border-radius: 8px 8px 0 0; border: 1px solid #ccc; border-bottom: none; position: sticky; top: 0; z-index: 50; }
+        .word-toolbar button, .word-toolbar select { padding: 6px; cursor: pointer; border: 1px solid #ddd; background: white; border-radius: 4px; font-weight: bold; font-size: 13px; }
+        .word-toolbar button:hover { background: #e2e6ea; }
+        .rich-box { border: 1px solid #ccc; padding: 20px; background: white; min-height: 150px; border-radius: 0 0 8px 8px; outline: none; font-size: 15px; }
 
-        .photo-entry { background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; border: 1px solid #e3e6f0; }
+        /* ENTRIES */
+        .photo-entry { background: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; border: 1px solid #e3e6f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .preview-img { width: 240px; height: 135px; object-fit: cover; border-radius: 6px; border: 2px solid var(--royal-gold); }
+        .drag-handle { cursor: grab; color: var(--royal-gold); font-size: 20px; margin-bottom: 10px; display: block; }
 
         #sb-config { padding: 15px; background: #07142e; border-top: 1px solid rgba(255,255,255,0.1); }
         .sb-input { width: 100%; padding: 8px; margin-bottom: 6px; border-radius: 4px; border: none; font-size: 11px; background: rgba(255,255,255,0.1); color: white; }
@@ -49,10 +47,10 @@
         <button onclick="addBati()" style="width:100%; padding:12px; border-radius:8px; border: 2px dashed var(--royal-gold); background:transparent; color:white; cursor:pointer; font-weight:bold;">+ Ajouter Structure</button>
     </div>
     <div id="sb-config">
-        <label style="font-size:10px; color:var(--royal-gold); font-weight:bold;">ARCHIVAGE SUPABASE</label>
-        <input type="text" id="sb-url" placeholder="URL" class="sb-input">
-        <input type="password" id="sb-key" placeholder="Key" class="sb-input">
-        <button onclick="alert('Connecté')" style="width:100%; padding:8px; background:var(--royal-gold); border:none; border-radius:4px; font-weight:bold; cursor:pointer;">☁️ Sync</button>
+        <label style="font-size:10px; color:var(--royal-gold); font-weight:bold;">ARCHIVAGE CLOUD (SUPABASE)</label>
+        <input type="text" id="sb-url" placeholder="URL Supabase" class="sb-input">
+        <input type="password" id="sb-key" placeholder="Clé API Anon" class="sb-input">
+        <button onclick="alert('Configuration prête pour archivage.')" style="width:100%; padding:8px; background:var(--royal-gold); border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">☁️ Connecter Base</button>
     </div>
 </div>
 
@@ -60,12 +58,12 @@
     <div id="top-nav">
         <div style="display:flex; align-items:center; gap:15px;">
             <img src="Logo_Créteil_Val_Marne.svg.png" id="main-logo-src" style="height:45px;" crossorigin="anonymous">
-            <input type="text" id="project-title" placeholder="TITRE DU RAPPORT..." style="width:350px; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold;">
+            <input type="text" id="project-title" placeholder="NOM DU RAPPORT..." style="width:350px; padding:10px; border-radius:6px; border:1px solid #ccc; font-weight:bold;">
         </div>
-        <button onclick="generateReport()" style="padding:12px 35px; background:var(--royal-bg); color:white; border:none; border-radius:30px; font-weight:900; cursor:pointer;">💾 GÉNÉRER (.HTML)</button>
+        <button onclick="generateReport()" style="padding:12px 35px; background:var(--royal-bg); color:white; border:none; border-radius:30px; font-weight:900; cursor:pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">💾 GÉNÉRER (.HTML)</button>
     </div>
     
-    <div id="editor-workspace">
+    <div id="editor-workspace" style="flex:1; overflow-y:auto; padding:30px;">
         <div id="active-title" style="margin-bottom:25px; font-size:1.8rem; font-weight:900; color:var(--royal-bg);">Sélectionnez un bâtiment</div>
         <div id="photo-container"></div>
     </div>
@@ -79,6 +77,7 @@
 <script>
     let diagnostic = { buildings: {} };
     let activeB = null;
+    let dragSrc = null;
 
     function addBati() {
         const name = prompt("Nom de la structure :");
@@ -90,11 +89,13 @@
         Object.keys(diagnostic.buildings).forEach(b => {
             const div = document.createElement('div');
             div.className = `b-item ${activeB === b ? 'active' : ''}`;
-            div.innerHTML = `<span>${b}</span>`;
+            div.innerHTML = `<span>${b}</span><span onclick="delB('${b}', event)" style="color:red; font-weight:bold;">×</span>`;
             div.onclick = () => switchB(b);
             list.appendChild(div);
         });
     }
+
+    function delB(n, e) { e.stopPropagation(); if(confirm('Supprimer '+n+'?')){ delete diagnostic.buildings[n]; activeB=null; renderSide(); renderPhotos(); }}
 
     function switchB(name) { activeB = name; document.getElementById('active-title').innerText = name; renderSide(); renderPhotos(); }
 
@@ -103,7 +104,7 @@
         Array.from(input.files).forEach(file => {
             const reader = new FileReader();
             reader.onload = e => { diagnostic.buildings[activeB].push({ img: e.target.result, desc: "" }); renderPhotos(); };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(file); // UHD [cite: 2026-01-02]
         });
     }
 
@@ -115,24 +116,33 @@
         diagnostic.buildings[activeB].forEach((p, i) => {
             const card = document.createElement('div');
             card.className = 'photo-entry';
+            card.draggable = true;
+            card.dataset.index = i;
             card.innerHTML = `
+                <div class="drag-handle">⠿ <span style="font-size:12px;">RÉORDONNER</span></div>
                 <div style="display:flex; gap:25px;">
                     <img src="${p.img}" class="preview-img">
-                    <div style="flex:1">
-                        <div class="mega-toolbar">
-                            <div class="tool-group"><button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button><button onclick="cmd('underline')">U</button></div>
-                            <div class="tool-group">
-                                <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option></select>
-                            </div>
-                            <div class="tool-group">
-                                <label style="font-size:10px;">Texte:</label><input type="color" onchange="cmd('foreColor', this.value)">
-                                <label style="font-size:10px; margin-left:5px;">Surligne:</label><input type="color" value="#ffff00" onchange="cmd('hiliteColor', this.value)">
-                            </div>
+                    <div style="flex:1" onpointerdown="event.stopPropagation()">
+                        <div class="word-toolbar">
+                            <button onclick="cmd('bold')">B</button><button onclick="cmd('italic')">I</button><button onclick="cmd('underline')">U</button>
+                            <select onchange="cmd('fontSize', this.value)"><option value="3">Taille</option><option value="1">Petit</option><option value="3">Normal</option><option value="5">Grand</option></select>
+                            <label style="font-size:10px;">Couleur:</label><input type="color" onchange="cmd('foreColor', this.value)">
+                            <button onclick="cmd('hiliteColor', '#FFFF00')">Surligner</button>
                             <button onclick="cmd('insertUnorderedList')">• Liste</button>
                         </div>
                         <div class="rich-box" contenteditable="true" oninput="diagnostic.buildings['${activeB}'][${i}].desc = this.innerHTML">${p.desc}</div>
                     </div>
                 </div>`;
+            card.addEventListener('dragstart', () => { dragSrc = card; card.style.opacity = '0.5'; });
+            card.addEventListener('dragover', e => e.preventDefault());
+            card.addEventListener('drop', () => {
+                const list = diagnostic.buildings[activeB];
+                const from = parseInt(dragSrc.dataset.index);
+                const to = parseInt(card.dataset.index);
+                const moved = list.splice(from, 1)[0];
+                list.splice(to, 0, moved);
+                renderPhotos();
+            });
             cont.appendChild(card);
         });
     }
@@ -149,7 +159,7 @@
     }
 
     function generateReport() {
-        const title = document.getElementById('project-title').value || "Diagnostic";
+        const title = document.getElementById('project-title').value || "Diagnostic_CCAS";
         document.getElementById('courage-overlay').style.display = 'flex';
         let b64Logo = "";
         try { b64Logo = getB64Logo(); } catch(e) { b64Logo = "Logo_Créteil_Val_Marne.svg.png"; }
@@ -163,14 +173,17 @@
                 .nav-btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
                 .nav-btn.active { color: var(--gold); font-weight: 700; background: rgba(255,255,255,0.05); border-left: 6px solid var(--gold); }
                 #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
+                
+                /* HEADER LOGO CORRIGÉ (2 LIGNES SANS OVERLAP) */
                 .logo-box { position: absolute; top: 30px; right: 30px; text-align: right; z-index: 200; }
                 .logo-box img { width: 170px; margin-bottom: 8px; }
-                .logo-box p { margin: 0; font-size: 0.75rem; color: var(--gold); font-weight: 700; text-transform: uppercase; line-height: 1.4; letter-spacing: 0.5px; }
+                .logo-box p { margin: 0; font-size: 0.72rem; color: var(--gold); font-weight: 700; text-transform: uppercase; line-height: 1.4; width: 220px; letter-spacing: 0.5px; }
+
                 .viewer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
                 .frame { width: 80%; aspect-ratio: 16/9; border: 5px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 60px #000; }
                 .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
-                .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 160px; }
-                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2.5px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 32px; }
+                .desc-box { padding: 40px 50px; background: rgba(5, 14, 36, 0.98); border-top: 4px solid var(--gold); min-height: 160px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
+                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.9); color: var(--gold); border: 2.5px solid var(--gold); padding: 25px; cursor: pointer; border-radius: 50%; font-size: 32px; z-index: 210; }
             </style></head><body>
             <div id="side"><div style="padding:25px; color:var(--gold); font-weight:800; border-bottom:1px solid #333; text-transform:uppercase;">${title}</div><div id="m"></div></div>
             <div id="main">
@@ -179,7 +192,7 @@
                     <p>DIRECTION DES FINANCES ET DES<br>MOYENS GÉNÉRAUX DU CCAS</p>
                 </div>
                 <div class="viewer"><div class="frame" id="v_fr"><div id="v_img" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div></div></div>
-                <div class="desc-box"><h2 id="bn" style="color:var(--gold); margin:0 0 15px 0; text-transform:uppercase;"></h2><div id="txt" style="font-size:1.25rem;"></div></div>
+                <div class="desc-box"><h2 id="bn" style="color:var(--gold); margin:0 0 10px 0; text-transform:uppercase;"></h2><div id="txt" style="font-size:1.25rem;"></div></div>
             </div>
             <script>
                 const d = ${dataStr}; let cb = Object.keys(d.buildings)[0], ci = 0;
@@ -195,7 +208,7 @@
                     if(!its || its.length === 0) return;
                     vi.innerHTML = '<img src="' + its[ci].img + '">';
                     document.getElementById('bn').innerText = cb;
-                    document.getElementById('txt').innerHTML = its[ci].desc || "";
+                    document.getElementById('txt').innerHTML = its[ci].desc || "<i>Aucun diagnostic technique saisi.</i>";
                     fr.querySelectorAll('.arr').forEach(a => a.remove());
                     if (its.length > 1) {
                         const bL = document.createElement('button'); bL.className = 'arr'; bL.style.left = '-40px'; bL.innerHTML = '❮'; bL.onclick = () => { ci=(ci-1+its.length)%its.length; s(); };
@@ -205,6 +218,7 @@
                 }
                 window.onload = () => { rN(); s(); };
             <\/script></body></html>`;
+            
             const a = document.createElement('a');
             const safe = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
             a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
