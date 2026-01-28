@@ -2,69 +2,55 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | Gestionnaire de Dossiers v2</title>
+    <title>Studio CCAS | Direction des Finances</title>
     <style>
-        :root { --royal-bg: #0A1A3C; --royal-gold: #CCA43B; --royal-gold-light: #F4D03F; --danger: #e74c3c; --success: #27ae60; --grey-light: #f4f6f8; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: var(--grey-light); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root { --royal-bg: #0A1A3C; --royal-gold: #CCA43B; --grey-light: #f4f6f8; --danger: #e74c3c; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--grey-light); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* --- ÉCRAN ACCUEIL (EXPLORATEUR) --- */
+        /* --- DASHBOARD (ACCUEIL) --- */
         #dashboard-view { flex: 1; padding: 40px; display: flex; flex-direction: column; }
         .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .dash-title { color: var(--royal-bg); font-size: 2rem; font-weight: 900; text-transform: uppercase; border-bottom: 4px solid var(--royal-gold); padding-bottom: 5px; }
-        
+        .dash-title { color: var(--royal-bg); font-size: 2rem; font-weight: 900; border-bottom: 4px solid var(--royal-gold); }
         .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; overflow-y: auto; padding: 10px; }
         .project-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; border: 2px solid transparent; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .project-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-color: var(--royal-gold); }
-        .folder-icon { font-size: 3rem; color: var(--royal-gold); margin-bottom: 15px; text-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .p-name { font-weight: 700; color: var(--royal-bg); font-size: 1.1rem; word-break: break-word; }
-        .p-date { font-size: 0.8rem; color: #888; margin-top: 5px; }
-        .del-proj-btn { position: absolute; top: 10px; right: 10px; color: #ffcccc; font-weight: bold; background: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; transition: 0.2s; opacity: 0; }
+        .project-card:hover { transform: translateY(-5px); border-color: var(--royal-gold); }
+        .del-proj-btn { position: absolute; top: 10px; right: 10px; color: #ffcccc; font-weight: bold; background: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; opacity: 0; transition:0.2s; }
         .project-card:hover .del-proj-btn { opacity: 1; color: var(--danger); }
         .del-proj-btn:hover { background: var(--danger); color: white; }
-
-        .new-card { border: 2px dashed #cbd5e0; background: transparent; justify-content: center; color: #718096; }
+        .new-card { border: 2px dashed #cbd5e0; background: transparent; color: #718096; justify-content: center; }
         .new-card:hover { border-color: var(--royal-bg); color: var(--royal-bg); background: rgba(10, 26, 60, 0.05); }
 
-        /* --- ÉCRAN STUDIO (ÉDITEUR) --- */
+        /* --- STUDIO (ÉDITEUR) --- */
         #studio-view { display: none; height: 100vh; flex-direction: row; }
-        
-        /* Sidebar Studio */
         #sidebar { width: 300px; background: var(--royal-bg); color: white; display: flex; flex-direction: column; box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; }
-        .back-home-btn { background: rgba(255,255,255,0.1); border: none; color: var(--royal-gold); padding: 15px; cursor: pointer; text-align: left; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .back-home-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+        .back-btn { background: rgba(255,255,255,0.1); border: none; color: var(--royal-gold); padding: 15px; cursor: pointer; text-align: left; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .back-btn:hover { background: rgba(255,255,255,0.2); color: white; }
         
-        /* Main Studio */
         #main-editor { flex: 1; display: flex; flex-direction: column; background: #f4f6f8; overflow: hidden; }
-        #top-bar { background: white; padding: 12px 30px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        #top-bar { background: white; padding: 10px 30px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Outils Éditeur */
+        /* Outils & Photos */
+        .photo-list { flex: 1; overflow-y: auto; padding: 30px; }
+        .photo-card-edit { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 20px; align-items: flex-start; position: relative; border: 1px solid #eee; }
+        .photo-card-edit.dragging { opacity: 0.5; border: 2px dashed var(--royal-gold); }
+        .preview-img { width: 200px; height: 130px; object-fit: cover; border-radius: 4px; border: 2px solid var(--royal-gold); flex-shrink: 0; background: #eee; }
         .toolbar { display: flex; gap: 5px; background: #fff; padding: 5px; border: 1px solid #ccc; border-radius: 6px; margin-bottom: 5px; flex-wrap: wrap; }
-        .toolbar button, .toolbar select { cursor: pointer; padding: 4px 8px; border: 1px solid transparent; background: transparent; font-weight: bold; border-radius: 4px; font-size: 12px; }
+        .toolbar button, .toolbar select { cursor: pointer; padding: 4px; border: 1px solid transparent; background: transparent; font-weight: bold; border-radius: 4px; font-size:12px; }
         .toolbar button:hover { background: #eee; }
         .rich-box { min-height: 100px; border: 1px solid #ccc; padding: 10px; background: white; border-radius: 6px; overflow-y: auto; font-size: 14px; }
-
-        /* Photos */
-        .photo-list { flex: 1; overflow-y: auto; padding: 30px; }
-        .photo-card-edit { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 20px; align-items: flex-start; position: relative; border: 1px solid #eee; transition: transform 0.2s; }
-        .photo-card-edit.dragging { opacity: 0.5; border: 2px dashed var(--royal-gold); transform: scale(0.98); }
-        .preview-img { width: 200px; height: 130px; object-fit: cover; border-radius: 4px; border: 2px solid var(--royal-gold); flex-shrink: 0; background: #eee; }
-        .drag-handle { cursor: grab; font-size: 24px; color: #ccc; padding-right: 10px; display: flex; align-items: center; }
         .del-photo-btn { position: absolute; top: -10px; right: -10px; background: var(--danger); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        /* Bâtiments Sidebar */
         #b-list { flex: 1; overflow-y: auto; padding: 10px; }
         .b-item { padding: 12px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; }
         .b-item.active { background: var(--royal-gold); color: var(--royal-bg); font-weight: bold; }
-        .b-del { color: #ff6b6b; font-weight: bold; padding: 0 5px; }
 
-        /* Boutons Actions */
         .btn-main { background: var(--royal-bg); color: white; padding: 10px 25px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s; }
         .btn-main:hover { background: var(--royal-gold); color: var(--royal-bg); }
-        .btn-sec { background: transparent; border: 2px solid var(--royal-bg); color: var(--royal-bg); padding: 8px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+        .btn-sec { background: transparent; border: 2px solid var(--royal-bg); color: var(--royal-bg); padding: 8px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 12px; }
 
-        /* OVERLAY */
-        #loading { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: white; backdrop-filter: blur(5px); }
-        #courage-photo { width: 350px; height: 350px; border-radius: 50%; border: 10px solid var(--royal-gold); object-fit: cover; box-shadow: 0 0 50px rgba(204, 164, 59, 0.5); animation: pulse 2s infinite; background: #000; }
+        /* OVERLAY COURAGE */
+        #courage-overlay { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: white; backdrop-filter: blur(5px); }
+        #courage-img { width: 350px; height: 350px; border-radius: 50%; border: 10px solid var(--royal-gold); object-fit: cover; box-shadow: 0 0 50px rgba(204, 164, 59, 0.5); animation: pulse 2s infinite; background: #000; cursor: pointer; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
@@ -72,364 +58,198 @@
 
 <div id="dashboard-view">
     <div class="dash-header">
-        <div>
-            <div class="dash-title">STUDIO CCAS</div>
-            <div style="color:#666;">Espace de Travail - Direction des Finances</div>
-        </div>
+        <div><div class="dash-title">STUDIO CCAS</div><div style="color:#666;">Direction des Finances</div></div>
         <div style="display:flex; gap:10px;">
-            <button onclick="exportAllData()" class="btn-sec">💾 SAUVEGARDE TOTALE (USB)</button>
-            <button onclick="importData()" class="btn-sec">📂 IMPORTER</button>
-            <input type="file" id="file-import" style="display:none" onchange="processImport(this)">
+            <button onclick="exportData()" class="btn-sec">💾 SAUVEGARDE (USB)</button>
+            <button onclick="document.getElementById('file-imp').click()" class="btn-sec">📂 IMPORTER</button>
+            <input type="file" id="file-imp" style="display:none" onchange="importData(this)">
         </div>
     </div>
-    <div id="projects-container" class="projects-grid"></div>
+    <div id="projects-grid" class="projects-grid"></div>
 </div>
 
 <div id="studio-view">
     <div id="sidebar">
-        <button onclick="goHome()" class="back-home-btn">🏠 RETOUR AUX DOSSIERS</button>
-        <div style="padding:20px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.1);">
-            <h2 id="current-project-name" style="margin:0; font-size:1.2rem; color:var(--royal-gold);">Projet</h2>
-        </div>
+        <button onclick="goHome()" class="back-btn">🏠 RETOUR ACCUEIL</button>
+        <div style="padding:20px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.1);"><h2 id="proj-name-disp" style="margin:0; font-size:1.2rem; color:var(--royal-gold);">Projet</h2></div>
         <div id="b-list"></div>
-        <div style="padding:15px;">
-            <button onclick="addBuilding()" style="width:100%; padding:10px; border:2px dashed var(--royal-gold); background:transparent; color:white; border-radius:6px; cursor:pointer; font-weight:bold;">+ BÂTIMENT</button>
-        </div>
+        <div style="padding:15px;"><button onclick="addBati()" style="width:100%; padding:10px; border:2px dashed var(--royal-gold); background:transparent; color:white; border-radius:6px; cursor:pointer; font-weight:bold;">+ BÂTIMENT</button></div>
     </div>
-
     <div id="main-editor">
         <div id="top-bar">
             <img src="Logo_Créteil_Val_Marne.svg.png" id="logo-src" style="display:none;" crossorigin="anonymous">
+            <img src="courage.jpg.JPG" id="courage-src" style="display:none;" onerror="this.src='https://via.placeholder.com/300x300/0A1A3C/CCA43B?text=PHOTO+PETITE';">
             
             <div style="font-weight:bold; color:var(--royal-bg); font-size:1.2rem;" id="active-b-title">Sélectionnez un bâtiment</div>
-            <button onclick="generateHTML()" class="btn-main">🚀 GÉNÉRER LE RAPPORT</button>
+            <button onclick="gen()" class="btn-main">🚀 GÉNÉRER LE FICHIER</button>
         </div>
         <div id="editor-area" class="photo-list"></div>
     </div>
 </div>
 
-<div id="loading">
-    <img src="courage.jpg.JPG" id="courage-photo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; this.style.border='5px dashed red';">
-    <h1 style="color:var(--royal-gold); font-size:3rem; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px;">COURAGE MAMIE ! ❤️</h1>
+<div id="courage-overlay">
+    <img src="courage.jpg.JPG" id="courage-img" onclick="document.getElementById('courage-up').click()" title="Cliquer pour changer la photo si nécessaire">
+    <input type="file" id="courage-up" style="display:none" onchange="changeCourage(this)">
+    <h1 style="color:var(--royal-gold); font-size:3rem; margin-top:20px; text-transform:uppercase; letter-spacing:2px;">COURAGE MAMIE ! ❤️</h1>
     <p>Génération du fichier en cours...</p>
+    <p style="font-size:0.8rem; opacity:0.5;">(Si la photo n'apparaît pas, cliquez sur le rond pour la choisir)</p>
 </div>
 
 <script>
-    // --- NOYAU DE DONNÉES ---
-    let db = JSON.parse(localStorage.getItem('ccas_db_v1')) || {};
-    let currentProjID = null;
-    let currentBati = null;
+    let db = JSON.parse(localStorage.getItem('ccas_os_v6')) || {};
+    let curID = null;
+    let curB = null;
     let dragSrc = null;
     let logoB64 = "";
+    let courageB64 = "";
 
-    // Démarrage
     window.onload = () => {
-        renderDashboard();
-        const img = document.getElementById('logo-src');
-        if(img.complete) toB64(img); else img.onload = () => toB64(img);
+        renderDash();
+        const l = document.getElementById('logo-src');
+        if(l.complete) toB64(l, r=>logoB64=r); else l.onload=()=>toB64(l, r=>logoB64=r);
+        
+        // Sécurisation photo courage
+        const c = document.getElementById('courage-src');
+        if(c.complete) toB64(c, r=>courageB64=r); else c.onload=()=>toB64(c, r=>courageB64=r);
     };
 
-    function toB64(img) {
+    function toB64(img, cb) {
         try {
-            const c = document.createElement('canvas');
-            c.width = img.naturalWidth; c.height = img.naturalHeight;
-            c.getContext('2d').drawImage(img, 0, 0);
-            logoB64 = c.toDataURL('image/png');
-        } catch(e) {}
+            const c = document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight;
+            c.getContext('2d').drawImage(img,0,0); cb(c.toDataURL('image/png'));
+        } catch(e){}
     }
 
-    function saveDB() {
-        localStorage.setItem('ccas_db_v1', JSON.stringify(db));
-    }
+    function save() { localStorage.setItem('ccas_os_v6', JSON.stringify(db)); }
 
-    // --- LOGIQUE DASHBOARD ---
-    function renderDashboard() {
-        const grid = document.getElementById('projects-container');
-        grid.innerHTML = `<div class="project-card new-card" onclick="createProject()">
-            <div style="font-size:3rem;">+</div>
-            <div style="font-weight:bold;">NOUVEAU DOSSIER</div>
-        </div>`;
-
-        Object.keys(db).sort((a,b) => db[b].created - db[a].created).forEach(id => {
-            const p = db[id];
-            const div = document.createElement('div');
-            div.className = 'project-card';
-            div.innerHTML = `
-                <div class="del-proj-btn" onclick="deleteProject('${id}', event)">×</div>
-                <div class="folder-icon">📁</div>
-                <div class="p-name">${p.name}</div>
-                <div class="p-date">Créé le : ${new Date(p.created).toLocaleDateString()}</div>
-            `;
-            div.onclick = () => openProject(id);
-            grid.appendChild(div);
+    // --- DASHBOARD ---
+    function renderDash() {
+        const g = document.getElementById('projects-grid');
+        g.innerHTML = `<div class="project-card new-card" onclick="newProj()"><div style="font-size:3rem;">+</div><div>NOUVEAU DOSSIER</div></div>`;
+        Object.keys(db).sort((a,b)=>db[b].date-db[a].date).forEach(id=>{
+            const d=document.createElement('div'); d.className='project-card';
+            d.innerHTML=`<div class="del-proj-btn" onclick="delProj('${id}', event)">×</div><div style="font-size:3rem; color:var(--royal-gold);">📁</div><div style="font-weight:bold;">${db[id].name}</div><div style="font-size:0.8rem; color:#888;">${new Date(db[id].date).toLocaleDateString()}</div>`;
+            d.onclick=()=>openProj(id); g.appendChild(d);
         });
     }
 
-    function createProject() {
-        const name = prompt("Nom du nouveau dossier (ex: Plan Canicule) :");
-        if(name) {
-            const id = Date.now().toString();
-            db[id] = { name: name, created: Date.now(), buildings: {} };
-            saveDB();
-            openProject(id);
-        }
+    function newProj() {
+        const n = prompt("Nom du dossier :");
+        if(n) { const id=Date.now().toString(); db[id]={name:n, date:Date.now(), data:{}}; save(); openProj(id); }
     }
 
-    function deleteProject(id, e) {
-        e.stopPropagation();
-        if(confirm("Supprimer définitivement ce dossier et toutes ses photos ?")) {
-            delete db[id];
-            saveDB();
-            renderDashboard();
-        }
+    function delProj(id, e) {
+        e.stopPropagation(); if(confirm("Supprimer ce dossier ?")) { delete db[id]; save(); renderDash(); }
     }
 
-    // --- LOGIQUE STUDIO ---
-    function openProject(id) {
-        currentProjID = id;
-        document.getElementById('dashboard-view').style.display = 'none';
-        document.getElementById('studio-view').style.display = 'flex';
-        document.getElementById('current-project-name').innerText = db[id].name;
-        currentBati = null;
-        renderSidebar();
-        renderEditor();
+    // --- STUDIO ---
+    function openProj(id) {
+        curID = id; document.getElementById('dashboard-view').style.display='none'; document.getElementById('studio-view').style.display='flex';
+        document.getElementById('proj-name-disp').innerText = db[id].name; curB=null; renderSide(); renderEdit();
     }
 
-    function goHome() {
-        currentProjID = null;
-        document.getElementById('studio-view').style.display = 'none';
-        document.getElementById('dashboard-view').style.display = 'flex';
-        renderDashboard();
+    function goHome() { curID=null; document.getElementById('studio-view').style.display='none'; document.getElementById('dashboard-view').style.display='flex'; renderDash(); }
+
+    function addBati() {
+        const n = prompt("Nom du bâtiment :");
+        if(n) { if(!db[curID].data[n]) { db[curID].data[n]=[]; save(); switchB(n); } else alert("Existe déjà"); }
     }
 
-    function addBuilding() {
-        const name = prompt("Nom du bâtiment :");
-        if(name) {
-            if(!db[currentProjID].buildings[name]) {
-                db[currentProjID].buildings[name] = [];
-                saveDB();
-                switchBati(name);
-            } else alert("Existe déjà !");
-        }
-    }
-
-    function renderSidebar() {
-        const list = document.getElementById('b-list');
-        list.innerHTML = '';
-        const bList = db[currentProjID].buildings;
-        Object.keys(bList).forEach(b => {
-            const div = document.createElement('div');
-            div.className = `b-item ${currentBati === b ? 'active' : ''}`;
-            div.innerHTML = `<span>${b}</span><span class="b-del" onclick="delBati('${b}', event)">×</span>`;
-            div.onclick = () => switchBati(b);
-            list.appendChild(div);
+    function renderSide() {
+        const l = document.getElementById('b-list'); l.innerHTML='';
+        Object.keys(db[curID].data).forEach(b=>{
+            const d=document.createElement('div'); d.className=`b-item ${curB===b?'active':''}`;
+            d.innerHTML=`<span>${b}</span><span style="color:#ff6b6b; font-weight:bold;" onclick="delB('${b}', event)">×</span>`;
+            d.onclick=()=>switchB(b); l.appendChild(d);
         });
     }
 
-    function delBati(name, e) {
-        e.stopPropagation();
-        if(confirm("Supprimer le bâtiment "+name+" ?")) {
-            delete db[currentProjID].buildings[name];
-            if(currentBati === name) currentBati = null;
-            saveDB(); renderSidebar(); renderEditor();
-        }
-    }
+    function delB(n, e) { e.stopPropagation(); if(confirm("Supprimer "+n+" ?")) { delete db[curID].data[n]; if(curB===n) curB=null; save(); renderSide(); renderEdit(); } }
+    function switchB(n) { curB=n; document.getElementById('active-b-title').innerText=n; renderSide(); renderEdit(); }
 
-    function switchBati(name) {
-        currentBati = name;
-        document.getElementById('active-b-title').innerText = name;
-        renderSidebar();
-        renderEditor();
-    }
-
-    // --- ÉDITEUR PHOTOS ---
-    function renderEditor() {
-        const area = document.getElementById('editor-area');
-        if(!currentBati) { area.innerHTML = '<div style="text-align:center; color:#888; margin-top:50px;">Sélectionnez ou créez un bâtiment à gauche.</div>'; return; }
-
-        area.innerHTML = `<label style="display:block; padding:30px; border:2px dashed #ccc; text-align:center; background:white; cursor:pointer; font-weight:bold; color:#666; margin-bottom:20px; border-radius:8px;">
-            + AJOUTER PHOTOS
-            <input type="file" multiple onchange="addPhotos(this)" style="display:none">
-        </label>`;
-
-        const photos = db[currentProjID].buildings[currentBati];
-        photos.forEach((p, i) => {
-            const card = document.createElement('div');
-            card.className = 'photo-card-edit';
-            card.draggable = true;
-            card.dataset.index = i;
-            card.innerHTML = `
-                <div class="del-photo-btn" onclick="removePhoto(${i})">×</div>
-                <div class="drag-handle">⠿</div>
-                <img src="${p.img}" class="preview-img">
-                <div style="flex:1; min-width:0;">
-                    <div class="toolbar">
-                        <button onclick="exec('bold')"><b>G</b></button>
-                        <button onclick="exec('italic')"><i>I</i></button>
-                        <button onclick="exec('underline')"><u>S</u></button>
-                        <input type="color" onchange="exec('foreColor', this.value)" style="height:25px; padding:0;">
-                        <button onclick="exec('hiliteColor', '#FFFF00')">🖍️</button>
-                        <select onchange="exec('fontSize', this.value)"><option value="3">Taille</option><option value="5">Grand</option><option value="6">Titre</option></select>
-                        <button onclick="exec('insertUnorderedList')">• Liste</button>
-                    </div>
-                    <div class="rich-box" contenteditable="true" oninput="updateDesc(${i}, this.innerHTML)">${p.desc}</div>
-                </div>
-            `;
-            // Drag Events
-            card.addEventListener('dragstart', () => { dragSrc = card; card.classList.add('dragging'); });
-            card.addEventListener('dragover', e => e.preventDefault());
-            card.addEventListener('drop', () => {
-                if(dragSrc !== card) {
-                    const from = parseInt(dragSrc.dataset.index);
-                    const to = parseInt(card.dataset.index);
-                    const moved = photos.splice(from, 1)[0];
-                    photos.splice(to, 0, moved);
-                    saveDB(); renderEditor();
-                }
-            });
-            card.addEventListener('dragend', () => card.classList.remove('dragging'));
-            area.appendChild(card);
-        });
-    }
-
-    function addPhotos(input) {
-        Array.from(input.files).forEach(f => {
-            const r = new FileReader();
-            r.onload = e => {
-                db[currentProjID].buildings[currentBati].push({ img: e.target.result, desc: "" });
-                saveDB(); renderEditor();
-            };
-            r.readAsDataURL(f);
-        });
-    }
-
-    function removePhoto(i) {
-        if(confirm("Supprimer cette photo ?")) {
-            db[currentProjID].buildings[currentBati].splice(i, 1);
-            saveDB(); renderEditor();
-        }
-    }
-
-    function updateDesc(i, html) {
-        db[currentProjID].buildings[currentBati][i].desc = html;
-        saveDB(); 
-    }
-
-    function exec(cmd, val=null) { document.execCommand(cmd, false, val); }
-
-    // --- EXPORT / IMPORT ---
-    function exportAllData() {
-        const dataStr = JSON.stringify(db);
-        const blob = new Blob([dataStr], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = "SAUVEGARDE_CCAS_" + new Date().toISOString().slice(0,10) + ".json";
-        a.click();
-    }
-
-    function importData() { document.getElementById('file-import').click(); }
-    
-    function processImport(input) {
-        const file = input.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = e => {
-            if(confirm("Cela va fusionner les dossiers importés avec les vôtres. Continuer ?")) {
-                try {
-                    const importedDB = JSON.parse(e.target.result);
-                    db = { ...db, ...importedDB }; 
-                    saveDB();
-                    renderDashboard();
-                    alert("Importation réussie !");
-                } catch(err) { alert("Erreur lors de l'importation du fichier."); }
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    // --- GÉNÉRATEUR FINAL ---
-    function generateHTML() {
-        const proj = db[currentProjID];
-        document.getElementById('loading').style.display = 'flex';
+    function renderEdit() {
+        const a = document.getElementById('editor-area');
+        if(!curB) { a.innerHTML='<div style="text-align:center; color:#888; margin-top:50px;">Sélectionnez un bâtiment.</div>'; return; }
+        a.innerHTML=`<label style="display:block; padding:30px; border:2px dashed #ccc; text-align:center; background:white; cursor:pointer; font-weight:bold; margin-bottom:20px;">+ AJOUTER PHOTOS<input type="file" multiple onchange="addP(this)" style="display:none"></label>`;
         
-        const finalLogo = logoB64 || "Logo_Créteil_Val_Marne.svg.png";
+        const photos = db[curID].data[curB];
+        photos.forEach((p,i)=>{
+            const c=document.createElement('div'); c.className='photo-card-edit'; c.draggable=true; c.dataset.i=i;
+            c.innerHTML=`<div class="del-photo-btn" onclick="delP(${i})">×</div><div class="drag-handle">⠿</div><img src="${p.img}" class="preview-img"><div style="flex:1"><div class="toolbar"><button onclick="cmd('bold')"><b>B</b></button><button onclick="cmd('italic')"><i>I</i></button><button onclick="cmd('underline')"><u>U</u></button><input type="color" onchange="cmd('foreColor',this.value)"><button onclick="cmd('hiliteColor','#FFFF00')">🖍️</button><select onchange="cmd('fontSize',this.value)"><option value="3">T</option><option value="5">Gr</option><option value="6">XL</option></select><button onclick="cmd('insertUnorderedList')">•</button></div><div class="rich-box" contenteditable="true" oninput="updTx(${i},this.innerHTML)">${p.desc}</div></div>`;
+            c.ondragstart=()=>{dragSrc=c; c.classList.add('dragging')}; c.ondragover=e=>e.preventDefault();
+            c.ondrop=()=>{ if(dragSrc!==c) { const f=parseInt(dragSrc.dataset.i), t=parseInt(c.dataset.i), m=photos.splice(f,1)[0]; photos.splice(t,0,m); save(); renderEdit(); } };
+            c.ondragend=()=>c.classList.remove('dragging'); a.appendChild(c);
+        });
+    }
 
-        setTimeout(() => {
-            const dataStr = JSON.stringify(proj.buildings).replace(/</g, '\\u003c');
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
-                :root { --bg: #0A1A3C; --gold: #CCA43B; --txt: #F4F7FD; }
-                body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #000; color: var(--txt); overflow: hidden; }
-                #side { width: 280px; background: #050E24; border-right: 3px solid var(--gold); display: flex; flex-direction: column; z-index:10; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
-                .nav-title { padding: 25px; color: var(--gold); font-weight: 800; border-bottom: 1px solid #1f2d40; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; text-align:center; }
-                .nav-scroll { flex:1; overflow-y:auto; }
-                .nav-btn { width: 100%; padding: 20px 25px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #111; font-size: 14px; transition: 0.3s; }
-                .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; padding-left: 30px; }
-                .nav-btn.active { color: var(--gold); background: rgba(204, 164, 59, 0.1); border-left: 5px solid var(--gold); font-weight: bold; }
-                #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, #142850, #0A1A3C); }
-                
-                /* HEADER INCORPORÉ DANS LE CADRE */
-                .header-in-frame { position: absolute; top: 15px; right: 15px; display: flex; align-items: center; gap: 12px; z-index: 50; pointer-events: none; background: rgba(10, 26, 60, 0.6); padding: 8px 15px; border-radius: 6px; border: 1px solid var(--gold); backdrop-filter: blur(5px); }
-                .header-logo-small { width: 70px; height: auto; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8)); }
-                .header-text-small { margin: 0; font-size: 0.6rem; color: var(--gold); font-weight: 700; text-transform: uppercase; line-height: 1.2; letter-spacing: 0.5px; text-align: left; text-shadow: 0 1px 2px rgba(0,0,0,1); }
+    function addP(inpt) { Array.from(inpt.files).forEach(f=>{ const r=new FileReader(); r.onload=e=>{ db[curID].data[curB].push({img:e.target.result, desc:""}); save(); renderEdit(); }; r.readAsDataURL(f); }); }
+    function delP(i) { if(confirm("Supprimer ?")) { db[curID].data[curB].splice(i,1); save(); renderEdit(); } }
+    function updTx(i, h) { db[curID].data[curB][i].desc=h; save(); }
+    function cmd(c,v=null) { document.execCommand(c,false,v); }
 
-                .viewer-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
-                .frame { width: 100%; max-width: 1400px; aspect-ratio: 16/9; border: 4px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.8); border-radius: 2px; }
-                .frame img { width: 100%; height: 100%; object-fit: contain; }
-                
-                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10, 26, 60, 0.8); color: var(--gold); border: 2px solid var(--gold); padding: 20px; cursor: pointer; border-radius: 50%; font-size: 30px; z-index: 60; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; }
-                .arr:hover { background: var(--gold); color: #000; scale: 1.1; }
-                .arr-left { left: -35px; } .arr-right { right: -35px; }
-                .desc-box { padding: 35px 50px; background: rgba(5, 14, 36, 0.95); border-top: 4px solid var(--gold); min-height: 150px; z-index: 40; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
-                .desc-title { margin: 0 0 15px 0; color: var(--gold); font-size: 1.8rem; text-transform: uppercase; font-weight: 300; letter-spacing: 2px; border-bottom: 1px solid rgba(204, 164, 59, 0.3); padding-bottom: 10px; display: inline-block; }
-                .desc-content { font-size: 1.3rem; line-height: 1.6; font-weight: 300; color: #eef; }
-                .desc-content ul { padding-left: 20px; } .desc-content strong { color: white; font-weight: 600; }
+    // --- DATA ---
+    function exportData() { const b=new Blob([JSON.stringify(db)],{type:"application/json"}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="CCAS_BACKUP.json"; a.click(); }
+    function importData(inpt) { const f=inpt.files[0]; if(f) { const r=new FileReader(); r.onload=e=>{ if(confirm("Fusionner ?")) { db={...db, ...JSON.parse(e.target.result)}; save(); renderDash(); alert("OK"); } }; r.readAsText(f); } }
+
+    // --- COURAGE PHOTO ---
+    function changeCourage(input) {
+        if(input.files && input.files[0]) {
+            const r = new FileReader();
+            r.onload = function(e) {
+                document.getElementById('courage-img').src = e.target.result;
+                courageB64 = e.target.result; // Update b64 for next time
+            }
+            r.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // --- GEN ---
+    function gen() {
+        const proj = db[curID];
+        document.getElementById('courage-overlay').style.display='flex';
+        // Utilisation du B64 sécurisé ou fallback
+        if(courageB64) document.getElementById('courage-img').src = courageB64;
+
+        const fLogo = logoB64 || "Logo_Créteil_Val_Marne.svg.png";
+        
+        setTimeout(()=>{
+            const dStr = JSON.stringify(proj.data).replace(/</g,'\\u003c');
+            const h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
+            :root{--bg:#0A1A3C;--gold:#CCA43B;--txt:#F4F7FD}body{font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;background:#000;color:var(--txt);overflow:hidden}
+            #side{width:280px;background:#050E24;border-right:3px solid var(--gold);display:flex;flex-direction:column;z-index:10;box-shadow:5px 0 15px rgba(0,0,0,0.5)}
+            .nav-t{padding:25px;color:var(--gold);font-weight:800;border-bottom:1px solid #1f2d40;text-transform:uppercase;text-align:center}
+            .nav-btn{width:100%;padding:20px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #111;transition:0.3s}
+            .nav-btn:hover{background:rgba(255,255,255,0.05);color:white}.nav-btn.active{color:var(--gold);background:rgba(204,164,59,0.1);border-left:5px solid var(--gold);font-weight:bold}
+            #main{flex:1;display:flex;flex-direction:column;position:relative;background:radial-gradient(circle at center,#142850,#0A1A3C)}
+            .h-zone{position:absolute;top:20px;right:20px;display:flex;align-items:center;gap:10px;z-index:50;background:rgba(10,26,60,0.6);padding:10px 15px;border-radius:6px;border:1px solid var(--gold);backdrop-filter:blur(5px)}
+            .h-logo{width:60px;height:auto}.h-txt{margin:0;font-size:0.6rem;color:var(--gold);font-weight:700;text-transform:uppercase;line-height:1.2;text-align:left}
+            .view{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+            .frame{width:100%;max-width:1400px;aspect-ratio:16/9;border:4px solid var(--gold);background:#000;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 80px rgba(0,0,0,0.8)}
+            .frame img{width:100%;height:100%;object-fit:contain}
+            .arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,26,60,0.8);color:var(--gold);border:2px solid var(--gold);width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:24px;z-index:60;transition:0.2s}
+            .arr:hover{background:var(--gold);color:black;scale:1.1}.al{left:-25px}.ar{right:-25px}
+            .desc{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:4px solid var(--gold);min-height:150px;z-index:40;box-shadow:0 -10px 30px rgba(0,0,0,0.5)}
+            .dt{margin:0 0 10px 0;color:var(--gold);font-size:1.8rem;text-transform:uppercase;border-bottom:1px solid rgba(204,164,59,0.3);display:inline-block}
+            .dc{font-size:1.3rem;line-height:1.5;font-weight:300;color:#eef}.dc ul{padding-left:20px}
             </style></head><body>
-            <div id="side"><div class="nav-title">${proj.name}</div><div id="nav-list" class="nav-scroll"></div></div>
-            <div id="main">
-                <div class="viewer-container">
-                    <div class="frame" id="frame-box">
-                        <div class="header-in-frame">
-                            <img src="${finalLogo}" class="header-logo-small">
-                            <p class="header-text-small">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</p>
-                        </div>
-                        <div id="img-slot" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div>
-                    </div>
-                </div>
-                <div class="desc-box"><h2 id="b-name" class="desc-title"></h2><div id="txt-content" class="desc-content"></div></div>
-            </div>
+            <div id="side"><div class="nav-t">${proj.name}</div><div id="nl" style="flex:1;overflow-y:auto"></div></div>
+            <div id="main"><div class="view"><div class="frame" id="fr">
+            <div class="h-zone"><img src="${fLogo}" class="h-logo"><p class="h-txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</p></div>
+            <div id="sl" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div></div></div>
+            <div class="desc"><h2 id="bn" class="dt"></h2><div id="tc" class="dc"></div></div></div>
             <script>
-                const data = ${dataStr}; let curB = Object.keys(data)[0]; let curI = 0;
-                function renderNav() {
-                    const list = document.getElementById('nav-list'); list.innerHTML = '';
-                    Object.keys(data).forEach(k => {
-                        const btn = document.createElement('button'); btn.className = 'nav-btn' + (curB === k ? ' active' : '');
-                        btn.innerText = k; btn.onclick = () => { curB = k; curI = 0; show(); renderNav(); }; list.appendChild(btn);
-                    });
-                }
-                function show() {
-                    const slot = document.getElementById('img-slot'); const frame = document.getElementById('frame-box'); const items = data[curB];
-                    if(!items || items.length === 0) { slot.innerHTML = '<div style="color:#666">Aucune photo</div>'; document.getElementById('txt-content').innerHTML = ""; frame.querySelectorAll('.arr').forEach(a => a.remove()); return; }
-                    slot.innerHTML = '<img src="' + items[curI].img + '">';
-                    document.getElementById('b-name').innerText = curB;
-                    document.getElementById('txt-content').innerHTML = items[curI].desc || "<i>Aucune observation.</i>";
-                    frame.querySelectorAll('.arr').forEach(a => a.remove());
-                    if (items.length > 1) {
-                        const l = document.createElement('div'); l.className = 'arr arr-left'; l.innerHTML = '❮'; l.onclick = () => { curI = (curI - 1 + items.length) % items.length; show(); };
-                        const r = document.createElement('div'); r.className = 'arr arr-right'; r.innerHTML = '❯'; r.onclick = () => { curI = (curI + 1) % items.length; show(); };
-                        frame.appendChild(l); frame.appendChild(r);
-                    }
-                }
-                window.onload = () => { if(curB) { renderNav(); show(); } };
+            const d=${dStr};let cB=Object.keys(d)[0],cI=0;
+            function rN(){const l=document.getElementById('nl');l.innerHTML='';Object.keys(d).forEach(k=>{const b=document.createElement('button');b.className='nav-btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rN()};l.appendChild(b)})}
+            function sh(){const s=document.getElementById('sl'),f=document.getElementById('fr'),i=d[cB];if(!i||!i.length){s.innerHTML='<div style="color:#666">Vide</div>';document.getElementById('tc').innerHTML='';f.querySelectorAll('.arr').forEach(a=>a.remove());return}
+            s.innerHTML='<img src="'+i[cI].img+'">';document.getElementById('bn').innerText=cB;document.getElementById('tc').innerHTML=i[cI].desc||"";
+            f.querySelectorAll('.arr').forEach(a=>a.remove());
+            if(i.length>1){const l=document.createElement('div');l.className='arr al';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};
+            const r=document.createElement('div');r.className='arr ar';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};f.appendChild(l);f.appendChild(r)}}
+            window.onload=()=>{if(cB){rN();sh()}};
             <\/script></body></html>`;
-            
-            const blob = new Blob([html], { type: 'text/html' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = proj.name.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".html";
-            a.click();
-            setTimeout(() => { document.getElementById('loading').style.display = 'none'; }, 1500);
-        }, 1500);
+            const b=new Blob([h],{type:'text/html'});const u=URL.createObjectURL(b);const x=document.createElement('a');x.href=u;x.download=proj.name.replace(/[^a-z0-9]/gi,'_')+".html";x.click();
+            setTimeout(()=>{document.getElementById('courage-overlay').style.display='none'},1500);
+        },1000);
     }
 </script>
 </body>
