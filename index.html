@@ -2,72 +2,87 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v14 Pro</title>
+    <title>Studio CCAS | v15 Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; --panel: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
 
+        /* GENERAL UI */
+        button { cursor: pointer; transition: 0.1s; }
+        button:active { transform: scale(0.98); }
+        
         /* DASHBOARD */
         #view-dashboard { flex: 1; padding: 30px; display: flex; flex-direction: column; }
-        .header { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-big { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: #e0e7ff; color: var(--blue); border: 1px solid var(--blue); }
+        .header { background: var(--panel); padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 3px solid var(--gold); }
+        .btn-big { padding: 12px 25px; border: none; border-radius: 6px; font-weight: bold; background: #eef2ff; color: var(--blue); border: 1px solid var(--blue); display:flex; align-items:center; gap:10px; }
         .btn-big:hover { background: var(--blue); color: white; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; overflow-y: auto; padding: 5px; }
-        .card { background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
-        .card:hover { border-color: var(--gold); transform: translateY(-3px); }
-        .del-btn { position: absolute; top: 5px; right: 5px; color: red; font-weight: bold; width: 25px; height: 25px; background:white; border-radius:50%; display: flex; align-items: center; justify-content: center; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; overflow-y: auto; padding: 5px; }
+        .card { background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; transition: 0.2s; }
+        .card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .del-btn { position: absolute; top: 8px; right: 8px; color: #ff4d4d; font-weight: bold; width: 28px; height: 28px; background:#fff0f0; border-radius:50%; display: flex; align-items: center; justify-content: center; }
 
         /* STUDIO */
         #view-studio { display: none; height: 100vh; flex-direction: row; }
-        #sidebar { width: 280px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; }
-        .back-home { padding: 15px; background: rgba(255,255,255,0.1); color: var(--gold); font-weight: bold; cursor: pointer; border: none; text-align: left; width: 100%; }
+        #sidebar { width: 280px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 10px rgba(0,0,0,0.2); }
+        .back-home { padding: 18px; background: rgba(255,255,255,0.05); color: var(--gold); font-weight: bold; cursor: pointer; border: none; text-align: left; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .back-home:hover { background: rgba(255,255,255,0.1); }
         
         #editor-main { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
-        .top-bar { background: white; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; height: 60px; }
+        .top-bar { background: white; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; height: 65px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        .logo-uploader { width: 50px; height: 50px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; border-radius: 4px; }
-        .logo-uploader img { width: 100%; height: 100%; object-fit: contain; }
+        .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; overflow: hidden; }
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
         
-        .gen-btn { background: var(--blue); color: white; padding: 10px 25px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; }
-        .content-area { flex: 1; overflow-y: auto; padding: 30px; }
+        .gen-btn { background: linear-gradient(135deg, var(--blue), #1a2b50); color: white; padding: 10px 30px; border-radius: 30px; border: none; font-weight: bold; box-shadow: 0 4px 10px rgba(10, 26, 60, 0.3); }
+        .gen-btn:hover { transform: scale(1.05); }
+
+        .content-area { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
         
-        /* PHOTOS & OUTILS COMPLETS */
-        .photo-block { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; border: 1px solid #ddd; position: relative; }
-        .photo-col { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-        .photo-img { width: 220px; height: 150px; object-fit: contain; border: 1px solid #ccc; background: #eee; cursor: pointer; }
-        
-        .btn-edit-photo { background: var(--blue); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; width: 100%; }
+        /* EDITOR CARDS */
+        .photo-block { background: white; padding: 20px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 25px; border: 1px solid #ddd; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .photo-col { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 240px; flex-shrink: 0; }
+        .photo-img { width: 100%; height: 160px; object-fit: contain; border: 1px solid #eee; background: #fafafa; border-radius: 4px; cursor: pointer; }
+        .btn-edit-photo { background: #333; color: white; border: none; padding: 8px 0; border-radius: 4px; width: 100%; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-edit-photo:hover { background: var(--gold); color: black; }
-
-        .del-p-btn { position: absolute; top: -10px; right: -10px; background: red; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; border:2px solid white; z-index: 5; }
         
-        /* BARRE D'OUTILS TEXTE AMÉLIORÉE */
-        .toolbar { display: flex; gap: 3px; margin-bottom: 5px; background: #f1f3f4; padding: 5px; border-radius: 4px; border: 1px solid #ddd; flex-wrap: wrap; }
-        .toolbar button, .toolbar select, .toolbar input[type=color] { cursor: pointer; height: 28px; border: 1px solid #ccc; background: white; border-radius: 3px; font-size: 12px; display: flex; align-items: center; justify-content: center; min-width: 28px; padding: 0 5px; }
-        .toolbar button:hover { background: #e8e8e8; }
-        .sep { width: 1px; background: #ccc; margin: 0 5px; }
+        .del-p-btn { position: absolute; top: -12px; right: -12px; background: #ff4d4d; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; border:3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
-        .rich-text { min-height: 120px; border: 1px solid #ccc; padding: 10px; border-radius: 4px; font-size: 14px; overflow-y: auto; background: #fff; line-height: 1.5; }
-        .rich-text:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 5px rgba(204,164,59,0.3); }
+        /* TEXT TOOLBAR */
+        .toolbar { display: flex; gap: 4px; margin-bottom: 8px; background: #f8f9fa; padding: 6px; border-radius: 6px; border: 1px solid #e9ecef; flex-wrap: wrap; }
+        .toolbar button { width: 30px; height: 30px; border: 1px solid transparent; background: white; border-radius: 4px; font-weight: bold; font-size: 13px; color: #444; border-color: #ddd; }
+        .toolbar button:hover { background: #e2e6ea; border-color: #adb5bd; }
+        .rich-text { min-height: 130px; border: 1px solid #ccc; padding: 12px; border-radius: 6px; font-size: 14px; overflow-y: auto; background: #fff; line-height: 1.5; color: #333; }
+        .rich-text:focus { border-color: var(--blue); outline: none; background: #fdfdff; }
 
-        .bat-item { padding: 10px; margin-bottom: 5px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; justify-content: space-between; border-radius: 4px; }
-        .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
+        .bat-item { padding: 12px; margin-bottom: 6px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; justify-content: space-between; border-radius: 6px; color: #ccc; }
+        .bat-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; border-left: 4px solid #fff; }
 
-        /* MODAL PAINT (DESSIN) */
-        #paint-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        #paint-canvas { background: transparent; cursor: crosshair; max-width: 90vw; max-height: 80vh; border: 2px solid #555; }
-        .paint-tools { display: flex; gap: 10px; margin-top: 20px; background: #333; padding: 10px; border-radius: 10px; }
-        .btn-paint { padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; background: #555; }
-        .btn-paint.active { background: var(--gold); color: black; }
-        .btn-paint-save { background: var(--success); } /* Vert */
-        .btn-paint-cancel { background: var(--danger); } /* Rouge */
+        /* --- PAINT MODAL (DESIGN MICROSOFT) --- */
+        #paint-modal { position: fixed; inset: 0; background: rgba(20, 20, 25, 0.95); z-index: 20000; display: none; flex-direction: column; }
+        .paint-header { height: 60px; background: #333; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #555; }
+        .paint-toolbar { height: 70px; background: #444; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 0 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        .tool-group { display: flex; gap: 5px; background: #333; padding: 5px; border-radius: 8px; align-items: center; }
+        .p-btn { width: 40px; height: 40px; border: 1px solid #555; background: #444; border-radius: 5px; color: white; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .p-btn:hover { background: #555; }
+        .p-btn.active { background: var(--gold); color: black; border-color: var(--gold); }
+        
+        .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .color-swatch:hover { transform: scale(1.1); }
+        .color-swatch.active { border-color: white; box-shadow: 0 0 0 2px var(--blue); }
 
-        /* MODALS */
+        #paint-canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #222; }
+        #paint-canvas { box-shadow: 0 0 30px rgba(0,0,0,0.5); background: transparent; cursor: crosshair; }
+
+        /* OVERLAYS */
         #overlay, #success-modal { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .success-box { background: white; width: 600px; padding: 30px; border-radius: 15px; text-align: left; color: #333; border: 4px solid var(--gold); }
-        #photo-courage { width: 300px; height: 300px; border-radius: 50%; border: 8px solid var(--gold); object-fit: cover; cursor: pointer; }
+        .success-box { background: white; width: 600px; padding: 40px; border-radius: 15px; text-align: left; color: #333; border-top: 6px solid var(--success); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        #photo-courage { width: 300px; height: 300px; border-radius: 50%; border: 8px solid var(--gold); object-fit: cover; cursor: pointer; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.02);} 100% {transform: scale(1);} }
     </style>
 </head>
 <body>
@@ -79,7 +94,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS</h1><p style="margin:0;color:#666">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:14px; opacity:0.6;">v15</span></h1><p style="margin:0;color:#666">Direction des Finances</p></div>
         <div style="display:flex; gap:10px;">
             <button class="btn-big" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
             <button class="btn-big" onclick="document.getElementById('import-input').click()">📂 OUVRIR USB</button>
@@ -91,78 +106,110 @@
 <div id="view-studio">
     <div id="sidebar">
         <button class="back-home" onclick="goDashboard()">🏠 REVENIR AUX DOSSIERS</button>
-        <div style="padding:15px; text-align:center; color:var(--gold); font-weight:bold;" id="lbl-proj">Projet</div>
+        <div style="padding:20px; text-align:center; color:var(--gold); font-weight:bold; font-size:1.1rem;" id="lbl-proj">Projet</div>
         <div id="list-bat" style="flex:1; overflow-y:auto; padding:10px;"></div>
-        <div style="padding:15px;"><button onclick="newBat()" style="width:100%; padding:10px; background:transparent; border:2px dashed var(--gold); color:white; font-weight:bold; cursor:pointer;">+ AJOUTER BÂTIMENT</button></div>
+        <div style="padding:20px;"><button onclick="newBat()" style="width:100%; padding:12px; background:transparent; border:2px dashed var(--gold); color:white; font-weight:bold; cursor:pointer; border-radius:6px;">+ AJOUTER BÂTIMENT</button></div>
     </div>
     <div id="editor-main">
         <div class="top-bar">
-            <div class="logo-uploader" onclick="document.getElementById('logo-input').click()" title="Changer le logo"><img id="logo-preview" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'"></div>
-            <div id="lbl-bat" style="font-weight:bold; color:var(--blue); font-size:1.2rem;">Accueil</div>
-            <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER LE ZIP (MAIL)</button>
+            <div class="logo-box" onclick="document.getElementById('logo-input').click()" title="Changer le logo"><img id="logo-preview" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'"></div>
+            <div id="lbl-bat" style="font-weight:bold; color:var(--blue); font-size:1.3rem;">Accueil</div>
+            <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER ZIP (MAIL)</button>
         </div>
         <div id="area-photos" class="content-area"></div>
     </div>
 </div>
 
 <div id="paint-modal">
-    <canvas id="paint-canvas"></canvas>
-    <div class="paint-tools">
-        <button class="btn-paint active" onclick="setTool('circle')">⭕ Cercle</button>
-        <button class="btn-paint" onclick="setTool('rect')">⬜ Cadre</button>
-        <button class="btn-paint" onclick="setTool('arrow')">↗️ Flèche</button>
-        <div style="width:20px;"></div>
-        <button class="btn-paint" onclick="undoPaint()">↩️ Annuler</button>
-        <button class="btn-paint btn-paint-save" onclick="savePaint()">💾 VALIDER</button>
-        <button class="btn-paint btn-paint-cancel" onclick="closePaint()">Fermer</button>
+    <div class="paint-header">
+        <div style="color:white; font-weight:bold;">🎨 RETOUCHE PHOTO</div>
+        <div style="display:flex; gap:10px;">
+            <button onclick="savePaint()" style="background:var(--gold); border:none; padding:8px 20px; border-radius:4px; font-weight:bold;">💾 ENREGISTRER</button>
+            <button onclick="closePaint()" style="background:#555; color:white; border:none; padding:8px 20px; border-radius:4px;">Annuler</button>
+        </div>
+    </div>
+    <div class="paint-toolbar">
+        <div class="tool-group">
+            <button class="p-btn active" onclick="setTool('rect')" title="Cadre">⬜</button>
+            <button class="p-btn" onclick="setTool('circle')" title="Cercle">⭕</button>
+            <button class="p-btn" onclick="setTool('arrow')" title="Flèche">↗️</button>
+            <button class="p-btn" onclick="undoPaint()" title="Annuler dernier trait">↩️</button>
+        </div>
+        <div class="tool-group">
+            <div class="color-swatch active" style="background:#ff0000;" onclick="setColor('#ff0000', this)"></div>
+            <div class="color-swatch" style="background:#ffff00;" onclick="setColor('#ffff00', this)"></div>
+            <div class="color-swatch" style="background:#00ff00;" onclick="setColor('#00ff00', this)"></div>
+            <div class="color-swatch" style="background:#0000ff;" onclick="setColor('#0000ff', this)"></div>
+            <div class="color-swatch" style="background:#ffffff;" onclick="setColor('#ffffff', this)"></div>
+            <input type="color" id="custom-color" onchange="setColor(this.value, null)" style="width:30px; height:30px; border:none; padding:0; background:none;">
+        </div>
+        <div class="tool-group" style="color:white; font-size:12px; padding:0 15px;">
+            Épaisseur<br>
+            <input type="range" min="2" max="20" value="5" oninput="setLineWidth(this.value)" style="width:100px;">
+        </div>
+    </div>
+    <div id="paint-canvas-container">
+        <canvas id="paint-canvas"></canvas>
     </div>
 </div>
 
 <div id="overlay">
     <img src="courage.jpg.JPG" id="photo-courage" onclick="document.getElementById('courage-input').click()" onerror="this.src='https://via.placeholder.com/300?text=PHOTO+MANQUANTE'">
     <h2 style="color:var(--gold); margin-top:20px;">COURAGE MAMIE ! ❤️</h2>
-    <p>Création du ZIP en cours...</p>
+    <p>Création du dossier ZIP en cours...</p>
 </div>
 
 <div id="success-modal">
     <div class="success-box">
-        <h2 style="color:var(--blue); margin:0 0 15px 0;">📦 Le dossier ZIP est prêt !</h2>
-        <p style="font-size:1.1rem; line-height:1.6;">Le fichier <strong>Dossier.zip</strong> est dans vos Téléchargements.<br><br>👉 Créez votre mail.<br>👉 Ajoutez ce fichier <strong>.zip</strong> en pièce jointe.<br>👉 Envoyez !</p>
-        <button style="background:var(--gold); border:none; padding:10px 20px; font-weight:bold; cursor:pointer; width:100%; border-radius:5px;" onclick="document.getElementById('success-modal').style.display='none'">OK, COMPRIS</button>
+        <h2 style="color:var(--blue); margin:0 0 15px 0;">📦 Dossier ZIP prêt !</h2>
+        <p style="font-size:1.1rem; line-height:1.6; color:#555;">Le fichier <strong>Dossier_Final.zip</strong> est dans <strong>Téléchargements</strong>.</p>
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+        <div style="display:flex; gap:15px; align-items:center;">
+            <div style="font-size:2rem;">📧</div>
+            <div><strong>Pour l'envoyer :</strong> Glissez ce fichier .zip directement dans votre mail pour le chef.</div>
+        </div>
+        <button style="background:var(--blue); color:white; border:none; padding:12px 20px; font-weight:bold; cursor:pointer; width:100%; border-radius:6px; margin-top:25px;" onclick="document.getElementById('success-modal').style.display='none'">OK, C'EST NOTÉ</button>
     </div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v14')) || {};
+    // --- COEUR DU SYSTEME ---
+    let db = JSON.parse(localStorage.getItem('ccas_db_v15')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
     
     // VARIABLES PAINT
-    let canvas, ctx, paintImg, isDrawing = false, startX, startY, currentTool = 'circle';
+    let canvas, ctx, paintImg, isDrawing = false, startX, startY;
+    let currentTool = 'rect', currentColor = '#ff0000', currentWidth = 5;
     let paintHistory = [], currentPhotoIndex = null;
 
     window.onload = () => {
         refreshGrid();
         if(appConfig.logo) document.getElementById('logo-preview').src = appConfig.logo;
         if(appConfig.courage) document.getElementById('photo-courage').src = appConfig.courage;
-        if(!appConfig.logo) { const img = document.getElementById('logo-preview'); if(img.complete) imgTo64(img, r => { appConfig.logo = r; saveConfig(); }); }
         
-        // Init Canvas
+        // Auto-save initial logo
+        if(!appConfig.logo) {
+            const img = document.getElementById('logo-preview');
+            if(img.complete && img.naturalWidth > 0) imgTo64(img, r => { appConfig.logo = r; saveConfig(); });
+        }
+
+        // Init Paint Canvas
         canvas = document.getElementById('paint-canvas');
         ctx = canvas.getContext('2d');
         canvas.addEventListener('mousedown', startDraw);
         canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDraw);
+        window.addEventListener('mouseup', stopDraw);
     };
 
-    function save() { localStorage.setItem('ccas_db_v14', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v15', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
 
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
     function updateCourage(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('photo-courage').src=e.target.result; appConfig.courage=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
 
-    // --- DASHBOARD ---
+    // --- NAVIGATION ---
     function refreshGrid() {
         const g = document.getElementById('grid-projects');
         g.innerHTML = `<div class="card" onclick="createProj()" style="border:2px dashed #ccc; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#888;"><h1>+</h1><div>NOUVEAU</div></div>`;
@@ -175,9 +222,148 @@
             g.appendChild(div);
         });
     }
-    function createProj() { const n = prompt("Nom du dossier :"); if(n) { const id = Date.now().toString(); db[id] = { name:n, date:Date.now(), data:{} }; save(); openProj(id); } }
-    function delProj(id, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete db[id]; save(); refreshGrid(); } }
+    function createProj() { const n = prompt("Nom du dossier (ex: Crèche Jaurès) :"); if(n) { const id = Date.now().toString(); db[id] = { name:n, date:Date.now(), data:{} }; save(); openProj(id); } }
+    function delProj(id, e) { e.stopPropagation(); if(confirm("Supprimer ce dossier ?")) { delete db[id]; save(); refreshGrid(); } }
 
+    function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; document.getElementById('lbl-proj').innerText = db[id].name; refreshSide(); refreshMain(); }
+    function goDashboard() { curP = null; document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
+
+    function newBat() { const n = prompt("Nom du bâtiment :"); if(n) { if(!db[curP].data[n]) { db[curP].data[n] = []; save(); openBat(n); refreshSide(); } else alert("Ce nom existe déjà"); } }
+    function refreshSide() {
+        const l = document.getElementById('list-bat'); l.innerHTML = '';
+        Object.keys(db[curP].data).forEach(b => {
+            const div = document.createElement('div'); div.className = `bat-item ${curB === b ? 'active' : ''}`;
+            div.innerHTML = `<span>${b}</span><span onclick="delBat('${b}', event)" style="color:#ff6b6b; font-weight:bold; padding:0 5px;">×</span>`;
+            div.onclick = () => openBat(b); l.appendChild(div);
+        });
+    }
+    function delBat(b, e) { e.stopPropagation(); if(confirm("Supprimer "+b+" ?")) { delete db[curP].data[b]; if(curB === b) curB = null; save(); refreshSide(); refreshMain(); } }
+    function openBat(b) { curB = b; document.getElementById('lbl-bat').innerText = b; refreshSide(); refreshMain(); }
+
+    function refreshMain() {
+        const area = document.getElementById('area-photos');
+        if(!curB) { area.innerHTML = '<div style="text-align:center; color:#999; margin-top:50px; font-size:1.2rem;">Sélectionnez un bâtiment à gauche pour commencer.</div>'; return; }
+        area.innerHTML = `<div onclick="document.getElementById('photo-input').click()" style="padding:30px; border:3px dashed #ddd; text-align:center; background:white; cursor:pointer; margin-bottom:30px; font-weight:bold; color:#888; border-radius:10px;">📸 AJOUTER DES PHOTOS ICI</div>`;
+        db[curP].data[curB].forEach((p, idx) => {
+            const div = document.createElement('div'); div.className = 'photo-block';
+            div.innerHTML = `
+                <div class="del-p-btn" onclick="delPhoto(${idx})">×</div>
+                <div class="photo-col">
+                    <img src="${p.img}" class="photo-img" onclick="openPaint(${idx})">
+                    <button class="btn-edit-photo" onclick="openPaint(${idx})">🎨 DESSINER DESSUS</button>
+                </div>
+                <div style="flex:1">
+                    <div class="toolbar">
+                        <button onclick="cmd('bold')" title="Gras"><b>B</b></button>
+                        <button onclick="cmd('italic')" title="Italique"><i>I</i></button>
+                        <button onclick="cmd('underline')" title="Souligné"><u>U</u></button>
+                        <div style="width:1px; background:#ccc; margin:0 5px;"></div>
+                        <input type="color" onchange="cmd('foreColor', this.value)" title="Couleur du texte" style="height:28px; width:30px; padding:0; border:none;">
+                        <button onclick="cmd('hiliteColor', 'yellow')" style="background:yellow;" title="Surligner">🖍️</button>
+                        <div style="width:1px; background:#ccc; margin:0 5px;"></div>
+                        <button onclick="cmd('justifyLeft')">⫷</button>
+                        <button onclick="cmd('justifyCenter')">||</button>
+                        <button onclick="cmd('insertUnorderedList')">• Liste</button>
+                        <select onchange="cmd('fontSize', this.value)" style="height:28px; border:1px solid #ccc; border-radius:3px;"><option value="3">Taille Normale</option><option value="5">Grand</option><option value="6">Très Grand</option></select>
+                    </div>
+                    <div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)">${p.desc}</div>
+                </div>`;
+            area.appendChild(div);
+        });
+    }
+    function cmd(c, v=null) { document.execCommand(c, false, v); }
+    function processPhotos(i) { Array.from(i.files).forEach(f => { const r = new FileReader(); r.onload = e => { db[curP].data[curB].push({img: e.target.result, desc: ""}); save(); refreshMain(); }; r.readAsDataURL(f); }); }
+    function delPhoto(idx) { if(confirm("Supprimer ?")) { db[curP].data[curB].splice(idx, 1); save(); refreshMain(); } }
+    function updateTxt(idx, h) { db[curP].data[curB][idx].desc = h; save(); }
+
+    // --- MOTEUR PAINT OPTIMISÉ ---
+    function openPaint(idx) {
+        currentPhotoIndex = idx;
+        const src = db[curP].data[curB][idx].img;
+        paintImg = new Image();
+        paintImg.onload = () => {
+            // Calcul taille optimale
+            const maxW = window.innerWidth * 0.8;
+            const maxH = window.innerHeight * 0.7;
+            let w = paintImg.width, h = paintImg.height;
+            const ratio = Math.min(maxW/w, maxH/h);
+            w = w * ratio; h = h * ratio;
+
+            canvas.width = w; canvas.height = h;
+            ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+            ctx.drawImage(paintImg, 0, 0, w, h);
+            saveHistory(); // Etat initial
+            document.getElementById('paint-modal').style.display = 'flex';
+        };
+        paintImg.src = src;
+    }
+
+    function setTool(t) { currentTool = t; document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active')); event.currentTarget.classList.add('active'); }
+    function setColor(c, el) { currentColor = c; if(el){ document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active')); el.classList.add('active'); } }
+    function setLineWidth(w) { currentWidth = w; }
+    
+    function saveHistory() { paintHistory.push(canvas.toDataURL()); if(paintHistory.length > 8) paintHistory.shift(); }
+    
+    function undoPaint() {
+        if(paintHistory.length > 1) {
+            paintHistory.pop();
+            let prev = new Image();
+            prev.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(prev,0,0); };
+            prev.src = paintHistory[paintHistory.length-1];
+        }
+    }
+
+    function startDraw(e) {
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        startX = e.clientX - rect.left;
+        startY = e.clientY - rect.top;
+        saveHistory();
+    }
+
+    function draw(e) {
+        if(!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        let img = new Image();
+        img.src = paintHistory[paintHistory.length-1];
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0);
+
+        ctx.strokeStyle = currentColor; ctx.lineWidth = currentWidth;
+        
+        ctx.beginPath();
+        if(currentTool === 'circle') {
+            let r = Math.sqrt(Math.pow(x-startX,2) + Math.pow(y-startY,2));
+            ctx.arc(startX, startY, r, 0, 2*Math.PI);
+            ctx.stroke();
+        } else if(currentTool === 'rect') {
+            ctx.strokeRect(startX, startY, x-startX, y-startY);
+        } else if(currentTool === 'arrow') {
+            const head = 15 + currentWidth;
+            const angle = Math.atan2(y-startY, x-startX);
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x - head * Math.cos(angle - Math.PI/6), y - head * Math.sin(angle - Math.PI/6));
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - head * Math.cos(angle + Math.PI/6), y - head * Math.sin(angle + Math.PI/6));
+            ctx.stroke();
+        }
+    }
+
+    function stopDraw() { isDrawing = false; }
+
+    function savePaint() {
+        db[curP].data[curB][currentPhotoIndex].img = canvas.toDataURL('image/jpeg', 0.85);
+        save();
+        closePaint();
+        refreshMain();
+    }
+    function closePaint() { document.getElementById('paint-modal').style.display = 'none'; paintHistory = []; }
+
+    // --- USB ---
     function saveToUSB() {
         const exportData = { db: db, config: appConfig };
         const blob = new Blob([JSON.stringify(exportData)], {type: "application/json"});
@@ -191,151 +377,7 @@
         }; r.readAsText(f);
     }
 
-    // --- STUDIO ---
-    function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; document.getElementById('lbl-proj').innerText = db[id].name; refreshSide(); refreshMain(); }
-    function goDashboard() { curP = null; document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
-    function newBat() { const n = prompt("Nom du bâtiment :"); if(n) { if(!db[curP].data[n]) { db[curP].data[n] = []; save(); openBat(n); refreshSide(); } else alert("Existe déjà !"); } }
-    function refreshSide() {
-        const l = document.getElementById('list-bat'); l.innerHTML = '';
-        Object.keys(db[curP].data).forEach(b => {
-            const div = document.createElement('div'); div.className = `bat-item ${curB === b ? 'active' : ''}`;
-            div.innerHTML = `<span>${b}</span><span onclick="delBat('${b}', event)" style="color:red; font-weight:bold;">×</span>`;
-            div.onclick = () => openBat(b); l.appendChild(div);
-        });
-    }
-    function delBat(b, e) { e.stopPropagation(); if(confirm("Supprimer "+b+" ?")) { delete db[curP].data[b]; if(curB === b) curB = null; save(); refreshSide(); refreshMain(); } }
-    function openBat(b) { curB = b; document.getElementById('lbl-bat').innerText = b; refreshSide(); refreshMain(); }
-
-    function refreshMain() {
-        const area = document.getElementById('area-photos');
-        if(!curB) { area.innerHTML = '<div style="text-align:center; color:#999; margin-top:50px;">Sélectionnez un bâtiment.</div>'; return; }
-        area.innerHTML = `<div onclick="document.getElementById('photo-input').click()" style="padding:20px; border:2px dashed #ccc; text-align:center; background:white; cursor:pointer; margin-bottom:20px; font-weight:bold; color:#666;">+ AJOUTER PHOTOS</div>`;
-        db[curP].data[curB].forEach((p, idx) => {
-            const div = document.createElement('div'); div.className = 'photo-block';
-            div.innerHTML = `
-                <div class="del-p-btn" onclick="delPhoto(${idx})">×</div>
-                <div class="photo-col">
-                    <img src="${p.img}" class="photo-img">
-                    <button class="btn-edit-photo" onclick="openPaint(${idx})">🎨 RETOUCHER / ENTOURER</button>
-                </div>
-                <div style="flex:1">
-                    <div class="toolbar">
-                        <button onclick="cmd('bold')"><b>B</b></button>
-                        <button onclick="cmd('italic')"><i>I</i></button>
-                        <button onclick="cmd('underline')"><u>U</u></button>
-                        <div class="sep"></div>
-                        <input type="color" onchange="cmd('foreColor', this.value)" title="Couleur Texte">
-                        <button onclick="cmd('hiliteColor', 'yellow')" style="background:yellow; font-size:10px;">Surligner</button>
-                        <div class="sep"></div>
-                        <button onclick="cmd('justifyLeft')">Gauche</button>
-                        <button onclick="cmd('justifyCenter')">Centre</button>
-                        <div class="sep"></div>
-                        <button onclick="cmd('insertUnorderedList')">• Liste</button>
-                        <select onchange="cmd('fontSize', this.value)"><option value="3">Taille Normale</option><option value="5">Grand</option><option value="6">Très Grand</option></select>
-                    </div>
-                    <div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)" placeholder="Description...">${p.desc}</div>
-                </div>`;
-            area.appendChild(div);
-        });
-    }
-    function cmd(c, v=null) { document.execCommand(c, false, v); }
-    function processPhotos(i) { Array.from(i.files).forEach(f => { const r = new FileReader(); r.onload = e => { db[curP].data[curB].push({img: e.target.result, desc: ""}); save(); refreshMain(); }; r.readAsDataURL(f); }); }
-    function delPhoto(idx) { if(confirm("Supprimer ?")) { db[curP].data[curB].splice(idx, 1); save(); refreshMain(); } }
-    function updateTxt(idx, h) { db[curP].data[curB][idx].desc = h; save(); }
-
-    // --- MOTEUR DE DESSIN (PAINT) ---
-    function openPaint(idx) {
-        currentPhotoIndex = idx;
-        const src = db[curP].data[curB][idx].img;
-        paintImg = new Image();
-        paintImg.onload = () => {
-            // Adapter la taille du canvas à l'image (max 800px de large)
-            let w = paintImg.width, h = paintImg.height;
-            if(w > 800) { h = h * (800/w); w = 800; }
-            canvas.width = w; canvas.height = h;
-            ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-            ctx.drawImage(paintImg, 0, 0, w, h);
-            saveHistory(); // Etat initial
-            document.getElementById('paint-modal').style.display = 'flex';
-        };
-        paintImg.src = src;
-    }
-
-    function setTool(t) { currentTool = t; document.querySelectorAll('.btn-paint').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); }
-    function saveHistory() { paintHistory.push(canvas.toDataURL()); if(paintHistory.length > 10) paintHistory.shift(); }
-    
-    function undoPaint() {
-        if(paintHistory.length > 1) {
-            paintHistory.pop(); // Remove current
-            let prev = new Image();
-            prev.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(prev,0,0); };
-            prev.src = paintHistory[paintHistory.length-1];
-        }
-    }
-
-    function startDraw(e) {
-        isDrawing = true;
-        const rect = canvas.getBoundingClientRect();
-        startX = e.clientX - rect.left;
-        startY = e.clientY - rect.top;
-        saveHistory(); // Save state before new shape
-    }
-
-    function draw(e) {
-        if(!isDrawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        // Restore last state to animate shape dragging
-        let img = new Image();
-        img.src = paintHistory[paintHistory.length-1];
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.drawImage(img,0,0);
-
-        ctx.strokeStyle = "red"; ctx.lineWidth = 4;
-        
-        if(currentTool === 'circle') {
-            ctx.beginPath();
-            let radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
-            ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
-            ctx.stroke();
-        } else if(currentTool === 'rect') {
-            ctx.strokeRect(startX, startY, x - startX, y - startY);
-        } else if(currentTool === 'arrow') {
-            drawArrow(ctx, startX, startY, x, y);
-        }
-    }
-
-    function stopDraw() { isDrawing = false; } // History saved on mousedown
-
-    function drawArrow(ctx, fromx, fromy, tox, toy) {
-        var headlen = 15; 
-        var dx = tox - fromx;
-        var dy = toy - fromy;
-        var angle = Math.atan2(dy, dx);
-        ctx.beginPath();
-        ctx.moveTo(fromx, fromy);
-        ctx.lineTo(tox, toy);
-        ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
-        ctx.moveTo(tox, toy);
-        ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
-        ctx.stroke();
-    }
-
-    function savePaint() {
-        db[curP].data[curB][currentPhotoIndex].img = canvas.toDataURL('image/jpeg', 0.8);
-        save();
-        closePaint();
-        refreshMain();
-    }
-
-    function closePaint() {
-        document.getElementById('paint-modal').style.display = 'none';
-        paintHistory = [];
-    }
-
-    // --- GEN ZIP ---
+    // --- ZIP ---
     function generateZip() {
         if(!window.JSZip) { alert("Erreur moteur ZIP"); return; }
         const proj = db[curP];
