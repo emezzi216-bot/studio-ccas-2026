@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | Version Finale v12</title>
+    <title>Studio CCAS | v14 Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
     <style>
         :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -27,30 +29,45 @@
         
         .logo-uploader { width: 50px; height: 50px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; border-radius: 4px; }
         .logo-uploader img { width: 100%; height: 100%; object-fit: contain; }
-        .logo-uploader:hover { border-color: var(--gold); background: #fffdf0; }
-
+        
         .gen-btn { background: var(--blue); color: white; padding: 10px 25px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; }
         .content-area { flex: 1; overflow-y: auto; padding: 30px; }
+        
+        /* PHOTOS & OUTILS COMPLETS */
         .photo-block { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; border: 1px solid #ddd; position: relative; }
-        .photo-img { width: 200px; height: 130px; object-fit: cover; border: 2px solid var(--gold); border-radius: 4px; background: #eee; flex-shrink: 0; }
-        .del-p-btn { position: absolute; top: -10px; right: -10px; background: red; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; border:2px solid white; }
+        .photo-col { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .photo-img { width: 220px; height: 150px; object-fit: contain; border: 1px solid #ccc; background: #eee; cursor: pointer; }
+        
+        .btn-edit-photo { background: var(--blue); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; width: 100%; }
+        .btn-edit-photo:hover { background: var(--gold); color: black; }
+
+        .del-p-btn { position: absolute; top: -10px; right: -10px; background: red; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; border:2px solid white; z-index: 5; }
+        
+        /* BARRE D'OUTILS TEXTE AMÉLIORÉE */
+        .toolbar { display: flex; gap: 3px; margin-bottom: 5px; background: #f1f3f4; padding: 5px; border-radius: 4px; border: 1px solid #ddd; flex-wrap: wrap; }
+        .toolbar button, .toolbar select, .toolbar input[type=color] { cursor: pointer; height: 28px; border: 1px solid #ccc; background: white; border-radius: 3px; font-size: 12px; display: flex; align-items: center; justify-content: center; min-width: 28px; padding: 0 5px; }
+        .toolbar button:hover { background: #e8e8e8; }
+        .sep { width: 1px; background: #ccc; margin: 0 5px; }
+        
+        .rich-text { min-height: 120px; border: 1px solid #ccc; padding: 10px; border-radius: 4px; font-size: 14px; overflow-y: auto; background: #fff; line-height: 1.5; }
+        .rich-text:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 5px rgba(204,164,59,0.3); }
+
         .bat-item { padding: 10px; margin-bottom: 5px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; justify-content: space-between; border-radius: 4px; }
         .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
 
-        /* OVERLAY LOADING */
-        #overlay { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.98); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        #photo-courage { width: 300px; height: 300px; border-radius: 50%; border: 8px solid var(--gold); object-fit: cover; cursor: pointer; }
+        /* MODAL PAINT (DESSIN) */
+        #paint-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #paint-canvas { background: transparent; cursor: crosshair; max-width: 90vw; max-height: 80vh; border: 2px solid #555; }
+        .paint-tools { display: flex; gap: 10px; margin-top: 20px; background: #333; padding: 10px; border-radius: 10px; }
+        .btn-paint { padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; background: #555; }
+        .btn-paint.active { background: var(--gold); color: black; }
+        .btn-paint-save { background: var(--success); } /* Vert */
+        .btn-paint-cancel { background: var(--danger); } /* Rouge */
 
-        /* MODAL SUCCES (NEW) */
-        #success-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; }
-        .success-box { background: white; width: 600px; padding: 30px; border-radius: 15px; text-align: left; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 4px solid var(--gold); }
-        .success-box h2 { color: var(--blue); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 15px; }
-        .step-row { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start; }
-        .step-num { background: var(--blue); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
-        .step-txt { color: #333; font-size: 1.1rem; }
-        .step-txt strong { color: var(--blue); }
-        .close-success { background: var(--gold); color: var(--blue); width: 100%; padding: 15px; border: none; font-weight: bold; font-size: 1.2rem; cursor: pointer; border-radius: 8px; margin-top: 10px; }
-        .close-success:hover { background: #d4ac3d; }
+        /* MODALS */
+        #overlay, #success-modal { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .success-box { background: white; width: 600px; padding: 30px; border-radius: 15px; text-align: left; color: #333; border: 4px solid var(--gold); }
+        #photo-courage { width: 300px; height: 300px; border-radius: 50%; border: 8px solid var(--gold); object-fit: cover; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -76,83 +93,76 @@
         <button class="back-home" onclick="goDashboard()">🏠 REVENIR AUX DOSSIERS</button>
         <div style="padding:15px; text-align:center; color:var(--gold); font-weight:bold;" id="lbl-proj">Projet</div>
         <div id="list-bat" style="flex:1; overflow-y:auto; padding:10px;"></div>
-        <div style="padding:15px;"><button onclick="newBat()" style="width:100%; padding:10px; background:transparent; border:2px dashed var(--gold); color:white; font-weight:bold; cursor:pointer;">+ BÂTIMENT</button></div>
+        <div style="padding:15px;"><button onclick="newBat()" style="width:100%; padding:10px; background:transparent; border:2px dashed var(--gold); color:white; font-weight:bold; cursor:pointer;">+ AJOUTER BÂTIMENT</button></div>
     </div>
     <div id="editor-main">
         <div class="top-bar">
-            <div class="logo-uploader" onclick="document.getElementById('logo-input').click()" title="Cliquez pour changer le logo">
-                <img id="logo-preview" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
-            </div>
+            <div class="logo-uploader" onclick="document.getElementById('logo-input').click()" title="Changer le logo"><img id="logo-preview" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'"></div>
             <div id="lbl-bat" style="font-weight:bold; color:var(--blue); font-size:1.2rem;">Accueil</div>
-            <button class="gen-btn" onclick="generateReport()">🚀 GÉNÉRER LE FICHIER</button>
+            <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER LE ZIP (MAIL)</button>
         </div>
         <div id="area-photos" class="content-area"></div>
+    </div>
+</div>
+
+<div id="paint-modal">
+    <canvas id="paint-canvas"></canvas>
+    <div class="paint-tools">
+        <button class="btn-paint active" onclick="setTool('circle')">⭕ Cercle</button>
+        <button class="btn-paint" onclick="setTool('rect')">⬜ Cadre</button>
+        <button class="btn-paint" onclick="setTool('arrow')">↗️ Flèche</button>
+        <div style="width:20px;"></div>
+        <button class="btn-paint" onclick="undoPaint()">↩️ Annuler</button>
+        <button class="btn-paint btn-paint-save" onclick="savePaint()">💾 VALIDER</button>
+        <button class="btn-paint btn-paint-cancel" onclick="closePaint()">Fermer</button>
     </div>
 </div>
 
 <div id="overlay">
     <img src="courage.jpg.JPG" id="photo-courage" onclick="document.getElementById('courage-input').click()" onerror="this.src='https://via.placeholder.com/300?text=PHOTO+MANQUANTE'">
     <h2 style="color:var(--gold); margin-top:20px;">COURAGE MAMIE ! ❤️</h2>
-    <p>Génération du fichier en cours...</p>
+    <p>Création du ZIP en cours...</p>
 </div>
 
 <div id="success-modal">
     <div class="success-box">
-        <h2>✅ C'est fait ! Le fichier est téléchargé.</h2>
-        
-        <div style="background:#f0f7ff; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #cce5ff;">
-            <strong>Nom du fichier :</strong> <span id="final-filename" style="font-family:monospace;">dossier.html</span><br>
-            <strong>Emplacement :</strong> Dossier "Téléchargements"
-        </div>
-
-        <div class="step-row">
-            <div class="step-num">1</div>
-            <div class="step-txt">Ouvrez votre boîte mail (Outlook) et créez un <strong>Nouveau message</strong>.</div>
-        </div>
-        <div class="step-row">
-            <div class="step-num">2</div>
-            <div class="step-txt">Cliquez sur le <strong>Trombone 📎 (Pièce jointe)</strong>.</div>
-        </div>
-        <div class="step-row">
-            <div class="step-num">3</div>
-            <div class="step-txt">Allez dans le dossier <strong>Téléchargements</strong> et choisissez le fichier.</div>
-        </div>
-        <div class="step-row">
-            <div class="step-num">4</div>
-            <div class="step-txt">Envoyez ! Vos collègues ont juste à <strong>double-cliquer</strong> sur la pièce jointe pour l'ouvrir.</div>
-        </div>
-
-        <button class="close-success" onclick="document.getElementById('success-modal').style.display='none'">J'AI COMPRIS, RETOUR AU TRAVAIL</button>
+        <h2 style="color:var(--blue); margin:0 0 15px 0;">📦 Le dossier ZIP est prêt !</h2>
+        <p style="font-size:1.1rem; line-height:1.6;">Le fichier <strong>Dossier.zip</strong> est dans vos Téléchargements.<br><br>👉 Créez votre mail.<br>👉 Ajoutez ce fichier <strong>.zip</strong> en pièce jointe.<br>👉 Envoyez !</p>
+        <button style="background:var(--gold); border:none; padding:10px 20px; font-weight:bold; cursor:pointer; width:100%; border-radius:5px;" onclick="document.getElementById('success-modal').style.display='none'">OK, COMPRIS</button>
     </div>
 </div>
 
 <script>
-    // DONNÉES
-    let db = JSON.parse(localStorage.getItem('ccas_db_v12')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v14')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
+    
+    // VARIABLES PAINT
+    let canvas, ctx, paintImg, isDrawing = false, startX, startY, currentTool = 'circle';
+    let paintHistory = [], currentPhotoIndex = null;
 
     window.onload = () => {
         refreshGrid();
         if(appConfig.logo) document.getElementById('logo-preview').src = appConfig.logo;
         if(appConfig.courage) document.getElementById('photo-courage').src = appConfig.courage;
+        if(!appConfig.logo) { const img = document.getElementById('logo-preview'); if(img.complete) imgTo64(img, r => { appConfig.logo = r; saveConfig(); }); }
         
-        // Auto-save initial assets if present
-        if(!appConfig.logo) {
-            const img = document.getElementById('logo-preview');
-            if(img.complete && img.naturalWidth > 0) imgTo64(img, r => { appConfig.logo = r; saveConfig(); });
-        }
+        // Init Canvas
+        canvas = document.getElementById('paint-canvas');
+        ctx = canvas.getContext('2d');
+        canvas.addEventListener('mousedown', startDraw);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDraw);
     };
 
-    function save() { localStorage.setItem('ccas_db_v12', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v14', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
 
-    // IMAGES
-    function updateLogo(input) { if(input.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(input.files[0]); } }
-    function updateCourage(input) { if(input.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('photo-courage').src=e.target.result; appConfig.courage=e.target.result; saveConfig(); }; r.readAsDataURL(input.files[0]); } }
+    function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
+    function updateCourage(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('photo-courage').src=e.target.result; appConfig.courage=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
 
-    // DASHBOARD
+    // --- DASHBOARD ---
     function refreshGrid() {
         const g = document.getElementById('grid-projects');
         g.innerHTML = `<div class="card" onclick="createProj()" style="border:2px dashed #ccc; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#888;"><h1>+</h1><div>NOUVEAU</div></div>`;
@@ -160,10 +170,7 @@
             const p = db[id];
             const div = document.createElement('div');
             div.className = 'card';
-            div.innerHTML = `<div class="del-btn" onclick="delProj('${id}', event)">×</div>
-                             <div style="font-size:2rem;">📁</div>
-                             <div style="font-weight:bold; color:#0A1A3C;">${p.name}</div>
-                             <div style="color:#888; font-size:0.8rem;">${new Date(p.date).toLocaleDateString()}</div>`;
+            div.innerHTML = `<div class="del-btn" onclick="delProj('${id}', event)">×</div><div style="font-size:2rem;">📁</div><div style="font-weight:bold; color:#0A1A3C;">${p.name}</div><div style="color:#888; font-size:0.8rem;">${new Date(p.date).toLocaleDateString()}</div>`;
             div.onclick = () => openProj(id);
             g.appendChild(div);
         });
@@ -171,25 +178,20 @@
     function createProj() { const n = prompt("Nom du dossier :"); if(n) { const id = Date.now().toString(); db[id] = { name:n, date:Date.now(), data:{} }; save(); openProj(id); } }
     function delProj(id, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete db[id]; save(); refreshGrid(); } }
 
-    // USB
     function saveToUSB() {
         const exportData = { db: db, config: appConfig };
         const blob = new Blob([JSON.stringify(exportData)], {type: "application/json"});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `CCAS_SAUVEGARDE_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click();
     }
-    function loadFile(input) {
-        const f = input.files[0]; if(!f) return;
+    function loadFile(i) {
+        const f = i.files[0]; if(!f) return;
         const r = new FileReader();
         r.onload = e => {
-            try {
-                const json = JSON.parse(e.target.result);
-                if(json.config) { appConfig = json.config; db = { ...db, ...json.db }; if(appConfig.logo) document.getElementById('logo-preview').src = appConfig.logo; if(appConfig.courage) document.getElementById('photo-courage').src = appConfig.courage; saveConfig(); } else { db = { ...db, ...json }; }
-                save(); refreshGrid(); alert("Dossiers récupérés !");
-            } catch(err) { alert("Fichier invalide."); }
+            try { const json = JSON.parse(e.target.result); if(json.config) { appConfig = json.config; db = { ...db, ...json.db }; saveConfig(); } else { db = { ...db, ...json }; } save(); refreshGrid(); alert("Dossiers récupérés !"); } catch(err) { alert("Fichier invalide."); }
         }; r.readAsText(f);
     }
 
-    // STUDIO
+    // --- STUDIO ---
     function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; document.getElementById('lbl-proj').innerText = db[id].name; refreshSide(); refreshMain(); }
     function goDashboard() { curP = null; document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
     function newBat() { const n = prompt("Nom du bâtiment :"); if(n) { if(!db[curP].data[n]) { db[curP].data[n] = []; save(); openBat(n); refreshSide(); } else alert("Existe déjà !"); } }
@@ -210,23 +212,139 @@
         area.innerHTML = `<div onclick="document.getElementById('photo-input').click()" style="padding:20px; border:2px dashed #ccc; text-align:center; background:white; cursor:pointer; margin-bottom:20px; font-weight:bold; color:#666;">+ AJOUTER PHOTOS</div>`;
         db[curP].data[curB].forEach((p, idx) => {
             const div = document.createElement('div'); div.className = 'photo-block';
-            div.innerHTML = `<div class="del-p-btn" onclick="delPhoto(${idx})">×</div><img src="${p.img}" class="photo-img"><div style="flex:1"><div class="toolbar"><button onclick="document.execCommand('bold')">B</button><button onclick="document.execCommand('italic')">I</button><button onclick="document.execCommand('underline')">U</button><button onclick="document.execCommand('insertUnorderedList')">• Liste</button><button onclick="document.execCommand('foreColor', false, '#ff0000')" style="color:red">A</button><button onclick="document.execCommand('hiliteColor', false, 'yellow')">🖍️</button></div><div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)">${p.desc}</div></div>`;
+            div.innerHTML = `
+                <div class="del-p-btn" onclick="delPhoto(${idx})">×</div>
+                <div class="photo-col">
+                    <img src="${p.img}" class="photo-img">
+                    <button class="btn-edit-photo" onclick="openPaint(${idx})">🎨 RETOUCHER / ENTOURER</button>
+                </div>
+                <div style="flex:1">
+                    <div class="toolbar">
+                        <button onclick="cmd('bold')"><b>B</b></button>
+                        <button onclick="cmd('italic')"><i>I</i></button>
+                        <button onclick="cmd('underline')"><u>U</u></button>
+                        <div class="sep"></div>
+                        <input type="color" onchange="cmd('foreColor', this.value)" title="Couleur Texte">
+                        <button onclick="cmd('hiliteColor', 'yellow')" style="background:yellow; font-size:10px;">Surligner</button>
+                        <div class="sep"></div>
+                        <button onclick="cmd('justifyLeft')">Gauche</button>
+                        <button onclick="cmd('justifyCenter')">Centre</button>
+                        <div class="sep"></div>
+                        <button onclick="cmd('insertUnorderedList')">• Liste</button>
+                        <select onchange="cmd('fontSize', this.value)"><option value="3">Taille Normale</option><option value="5">Grand</option><option value="6">Très Grand</option></select>
+                    </div>
+                    <div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)" placeholder="Description...">${p.desc}</div>
+                </div>`;
             area.appendChild(div);
         });
     }
-    function processPhotos(input) { Array.from(input.files).forEach(f => { const r = new FileReader(); r.onload = e => { db[curP].data[curB].push({img: e.target.result, desc: ""}); save(); refreshMain(); }; r.readAsDataURL(f); }); }
+    function cmd(c, v=null) { document.execCommand(c, false, v); }
+    function processPhotos(i) { Array.from(i.files).forEach(f => { const r = new FileReader(); r.onload = e => { db[curP].data[curB].push({img: e.target.result, desc: ""}); save(); refreshMain(); }; r.readAsDataURL(f); }); }
     function delPhoto(idx) { if(confirm("Supprimer ?")) { db[curP].data[curB].splice(idx, 1); save(); refreshMain(); } }
-    function updateTxt(idx, html) { db[curP].data[curB][idx].desc = html; save(); }
+    function updateTxt(idx, h) { db[curP].data[curB][idx].desc = h; save(); }
 
-    // GEN REPORT
-    function generateReport() {
+    // --- MOTEUR DE DESSIN (PAINT) ---
+    function openPaint(idx) {
+        currentPhotoIndex = idx;
+        const src = db[curP].data[curB][idx].img;
+        paintImg = new Image();
+        paintImg.onload = () => {
+            // Adapter la taille du canvas à l'image (max 800px de large)
+            let w = paintImg.width, h = paintImg.height;
+            if(w > 800) { h = h * (800/w); w = 800; }
+            canvas.width = w; canvas.height = h;
+            ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+            ctx.drawImage(paintImg, 0, 0, w, h);
+            saveHistory(); // Etat initial
+            document.getElementById('paint-modal').style.display = 'flex';
+        };
+        paintImg.src = src;
+    }
+
+    function setTool(t) { currentTool = t; document.querySelectorAll('.btn-paint').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); }
+    function saveHistory() { paintHistory.push(canvas.toDataURL()); if(paintHistory.length > 10) paintHistory.shift(); }
+    
+    function undoPaint() {
+        if(paintHistory.length > 1) {
+            paintHistory.pop(); // Remove current
+            let prev = new Image();
+            prev.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(prev,0,0); };
+            prev.src = paintHistory[paintHistory.length-1];
+        }
+    }
+
+    function startDraw(e) {
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        startX = e.clientX - rect.left;
+        startY = e.clientY - rect.top;
+        saveHistory(); // Save state before new shape
+    }
+
+    function draw(e) {
+        if(!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Restore last state to animate shape dragging
+        let img = new Image();
+        img.src = paintHistory[paintHistory.length-1];
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0);
+
+        ctx.strokeStyle = "red"; ctx.lineWidth = 4;
+        
+        if(currentTool === 'circle') {
+            ctx.beginPath();
+            let radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+            ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+            ctx.stroke();
+        } else if(currentTool === 'rect') {
+            ctx.strokeRect(startX, startY, x - startX, y - startY);
+        } else if(currentTool === 'arrow') {
+            drawArrow(ctx, startX, startY, x, y);
+        }
+    }
+
+    function stopDraw() { isDrawing = false; } // History saved on mousedown
+
+    function drawArrow(ctx, fromx, fromy, tox, toy) {
+        var headlen = 15; 
+        var dx = tox - fromx;
+        var dy = toy - fromy;
+        var angle = Math.atan2(dy, dx);
+        ctx.beginPath();
+        ctx.moveTo(fromx, fromy);
+        ctx.lineTo(tox, toy);
+        ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(tox, toy);
+        ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.stroke();
+    }
+
+    function savePaint() {
+        db[curP].data[curB][currentPhotoIndex].img = canvas.toDataURL('image/jpeg', 0.8);
+        save();
+        closePaint();
+        refreshMain();
+    }
+
+    function closePaint() {
+        document.getElementById('paint-modal').style.display = 'none';
+        paintHistory = [];
+    }
+
+    // --- GEN ZIP ---
+    function generateZip() {
+        if(!window.JSZip) { alert("Erreur moteur ZIP"); return; }
         const proj = db[curP];
         document.getElementById('overlay').style.display = 'flex';
         const finalLogo = appConfig.logo || "";
 
         setTimeout(() => {
             const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
+            const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
             body{font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;background:#000;color:#F4F7FD;overflow:hidden}
             #side{width:280px;background:#050E24;border-right:3px solid #CCA43B;display:flex;flex-direction:column;z-index:10;box-shadow:5px 0 15px rgba(0,0,0,0.5)}
             .head{padding:25px;color:#CCA43B;font-weight:800;border-bottom:1px solid #1f2d40;text-transform:uppercase;text-align:center}
@@ -242,7 +360,7 @@
             .frame img{width:100%;height:100%;object-fit:contain}
             .bot{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:4px solid #CCA43B;min-height:150px;z-index:50}
             .arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,26,60,0.8);color:#CCA43B;border:2px solid #CCA43B;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:24px;z-index:60}
-            .arr:hover{background:#CCA43B;color:black}.al{left:-25px} .ar{right:-25px}
+            .al{left:-25px} .ar{right:-25px}
             </style></head><body>
             <div id="side"><div class="head">${proj.name}</div><div id="nav" style="flex:1;overflow-y:auto"></div></div>
             <div id="main"><div class="view"><div class="frame" id="fr">
@@ -261,19 +379,16 @@
             const r=document.createElement('div');r.className='arr ar';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};f.appendChild(l);f.appendChild(r)}}
             window.onload=()=>{if(cB){rn();sh()}};
             <\/script></body></html>`;
-            
-            const fname = proj.name.replace(/[^a-z0-9]/gi, '_') + ".html";
-            const b = new Blob([html], {type: 'text/html'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(b);
-            a.download = fname;
-            a.click();
-            
-            // SHOW SUCCESS MODAL
-            document.getElementById('final-filename').innerText = fname;
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('success-modal').style.display = 'flex';
-        }, 1000);
+
+            const zip = new JSZip();
+            const safeName = proj.name.replace(/[^a-z0-9]/gi, '_');
+            zip.file(safeName + ".html", htmlContent);
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                const a = document.createElement('a'); a.href = URL.createObjectURL(content); a.download = safeName + ".zip"; a.click();
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('success-modal').style.display = 'flex';
+            });
+        }, 1500);
     }
 </script>
 </body>
