@@ -1,222 +1,280 @@
-<!DOCTYPE html><html lang="fr"><head>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
     <meta charset="UTF-8">
-    <title>STUDIO CCAS | Cloud Expert</title>
+    <title>Studio CCAS | Version Finale v12</title>
     <style>
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f7f9; --green: #27ae60; --cloud: #3498db; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* HEADER */
-        .main-header { background: var(--blue); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 100; border-bottom: 2px solid var(--gold); }
-        .status-badge { background: #27ae60; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
-        
-        #view-dashboard { flex:1; padding: 40px; overflow-y: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
-        .folder-card { background: white; border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; border: 1px solid #ddd; position: relative; transition: 0.2s; }
-        .folder-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        #view-studio { display: none; height: calc(100vh - 70px); flex-direction: row; }
-        #sidebar { width: 300px; background: var(--blue); border-right: 2px solid var(--gold); display: flex; flex-direction: column; color: white; }
-        .bat-nav-item { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s; }
-        .bat-nav-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
-        
-        #editor-content { flex: 1; background: #0A1A3C; display: flex; flex-direction: column; }
-        .toolbar-top { background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        
-        .photo-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; margin: 0 30px 20px 30px; display: flex; gap: 20px; border-left: 5px solid var(--gold); color: white; }
-        .img-container img { width: 220px; height: 150px; object-fit: cover; border-radius: 4px; border: 1px solid var(--gold); }
-        
-        .text-area { flex: 1; min-height: 100px; padding: 15px; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; outline: none; background: rgba(0,0,0,0.2); color: white; font-size: 1rem; }
-        .btn-expert { background: var(--green); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        /* DASHBOARD */
+        #view-dashboard { flex: 1; padding: 30px; display: flex; flex-direction: column; }
+        .header { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-big { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: #e0e7ff; color: var(--blue); border: 1px solid var(--blue); }
+        .btn-big:hover { background: var(--blue); color: white; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; overflow-y: auto; padding: 5px; }
+        .card { background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
+        .card:hover { border-color: var(--gold); transform: translateY(-3px); }
+        .del-btn { position: absolute; top: 5px; right: 5px; color: red; font-weight: bold; width: 25px; height: 25px; background:white; border-radius:50%; display: flex; align-items: center; justify-content: center; }
 
-        #overlay { position: fixed; inset: 0; background: var(--blue); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .img-courage { width: 200px; height: 200px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; margin-bottom: 20px; }
+        /* STUDIO */
+        #view-studio { display: none; height: 100vh; flex-direction: row; }
+        #sidebar { width: 280px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; }
+        .back-home { padding: 15px; background: rgba(255,255,255,0.1); color: var(--gold); font-weight: bold; cursor: pointer; border: none; text-align: left; width: 100%; }
+        
+        #editor-main { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
+        .top-bar { background: white; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; height: 60px; }
+        
+        .logo-uploader { width: 50px; height: 50px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; border-radius: 4px; }
+        .logo-uploader img { width: 100%; height: 100%; object-fit: contain; }
+        .logo-uploader:hover { border-color: var(--gold); background: #fffdf0; }
+
+        .gen-btn { background: var(--blue); color: white; padding: 10px 25px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; }
+        .content-area { flex: 1; overflow-y: auto; padding: 30px; }
+        .photo-block { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; border: 1px solid #ddd; position: relative; }
+        .photo-img { width: 200px; height: 130px; object-fit: cover; border: 2px solid var(--gold); border-radius: 4px; background: #eee; flex-shrink: 0; }
+        .del-p-btn { position: absolute; top: -10px; right: -10px; background: red; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; border:2px solid white; }
+        .bat-item { padding: 10px; margin-bottom: 5px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; justify-content: space-between; border-radius: 4px; }
+        .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
+
+        /* OVERLAY LOADING */
+        #overlay { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.98); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        #photo-courage { width: 300px; height: 300px; border-radius: 50%; border: 8px solid var(--gold); object-fit: cover; cursor: pointer; }
+
+        /* MODAL SUCCES (NEW) */
+        #success-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .success-box { background: white; width: 600px; padding: 30px; border-radius: 15px; text-align: left; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 4px solid var(--gold); }
+        .success-box h2 { color: var(--blue); margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        .step-row { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start; }
+        .step-num { background: var(--blue); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+        .step-txt { color: #333; font-size: 1.1rem; }
+        .step-txt strong { color: var(--blue); }
+        .close-success { background: var(--gold); color: var(--blue); width: 100%; padding: 15px; border: none; font-weight: bold; font-size: 1.2rem; cursor: pointer; border-radius: 8px; margin-top: 10px; }
+        .close-success:hover { background: #d4ac3d; }
     </style>
 </head>
 <body>
 
-<img src="Logo_Créteil_Val_Marne.svg.png" id="sys-logo" style="display:none" crossorigin="anonymous">
-
-<div class="main-header">
-    <div style="display:flex; align-items:center; gap:15px;">
-        <h2 style="margin:0; letter-spacing:1px;">STUDIO <span style="color:var(--gold)">CCAS</span></h2>
-        <div id="cloud-info" class="status-badge">☁️ SAUVEGARDE CLOUD OK</div>
-    </div>
-    <div style="font-size: 0.8rem; font-weight: bold; color: var(--gold);">DIRECTION GÉNÉRALE DES FINANCES</div>
-</div>
+<input type="file" id="import-input" style="display:none" onchange="loadFile(this)">
+<input type="file" id="photo-input" style="display:none" multiple onchange="processPhotos(this)">
+<input type="file" id="courage-input" style="display:none" onchange="updateCourage(this)">
+<input type="file" id="logo-input" style="display:none" onchange="updateLogo(this)">
 
 <div id="view-dashboard">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h1 style="color:var(--blue); margin:0;">Mes Projets de Travaux</h1>
-        <button onclick="createProj()" style="background:var(--blue); color:white; border:none; padding:15px 30px; border-radius:8px; font-weight:bold; cursor:pointer;">+ NOUVEAU DOSSIER</button>
+    <div class="header">
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS</h1><p style="margin:0;color:#666">Direction des Finances</p></div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-big" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
+            <button class="btn-big" onclick="document.getElementById('import-input').click()">📂 OUVRIR USB</button>
+        </div>
     </div>
     <div id="grid-projects" class="grid"></div>
 </div>
 
 <div id="view-studio">
     <div id="sidebar">
-        <button onclick="goDashboard()" style="padding:20px; background:rgba(255,255,255,0.1); border:none; color:white; cursor:pointer; font-weight:bold;">🏠 RETOUR À L'ACCUEIL</button>
-        <div id="list-bat" style="flex:1; overflow-y:auto;"></div>
-        <button onclick="newBat()" style="padding:20px; background:var(--gold); color:var(--blue); border:none; font-weight:bold; cursor:pointer;">+ AJOUTER UN BÂTIMENT</button>
+        <button class="back-home" onclick="goDashboard()">🏠 REVENIR AUX DOSSIERS</button>
+        <div style="padding:15px; text-align:center; color:var(--gold); font-weight:bold;" id="lbl-proj">Projet</div>
+        <div id="list-bat" style="flex:1; overflow-y:auto; padding:10px;"></div>
+        <div style="padding:15px;"><button onclick="newBat()" style="width:100%; padding:10px; background:transparent; border:2px dashed var(--gold); color:white; font-weight:bold; cursor:pointer;">+ BÂTIMENT</button></div>
     </div>
-    <div id="editor-content">
-        <div class="toolbar-top">
-            <h2 id="lbl-bat" style="margin:0; color:var(--blue);">Bâtiment</h2>
-            <button class="btn-expert" onclick="generateReport()">🚀 GÉNÉRER LE RAPPORT FINAL</button>
+    <div id="editor-main">
+        <div class="top-bar">
+            <div class="logo-uploader" onclick="document.getElementById('logo-input').click()" title="Cliquez pour changer le logo">
+                <img id="logo-preview" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
+            </div>
+            <div id="lbl-bat" style="font-weight:bold; color:var(--blue); font-size:1.2rem;">Accueil</div>
+            <button class="gen-btn" onclick="generateReport()">🚀 GÉNÉRER LE FICHIER</button>
         </div>
-        <div id="area-photos" style="flex:1; padding-top:30px; overflow-y:auto;"></div>
+        <div id="area-photos" class="content-area"></div>
     </div>
 </div>
 
 <div id="overlay">
-    <img src="courage.jpg.JPG" class="img-courage" onerror="this.src='https://via.placeholder.com/200?text=COURAGE'">
-    <h2 style="color:var(--gold);">COURAGE MAMAN ! ❤️</h2>
-    <p>Le fichier interactif est en cours de préparation...</p>
+    <img src="courage.jpg.JPG" id="photo-courage" onclick="document.getElementById('courage-input').click()" onerror="this.src='https://via.placeholder.com/300?text=PHOTO+MANQUANTE'">
+    <h2 style="color:var(--gold); margin-top:20px;">COURAGE MAMIE ! ❤️</h2>
+    <p>Génération du fichier en cours...</p>
 </div>
 
-<input type="file" id="photo-input" style="display:none" multiple onchange="processPhotos(this)">
+<div id="success-modal">
+    <div class="success-box">
+        <h2>✅ C'est fait ! Le fichier est téléchargé.</h2>
+        
+        <div style="background:#f0f7ff; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #cce5ff;">
+            <strong>Nom du fichier :</strong> <span id="final-filename" style="font-family:monospace;">dossier.html</span><br>
+            <strong>Emplacement :</strong> Dossier "Téléchargements"
+        </div>
+
+        <div class="step-row">
+            <div class="step-num">1</div>
+            <div class="step-txt">Ouvrez votre boîte mail (Outlook) et créez un <strong>Nouveau message</strong>.</div>
+        </div>
+        <div class="step-row">
+            <div class="step-num">2</div>
+            <div class="step-txt">Cliquez sur le <strong>Trombone 📎 (Pièce jointe)</strong>.</div>
+        </div>
+        <div class="step-row">
+            <div class="step-num">3</div>
+            <div class="step-txt">Allez dans le dossier <strong>Téléchargements</strong> et choisissez le fichier.</div>
+        </div>
+        <div class="step-row">
+            <div class="step-num">4</div>
+            <div class="step-txt">Envoyez ! Vos collègues ont juste à <strong>double-cliquer</strong> sur la pièce jointe pour l'ouvrir.</div>
+        </div>
+
+        <button class="close-success" onclick="document.getElementById('success-modal').style.display='none'">J'AI COMPRIS, RETOUR AU TRAVAIL</button>
+    </div>
+</div>
 
 <script>
-    const CLOUD_ID = "ccas_maman_final_storage"; 
-    let db = JSON.parse(localStorage.getItem('ccas_db_v18')) || {};
-    let curP = null, curB = null, logoData = "";
+    // DONNÉES
+    let db = JSON.parse(localStorage.getItem('ccas_db_v12')) || {};
+    let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
+    let curP = null, curB = null;
 
-    window.onload = () => { refreshGrid(); getLogo(); syncFromCloud(); };
+    window.onload = () => {
+        refreshGrid();
+        if(appConfig.logo) document.getElementById('logo-preview').src = appConfig.logo;
+        if(appConfig.courage) document.getElementById('photo-courage').src = appConfig.courage;
+        
+        // Auto-save initial assets if present
+        if(!appConfig.logo) {
+            const img = document.getElementById('logo-preview');
+            if(img.complete && img.naturalWidth > 0) imgTo64(img, r => { appConfig.logo = r; saveConfig(); });
+        }
+    };
 
-    function getLogo() {
-        const img = document.getElementById('sys-logo');
-        img.onload = () => {
-            const c = document.createElement('canvas');
-            c.width = img.width; c.height = img.height;
-            c.getContext('2d').drawImage(img, 0, 0);
-            logoData = c.toDataURL();
-        };
-    }
+    function save() { localStorage.setItem('ccas_db_v12', JSON.stringify(db)); }
+    function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
+    function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
 
-    // CLOUD
-    async function syncToCloud() {
-        try {
-            await fetch(`https://api.keyvalue.xyz/${CLOUD_ID}/data`, { method: 'POST', body: JSON.stringify(db) });
-            document.getElementById('cloud-info').innerText = "☁️ CLOUD : À JOUR";
-        } catch (e) {}
-    }
-
-    async function syncFromCloud() {
-        try {
-            const res = await fetch(`https://api.keyvalue.xyz/${CLOUD_ID}/data`);
-            if(res.ok) {
-                const cloudData = await res.json();
-                if(Object.keys(cloudData).length > Object.keys(db).length) {
-                    db = cloudData; refreshGrid();
-                }
-            }
-        } catch (e) {}
-    }
-
-    function save() {
-        localStorage.setItem('ccas_db_v18', JSON.stringify(db));
-        syncToCloud();
-    }
+    // IMAGES
+    function updateLogo(input) { if(input.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(input.files[0]); } }
+    function updateCourage(input) { if(input.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('photo-courage').src=e.target.result; appConfig.courage=e.target.result; saveConfig(); }; r.readAsDataURL(input.files[0]); } }
 
     // DASHBOARD
     function refreshGrid() {
-        const g = document.getElementById('grid-projects'); g.innerHTML = '';
-        Object.keys(db).forEach(id => {
-            const div = document.createElement('div'); div.className = 'folder-card';
-            div.innerHTML = `<div onclick="event.stopPropagation(); if(confirm('Supprimer ?')){delete db['${id}']; save(); refreshGrid();}" style="position:absolute; top:10px; right:15px; color:red;">🗑️</div>
-                             <div style="font-size:3rem; margin-bottom:10px;">📁</div><h3>${db[id].name}</h3>`;
+        const g = document.getElementById('grid-projects');
+        g.innerHTML = `<div class="card" onclick="createProj()" style="border:2px dashed #ccc; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#888;"><h1>+</h1><div>NOUVEAU</div></div>`;
+        Object.keys(db).sort((a,b) => db[b].date - db[a].date).forEach(id => {
+            const p = db[id];
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `<div class="del-btn" onclick="delProj('${id}', event)">×</div>
+                             <div style="font-size:2rem;">📁</div>
+                             <div style="font-weight:bold; color:#0A1A3C;">${p.name}</div>
+                             <div style="color:#888; font-size:0.8rem;">${new Date(p.date).toLocaleDateString()}</div>`;
             div.onclick = () => openProj(id);
             g.appendChild(div);
         });
     }
+    function createProj() { const n = prompt("Nom du dossier :"); if(n) { const id = Date.now().toString(); db[id] = { name:n, date:Date.now(), data:{} }; save(); openProj(id); } }
+    function delProj(id, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete db[id]; save(); refreshGrid(); } }
 
-    function createProj() { const n = prompt("Nom du dossier :"); if(n) { const id = Date.now().toString(); db[id] = { name:n, data:{} }; save(); openProj(id); } }
-    function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; refreshSide(); refreshMain(); }
-    function goDashboard() { document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
-    
+    // USB
+    function saveToUSB() {
+        const exportData = { db: db, config: appConfig };
+        const blob = new Blob([JSON.stringify(exportData)], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `CCAS_SAUVEGARDE_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click();
+    }
+    function loadFile(input) {
+        const f = input.files[0]; if(!f) return;
+        const r = new FileReader();
+        r.onload = e => {
+            try {
+                const json = JSON.parse(e.target.result);
+                if(json.config) { appConfig = json.config; db = { ...db, ...json.db }; if(appConfig.logo) document.getElementById('logo-preview').src = appConfig.logo; if(appConfig.courage) document.getElementById('photo-courage').src = appConfig.courage; saveConfig(); } else { db = { ...db, ...json }; }
+                save(); refreshGrid(); alert("Dossiers récupérés !");
+            } catch(err) { alert("Fichier invalide."); }
+        }; r.readAsText(f);
+    }
+
     // STUDIO
-    function newBat() { const n = prompt("Nom du bâtiment :"); if(n) { if(!db[curP].data[n]) db[curP].data[n] = []; save(); openBat(n); } }
+    function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; document.getElementById('lbl-proj').innerText = db[id].name; refreshSide(); refreshMain(); }
+    function goDashboard() { curP = null; document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
+    function newBat() { const n = prompt("Nom du bâtiment :"); if(n) { if(!db[curP].data[n]) { db[curP].data[n] = []; save(); openBat(n); refreshSide(); } else alert("Existe déjà !"); } }
     function refreshSide() {
         const l = document.getElementById('list-bat'); l.innerHTML = '';
         Object.keys(db[curP].data).forEach(b => {
-            const div = document.createElement('div'); div.className = 'bat-nav-item' + (curB === b ? ' active' : '');
-            div.innerText = b; div.onclick = () => openBat(b); l.appendChild(div);
+            const div = document.createElement('div'); div.className = `bat-item ${curB === b ? 'active' : ''}`;
+            div.innerHTML = `<span>${b}</span><span onclick="delBat('${b}', event)" style="color:red; font-weight:bold;">×</span>`;
+            div.onclick = () => openBat(b); l.appendChild(div);
         });
     }
+    function delBat(b, e) { e.stopPropagation(); if(confirm("Supprimer "+b+" ?")) { delete db[curP].data[b]; if(curB === b) curB = null; save(); refreshSide(); refreshMain(); } }
     function openBat(b) { curB = b; document.getElementById('lbl-bat').innerText = b; refreshSide(); refreshMain(); }
-    
+
     function refreshMain() {
-        const area = document.getElementById('area-photos'); area.innerHTML = '';
-        if(!curB) return;
-        area.innerHTML = `<button onclick="document.getElementById('photo-input').click()" style="width:calc(100% - 60px); padding:20px; margin:0 30px 20px 30px; cursor:pointer; font-weight:bold; background:white; border:2px dashed var(--gold); border-radius:8px;">📸 AJOUTER DES PHOTOS ICI</button>`;
-        db[curP].data[curB].forEach((p, i) => {
-            const div = document.createElement('div'); div.className = 'photo-card';
-            div.innerHTML = `<div class="img-container"><img src="${p.img}"></div>
-                <div class="text-area" contenteditable="true" oninput="db[curP].data[curB][${i}].desc=this.innerHTML; save()">${p.desc}</div>
-                <button onclick="db[curP].data[curB].splice(${i},1); save(); refreshMain();" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">🗑️</button>`;
+        const area = document.getElementById('area-photos');
+        if(!curB) { area.innerHTML = '<div style="text-align:center; color:#999; margin-top:50px;">Sélectionnez un bâtiment.</div>'; return; }
+        area.innerHTML = `<div onclick="document.getElementById('photo-input').click()" style="padding:20px; border:2px dashed #ccc; text-align:center; background:white; cursor:pointer; margin-bottom:20px; font-weight:bold; color:#666;">+ AJOUTER PHOTOS</div>`;
+        db[curP].data[curB].forEach((p, idx) => {
+            const div = document.createElement('div'); div.className = 'photo-block';
+            div.innerHTML = `<div class="del-p-btn" onclick="delPhoto(${idx})">×</div><img src="${p.img}" class="photo-img"><div style="flex:1"><div class="toolbar"><button onclick="document.execCommand('bold')">B</button><button onclick="document.execCommand('italic')">I</button><button onclick="document.execCommand('underline')">U</button><button onclick="document.execCommand('insertUnorderedList')">• Liste</button><button onclick="document.execCommand('foreColor', false, '#ff0000')" style="color:red">A</button><button onclick="document.execCommand('hiliteColor', false, 'yellow')">🖍️</button></div><div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)">${p.desc}</div></div>`;
             area.appendChild(div);
         });
     }
+    function processPhotos(input) { Array.from(input.files).forEach(f => { const r = new FileReader(); r.onload = e => { db[curP].data[curB].push({img: e.target.result, desc: ""}); save(); refreshMain(); }; r.readAsDataURL(f); }); }
+    function delPhoto(idx) { if(confirm("Supprimer ?")) { db[curP].data[curB].splice(idx, 1); save(); refreshMain(); } }
+    function updateTxt(idx, html) { db[curP].data[curB][idx].desc = html; save(); }
 
-    function processPhotos(input) {
-        Array.from(input.files).forEach(f => {
-            const r = new FileReader();
-            r.onload = e => { db[curP].data[curB].push({img: e.target.result, desc: "Notes de visite..."}); save(); refreshMain(); };
-            r.readAsDataURL(f);
-        });
-    }
-
-    // GÉNÉRATION RAPPORT INTERACTIF (SÉCURISÉ)
+    // GEN REPORT
     function generateReport() {
         const proj = db[curP];
         document.getElementById('overlay').style.display = 'flex';
-        
+        const finalLogo = appConfig.logo || "";
+
         setTimeout(() => {
-            const reportData = JSON.stringify(proj.data).replace(/</g, '\\u003c');
-            const reportHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>REPORTING CCAS</title><style>
-                body{font-family:sans-serif;margin:0;display:flex;height:100vh;background:#050E24;color:white;overflow:hidden}
-                #side{width:260px;background:#0A1A3C;border-right:3px solid #CCA43B;display:flex;flex-direction:column}
-                .btn{width:100%;padding:18px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #1f2d40;transition:0.2s}
-                .btn.active{color:#CCA43B;background:rgba(204,164,59,0.1);border-left:5px solid #CCA43B;font-weight:bold}
-                #main{flex:1;display:flex;flex-direction:column;position:relative;background:radial-gradient(circle at center, #142850, #050E24)}
-                .top-logo{position:absolute;top:20px;right:25px;display:flex;align-items:center;gap:12px;background:rgba(10,26,60,0.9);padding:10px 15px;border:1px solid #CCA43B;border-radius:6px}
-                .logo-img{width:55px}
-                .logo-txt{font-size:9px;font-weight:bold;color:#CCA43B;line-height:1.2;text-transform:uppercase}
-                .frame{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
-                .frame img{max-width:95%;max-height:95%;border:3px solid #CCA43B;box-shadow:0 0 50px #000;border-radius:4px}
-                .bot{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:3px solid #CCA43B;min-height:120px}
-                .arr{position:absolute;top:50%;transform:translateY(-50%);background:#CCA43B;color:#0A1A3C;width:55px;height:55px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-weight:bold;font-size:24px}
+            const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
+            body{font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;background:#000;color:#F4F7FD;overflow:hidden}
+            #side{width:280px;background:#050E24;border-right:3px solid #CCA43B;display:flex;flex-direction:column;z-index:10;box-shadow:5px 0 15px rgba(0,0,0,0.5)}
+            .head{padding:25px;color:#CCA43B;font-weight:800;border-bottom:1px solid #1f2d40;text-transform:uppercase;text-align:center}
+            .btn{width:100%;padding:20px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #111;transition:0.2s}
+            .btn.active{color:#CCA43B;background:rgba(204,164,59,0.1);border-left:5px solid #CCA43B;font-weight:bold}
+            .btn:hover{color:white}
+            #main{flex:1;display:flex;flex-direction:column;position:relative;background:radial-gradient(circle at center,#142850,#0A1A3C)}
+            .top-zone{position:absolute;top:15px;right:15px;display:flex;align-items:center;gap:10px;background:rgba(10,26,60,0.9);padding:5px 10px;border:1px solid #CCA43B;border-radius:4px;z-index:100}
+            .logo{width:50px !important;height:auto;display:block}
+            .txt{margin:0;font-size:9px !important;color:#CCA43B;font-weight:700;text-transform:uppercase;line-height:1.1;text-align:left}
+            .view{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+            .frame{width:100%;max-width:1400px;aspect-ratio:16/9;border:4px solid #CCA43B;background:#000;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 80px rgba(0,0,0,0.8)}
+            .frame img{width:100%;height:100%;object-fit:contain}
+            .bot{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:4px solid #CCA43B;min-height:150px;z-index:50}
+            .arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,26,60,0.8);color:#CCA43B;border:2px solid #CCA43B;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:24px;z-index:60}
+            .arr:hover{background:#CCA43B;color:black}.al{left:-25px} .ar{right:-25px}
             </style></head><body>
-                <div id="side"><div style="padding:25px;color:#CCA43B;font-weight:bold;font-size:18px;border-bottom:1px solid #1f2d40">${proj.name}</div><div id="nav"></div></div>
-                <div id="main">
-                    <div class="top-logo"><img src="${logoData}" class="logo-img"><div class="logo-txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div>
-                    <div class="frame" id="fr"><div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div></div>
-                    <div class="bot"><h2 id="tit" style="color:#CCA43B;margin:0 0 10px 0;text-transform:uppercase;letter-spacing:1px"></h2><div id="desc" style="font-size:1.3rem;line-height:1.5"></div></div>
-                </div>
-                <script>
-                const data = ${reportData}; let cB = Object.keys(data)[0], cI = 0;
-                function sh(){
-                    const s=document.getElementById('sc'),f=document.getElementById('fr'),i=data[cB];
-                    if(!i||!i.length)return;
-                    s.innerHTML='<img src="'+i[cI].img+'">';
-                    document.getElementById('tit').innerText=cB; document.getElementById('desc').innerHTML=i[cI].desc;
-                    document.querySelectorAll('.arr').forEach(a=>a.remove());
-                    if(i.length>1){
-                        const l=document.createElement('div');l.className='arr';l.style.left='25px';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};
-                        const r=document.createElement('div');r.className='arr';r.style.right='25px';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};
-                        f.appendChild(l);f.appendChild(r);
-                    }
-                }
-                function rn(){const n=document.getElementById('nav');n.innerHTML='';Object.keys(data).forEach(k=>{const b=document.createElement('button');b.className='btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rn()};n.appendChild(b)})}
-                window.onload=()=>{if(cB){rn();sh()}};
-                <\/script></body></html>`;
+            <div id="side"><div class="head">${proj.name}</div><div id="nav" style="flex:1;overflow-y:auto"></div></div>
+            <div id="main"><div class="view"><div class="frame" id="fr">
+                <div class="top-zone"><img src="${finalLogo}" class="logo"><div class="txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div>
+                <div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div>
+            </div></div>
+            <div class="bot"><h2 id="tit" style="color:#CCA43B;margin:0 0 10px 0;text-transform:uppercase"></h2><div id="desc" style="font-size:1.3rem;line-height:1.5"></div></div></div>
+            <script>
+            const d=${json};let cB=Object.keys(d)[0],cI=0;
+            function rn(){const n=document.getElementById('nav');n.innerHTML='';Object.keys(d).forEach(k=>{const b=document.createElement('button');b.className='btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rn()};n.appendChild(b)})}
+            function sh(){const s=document.getElementById('sc'),f=document.getElementById('fr'),i=d[cB];
+            if(!i||!i.length){s.innerHTML='';document.getElementById('desc').innerHTML='';f.querySelectorAll('.arr').forEach(a=>a.remove());return}
+            s.innerHTML='<img src="'+i[cI].img+'">';document.getElementById('tit').innerText=cB;document.getElementById('desc').innerHTML=i[cI].desc||"";
+            f.querySelectorAll('.arr').forEach(a=>a.remove());
+            if(i.length>1){const l=document.createElement('div');l.className='arr al';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};
+            const r=document.createElement('div');r.className='arr ar';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};f.appendChild(l);f.appendChild(r)}}
+            window.onload=()=>{if(cB){rn();sh()}};
+            <\/script></body></html>`;
             
-            const b = new Blob([reportHtml], {type: 'text/html'});
+            const fname = proj.name.replace(/[^a-z0-9]/gi, '_') + ".html";
+            const b = new Blob([html], {type: 'text/html'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(b);
-            a.download = proj.name + "_INTERACTIF.html";
+            a.download = fname;
             a.click();
-            document.getElementById('overlay').style.display='none';
-        }, 1500);
+            
+            // SHOW SUCCESS MODAL
+            document.getElementById('final-filename').innerText = fname;
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('success-modal').style.display = 'flex';
+        }, 1000);
     }
 </script>
-</body></html>
+</body>
+</html>
