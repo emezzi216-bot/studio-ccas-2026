@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v15 Pro</title>
+    <title>Studio CCAS | v16 Finale</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
@@ -41,40 +41,44 @@
 
         .content-area { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
         
-        /* EDITOR CARDS */
-        .photo-block { background: white; padding: 20px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 25px; border: 1px solid #ddd; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        /* EDITOR CARDS & DRAG DROP */
+        .photo-block { background: white; padding: 20px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 20px; border: 1px solid #ddd; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: 0.2s; }
+        
+        /* Style quand on glisse */
+        .photo-block.dragging { opacity: 0.5; border: 2px dashed var(--blue); transform: scale(0.98); }
+        .photo-block.drag-over { border-top: 4px solid var(--gold); }
+
+        .drag-handle { cursor: grab; font-size: 24px; color: #ccc; display: flex; align-items: center; justify-content: center; padding-right: 10px; }
+        .drag-handle:hover { color: var(--blue); }
+
         .photo-col { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 240px; flex-shrink: 0; }
         .photo-img { width: 100%; height: 160px; object-fit: contain; border: 1px solid #eee; background: #fafafa; border-radius: 4px; cursor: pointer; }
         .btn-edit-photo { background: #333; color: white; border: none; padding: 8px 0; border-radius: 4px; width: 100%; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-edit-photo:hover { background: var(--gold); color: black; }
         
-        .del-p-btn { position: absolute; top: -12px; right: -12px; background: #ff4d4d; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; border:3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .del-p-btn { position: absolute; top: -12px; right: -12px; background: #ff4d4d; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; border:3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5; }
         
         /* TEXT TOOLBAR */
         .toolbar { display: flex; gap: 4px; margin-bottom: 8px; background: #f8f9fa; padding: 6px; border-radius: 6px; border: 1px solid #e9ecef; flex-wrap: wrap; }
         .toolbar button { width: 30px; height: 30px; border: 1px solid transparent; background: white; border-radius: 4px; font-weight: bold; font-size: 13px; color: #444; border-color: #ddd; }
         .toolbar button:hover { background: #e2e6ea; border-color: #adb5bd; }
-        .rich-text { min-height: 130px; border: 1px solid #ccc; padding: 12px; border-radius: 6px; font-size: 14px; overflow-y: auto; background: #fff; line-height: 1.5; color: #333; }
+        .rich-text { min-height: 130px; border: 1px solid #ccc; padding: 12px; border-radius: 6px; font-size: 14px; overflow-y: auto; background: #fff; line-height: 1.5; color: #333; cursor: text; }
         .rich-text:focus { border-color: var(--blue); outline: none; background: #fdfdff; }
 
         .bat-item { padding: 12px; margin-bottom: 6px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; justify-content: space-between; border-radius: 6px; color: #ccc; }
         .bat-item:hover { background: rgba(255,255,255,0.1); color: white; }
         .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; border-left: 4px solid #fff; }
 
-        /* --- PAINT MODAL (DESIGN MICROSOFT) --- */
+        /* PAINT MODAL */
         #paint-modal { position: fixed; inset: 0; background: rgba(20, 20, 25, 0.95); z-index: 20000; display: none; flex-direction: column; }
         .paint-header { height: 60px; background: #333; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #555; }
         .paint-toolbar { height: 70px; background: #444; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 0 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        
         .tool-group { display: flex; gap: 5px; background: #333; padding: 5px; border-radius: 8px; align-items: center; }
         .p-btn { width: 40px; height: 40px; border: 1px solid #555; background: #444; border-radius: 5px; color: white; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .p-btn:hover { background: #555; }
         .p-btn.active { background: var(--gold); color: black; border-color: var(--gold); }
-        
         .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .color-swatch:hover { transform: scale(1.1); }
         .color-swatch.active { border-color: white; box-shadow: 0 0 0 2px var(--blue); }
-
         #paint-canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #222; }
         #paint-canvas { box-shadow: 0 0 30px rgba(0,0,0,0.5); background: transparent; cursor: crosshair; }
 
@@ -94,7 +98,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:14px; opacity:0.6;">v15</span></h1><p style="margin:0;color:#666">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:14px; opacity:0.6;">v16 Finale</span></h1><p style="margin:0;color:#666">Direction des Finances</p></div>
         <div style="display:flex; gap:10px;">
             <button class="btn-big" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
             <button class="btn-big" onclick="document.getElementById('import-input').click()">📂 OUVRIR USB</button>
@@ -130,10 +134,10 @@
     </div>
     <div class="paint-toolbar">
         <div class="tool-group">
-            <button class="p-btn active" onclick="setTool('rect')" title="Cadre">⬜</button>
-            <button class="p-btn" onclick="setTool('circle')" title="Cercle">⭕</button>
-            <button class="p-btn" onclick="setTool('arrow')" title="Flèche">↗️</button>
-            <button class="p-btn" onclick="undoPaint()" title="Annuler dernier trait">↩️</button>
+            <button class="p-btn active" onclick="setTool('rect')">⬜</button>
+            <button class="p-btn" onclick="setTool('circle')">⭕</button>
+            <button class="p-btn" onclick="setTool('arrow')">↗️</button>
+            <button class="p-btn" onclick="undoPaint()">↩️</button>
         </div>
         <div class="tool-group">
             <div class="color-swatch active" style="background:#ff0000;" onclick="setColor('#ff0000', this)"></div>
@@ -141,16 +145,13 @@
             <div class="color-swatch" style="background:#00ff00;" onclick="setColor('#00ff00', this)"></div>
             <div class="color-swatch" style="background:#0000ff;" onclick="setColor('#0000ff', this)"></div>
             <div class="color-swatch" style="background:#ffffff;" onclick="setColor('#ffffff', this)"></div>
-            <input type="color" id="custom-color" onchange="setColor(this.value, null)" style="width:30px; height:30px; border:none; padding:0; background:none;">
+            <input type="color" onchange="setColor(this.value, null)" style="width:30px; height:30px; border:none; padding:0; background:none;">
         </div>
         <div class="tool-group" style="color:white; font-size:12px; padding:0 15px;">
-            Épaisseur<br>
-            <input type="range" min="2" max="20" value="5" oninput="setLineWidth(this.value)" style="width:100px;">
+            Épaisseur<br><input type="range" min="2" max="20" value="5" oninput="setLineWidth(this.value)" style="width:100px;">
         </div>
     </div>
-    <div id="paint-canvas-container">
-        <canvas id="paint-canvas"></canvas>
-    </div>
+    <div id="paint-canvas-container"><canvas id="paint-canvas"></canvas></div>
 </div>
 
 <div id="overlay">
@@ -163,273 +164,168 @@
     <div class="success-box">
         <h2 style="color:var(--blue); margin:0 0 15px 0;">📦 Dossier ZIP prêt !</h2>
         <p style="font-size:1.1rem; line-height:1.6; color:#555;">Le fichier <strong>Dossier_Final.zip</strong> est dans <strong>Téléchargements</strong>.</p>
-        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
-        <div style="display:flex; gap:15px; align-items:center;">
-            <div style="font-size:2rem;">📧</div>
-            <div><strong>Pour l'envoyer :</strong> Glissez ce fichier .zip directement dans votre mail pour le chef.</div>
-        </div>
         <button style="background:var(--blue); color:white; border:none; padding:12px 20px; font-weight:bold; cursor:pointer; width:100%; border-radius:6px; margin-top:25px;" onclick="document.getElementById('success-modal').style.display='none'">OK, C'EST NOTÉ</button>
     </div>
 </div>
 
 <script>
-    // --- COEUR DU SYSTEME ---
-    let db = JSON.parse(localStorage.getItem('ccas_db_v15')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v16')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
-    
-    // VARIABLES PAINT
     let canvas, ctx, paintImg, isDrawing = false, startX, startY;
     let currentTool = 'rect', currentColor = '#ff0000', currentWidth = 5;
     let paintHistory = [], currentPhotoIndex = null;
+    let dragSrcEl = null;
 
     window.onload = () => {
         refreshGrid();
         if(appConfig.logo) document.getElementById('logo-preview').src = appConfig.logo;
         if(appConfig.courage) document.getElementById('photo-courage').src = appConfig.courage;
-        
-        // Auto-save initial logo
-        if(!appConfig.logo) {
-            const img = document.getElementById('logo-preview');
-            if(img.complete && img.naturalWidth > 0) imgTo64(img, r => { appConfig.logo = r; saveConfig(); });
-        }
-
-        // Init Paint Canvas
-        canvas = document.getElementById('paint-canvas');
-        ctx = canvas.getContext('2d');
-        canvas.addEventListener('mousedown', startDraw);
-        canvas.addEventListener('mousemove', draw);
-        window.addEventListener('mouseup', stopDraw);
+        if(!appConfig.logo) { const img = document.getElementById('logo-preview'); if(img.complete && img.naturalWidth > 0) imgTo64(img, r => { appConfig.logo = r; saveConfig(); }); }
+        canvas = document.getElementById('paint-canvas'); ctx = canvas.getContext('2d');
+        canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); window.addEventListener('mouseup', stopDraw);
     };
 
-    function save() { localStorage.setItem('ccas_db_v15', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v16', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
-
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
     function updateCourage(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('photo-courage').src=e.target.result; appConfig.courage=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
 
-    // --- NAVIGATION ---
     function refreshGrid() {
         const g = document.getElementById('grid-projects');
         g.innerHTML = `<div class="card" onclick="createProj()" style="border:2px dashed #ccc; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#888;"><h1>+</h1><div>NOUVEAU</div></div>`;
         Object.keys(db).sort((a,b) => db[b].date - db[a].date).forEach(id => {
             const p = db[id];
-            const div = document.createElement('div');
-            div.className = 'card';
+            const div = document.createElement('div'); div.className = 'card';
             div.innerHTML = `<div class="del-btn" onclick="delProj('${id}', event)">×</div><div style="font-size:2rem;">📁</div><div style="font-weight:bold; color:#0A1A3C;">${p.name}</div><div style="color:#888; font-size:0.8rem;">${new Date(p.date).toLocaleDateString()}</div>`;
-            div.onclick = () => openProj(id);
-            g.appendChild(div);
+            div.onclick = () => openProj(id); g.appendChild(div);
         });
     }
-    function createProj() { const n = prompt("Nom du dossier (ex: Crèche Jaurès) :"); if(n) { const id = Date.now().toString(); db[id] = { name:n, date:Date.now(), data:{} }; save(); openProj(id); } }
-    function delProj(id, e) { e.stopPropagation(); if(confirm("Supprimer ce dossier ?")) { delete db[id]; save(); refreshGrid(); } }
+    function createProj() { const n = prompt("Nom du dossier :"); if(n) { const id = Date.now().toString(); db[id] = { name:n, date:Date.now(), data:{} }; save(); openProj(id); } }
+    function delProj(id, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete db[id]; save(); refreshGrid(); } }
+    function saveToUSB() { const d = { db: db, config: appConfig }; const b = new Blob([JSON.stringify(d)], {type: "application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `CCAS_SAUVEGARDE_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); }
+    function loadFile(i) { const f = i.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { try { const j = JSON.parse(e.target.result); if(j.config) { appConfig = j.config; db = { ...db, ...j.db }; saveConfig(); } else { db = { ...db, ...j }; } save(); refreshGrid(); alert("OK"); } catch(err) { alert("Erreur"); } }; r.readAsText(f); }
 
     function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; document.getElementById('lbl-proj').innerText = db[id].name; refreshSide(); refreshMain(); }
     function goDashboard() { curP = null; document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
-
-    function newBat() { const n = prompt("Nom du bâtiment :"); if(n) { if(!db[curP].data[n]) { db[curP].data[n] = []; save(); openBat(n); refreshSide(); } else alert("Ce nom existe déjà"); } }
-    function refreshSide() {
-        const l = document.getElementById('list-bat'); l.innerHTML = '';
-        Object.keys(db[curP].data).forEach(b => {
-            const div = document.createElement('div'); div.className = `bat-item ${curB === b ? 'active' : ''}`;
-            div.innerHTML = `<span>${b}</span><span onclick="delBat('${b}', event)" style="color:#ff6b6b; font-weight:bold; padding:0 5px;">×</span>`;
-            div.onclick = () => openBat(b); l.appendChild(div);
-        });
-    }
+    function newBat() { const n = prompt("Nom du bâtiment :"); if(n) { if(!db[curP].data[n]) { db[curP].data[n] = []; save(); openBat(n); refreshSide(); } else alert("Existe déjà"); } }
+    function refreshSide() { const l = document.getElementById('list-bat'); l.innerHTML = ''; Object.keys(db[curP].data).forEach(b => { const d = document.createElement('div'); d.className = `bat-item ${curB === b ? 'active' : ''}`; d.innerHTML = `<span>${b}</span><span onclick="delBat('${b}', event)" style="color:#ff6b6b; font-weight:bold; padding:0 5px;">×</span>`; d.onclick = () => openBat(b); l.appendChild(d); }); }
     function delBat(b, e) { e.stopPropagation(); if(confirm("Supprimer "+b+" ?")) { delete db[curP].data[b]; if(curB === b) curB = null; save(); refreshSide(); refreshMain(); } }
     function openBat(b) { curB = b; document.getElementById('lbl-bat').innerText = b; refreshSide(); refreshMain(); }
 
     function refreshMain() {
         const area = document.getElementById('area-photos');
-        if(!curB) { area.innerHTML = '<div style="text-align:center; color:#999; margin-top:50px; font-size:1.2rem;">Sélectionnez un bâtiment à gauche pour commencer.</div>'; return; }
+        if(!curB) { area.innerHTML = '<div style="text-align:center; color:#999; margin-top:50px;">Sélectionnez un bâtiment.</div>'; return; }
         area.innerHTML = `<div onclick="document.getElementById('photo-input').click()" style="padding:30px; border:3px dashed #ddd; text-align:center; background:white; cursor:pointer; margin-bottom:30px; font-weight:bold; color:#888; border-radius:10px;">📸 AJOUTER DES PHOTOS ICI</div>`;
         db[curP].data[curB].forEach((p, idx) => {
-            const div = document.createElement('div'); div.className = 'photo-block';
+            const div = document.createElement('div');
+            div.className = 'photo-block';
+            div.draggable = true;
+            div.dataset.index = idx;
+            // EVENTS DRAG DROP
+            div.ondragstart = handleDragStart;
+            div.ondragover = handleDragOver;
+            div.ondragleave = handleDragLeave;
+            div.ondrop = handleDrop;
+
             div.innerHTML = `
                 <div class="del-p-btn" onclick="delPhoto(${idx})">×</div>
+                <div class="drag-handle" title="Glisser pour déplacer">⠿</div>
                 <div class="photo-col">
                     <img src="${p.img}" class="photo-img" onclick="openPaint(${idx})">
-                    <button class="btn-edit-photo" onclick="openPaint(${idx})">🎨 DESSINER DESSUS</button>
+                    <button class="btn-edit-photo" onclick="openPaint(${idx})">🎨 RETOUCHER</button>
                 </div>
                 <div style="flex:1">
                     <div class="toolbar">
-                        <button onclick="cmd('bold')" title="Gras"><b>B</b></button>
-                        <button onclick="cmd('italic')" title="Italique"><i>I</i></button>
-                        <button onclick="cmd('underline')" title="Souligné"><u>U</u></button>
+                        <button onclick="cmd('bold')"><b>B</b></button><button onclick="cmd('italic')"><i>I</i></button><button onclick="cmd('underline')"><u>U</u></button>
                         <div style="width:1px; background:#ccc; margin:0 5px;"></div>
-                        <input type="color" onchange="cmd('foreColor', this.value)" title="Couleur du texte" style="height:28px; width:30px; padding:0; border:none;">
-                        <button onclick="cmd('hiliteColor', 'yellow')" style="background:yellow;" title="Surligner">🖍️</button>
+                        <input type="color" onchange="cmd('foreColor', this.value)" style="height:28px; width:30px;">
+                        <button onclick="cmd('hiliteColor', 'yellow')" style="background:yellow;">🖍️</button>
                         <div style="width:1px; background:#ccc; margin:0 5px;"></div>
-                        <button onclick="cmd('justifyLeft')">⫷</button>
-                        <button onclick="cmd('justifyCenter')">||</button>
                         <button onclick="cmd('insertUnorderedList')">• Liste</button>
-                        <select onchange="cmd('fontSize', this.value)" style="height:28px; border:1px solid #ccc; border-radius:3px;"><option value="3">Taille Normale</option><option value="5">Grand</option><option value="6">Très Grand</option></select>
                     </div>
                     <div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)">${p.desc}</div>
                 </div>`;
             area.appendChild(div);
         });
     }
+
+    // DRAG AND DROP LOGIC
+    function handleDragStart(e) { dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
+    function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); this.classList.add('drag-over'); return false; }
+    function handleDragLeave(e) { this.classList.remove('drag-over'); }
+    function handleDrop(e) {
+        if (e.stopPropagation) e.stopPropagation();
+        this.classList.remove('drag-over');
+        if (dragSrcEl !== this) {
+            const oldIdx = parseInt(dragSrcEl.dataset.index);
+            const newIdx = parseInt(this.dataset.index);
+            const arr = db[curP].data[curB];
+            const item = arr.splice(oldIdx, 1)[0];
+            arr.splice(newIdx, 0, item);
+            save(); refreshMain();
+        }
+        return false;
+    }
+
     function cmd(c, v=null) { document.execCommand(c, false, v); }
     function processPhotos(i) { Array.from(i.files).forEach(f => { const r = new FileReader(); r.onload = e => { db[curP].data[curB].push({img: e.target.result, desc: ""}); save(); refreshMain(); }; r.readAsDataURL(f); }); }
     function delPhoto(idx) { if(confirm("Supprimer ?")) { db[curP].data[curB].splice(idx, 1); save(); refreshMain(); } }
     function updateTxt(idx, h) { db[curP].data[curB][idx].desc = h; save(); }
 
-    // --- MOTEUR PAINT OPTIMISÉ ---
     function openPaint(idx) {
-        currentPhotoIndex = idx;
-        const src = db[curP].data[curB][idx].img;
-        paintImg = new Image();
+        currentPhotoIndex = idx; const src = db[curP].data[curB][idx].img; paintImg = new Image();
         paintImg.onload = () => {
-            // Calcul taille optimale
-            const maxW = window.innerWidth * 0.8;
-            const maxH = window.innerHeight * 0.7;
-            let w = paintImg.width, h = paintImg.height;
-            const ratio = Math.min(maxW/w, maxH/h);
-            w = w * ratio; h = h * ratio;
-
-            canvas.width = w; canvas.height = h;
-            ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-            ctx.drawImage(paintImg, 0, 0, w, h);
-            saveHistory(); // Etat initial
-            document.getElementById('paint-modal').style.display = 'flex';
-        };
-        paintImg.src = src;
+            const maxW = window.innerWidth * 0.8, maxH = window.innerHeight * 0.7;
+            let w = paintImg.width, h = paintImg.height, r = Math.min(maxW/w, maxH/h);
+            w *= r; h *= r; canvas.width = w; canvas.height = h;
+            ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.drawImage(paintImg, 0, 0, w, h);
+            saveHistory(); document.getElementById('paint-modal').style.display = 'flex';
+        }; paintImg.src = src;
     }
-
-    function setTool(t) { currentTool = t; document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active')); event.currentTarget.classList.add('active'); }
-    function setColor(c, el) { currentColor = c; if(el){ document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active')); el.classList.add('active'); } }
+    function setTool(t) { currentTool = t; document.querySelectorAll('.p-btn').forEach(b=>b.classList.remove('active')); event.currentTarget.classList.add('active'); }
+    function setColor(c, el) { currentColor = c; if(el){ document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active')); el.classList.add('active'); } }
     function setLineWidth(w) { currentWidth = w; }
-    
-    function saveHistory() { paintHistory.push(canvas.toDataURL()); if(paintHistory.length > 8) paintHistory.shift(); }
-    
-    function undoPaint() {
-        if(paintHistory.length > 1) {
-            paintHistory.pop();
-            let prev = new Image();
-            prev.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(prev,0,0); };
-            prev.src = paintHistory[paintHistory.length-1];
-        }
-    }
-
-    function startDraw(e) {
-        isDrawing = true;
-        const rect = canvas.getBoundingClientRect();
-        startX = e.clientX - rect.left;
-        startY = e.clientY - rect.top;
-        saveHistory();
-    }
-
+    function saveHistory() { paintHistory.push(canvas.toDataURL()); if(paintHistory.length>8) paintHistory.shift(); }
+    function undoPaint() { if(paintHistory.length>1) { paintHistory.pop(); let i = new Image(); i.onload=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(i,0,0);}; i.src = paintHistory[paintHistory.length-1]; } }
+    function startDraw(e) { isDrawing=true; const r=canvas.getBoundingClientRect(); startX=e.clientX-r.left; startY=e.clientY-r.top; saveHistory(); }
     function draw(e) {
-        if(!isDrawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        let img = new Image();
-        img.src = paintHistory[paintHistory.length-1];
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.drawImage(img,0,0);
-
-        ctx.strokeStyle = currentColor; ctx.lineWidth = currentWidth;
-        
-        ctx.beginPath();
-        if(currentTool === 'circle') {
-            let r = Math.sqrt(Math.pow(x-startX,2) + Math.pow(y-startY,2));
-            ctx.arc(startX, startY, r, 0, 2*Math.PI);
-            ctx.stroke();
-        } else if(currentTool === 'rect') {
-            ctx.strokeRect(startX, startY, x-startX, y-startY);
-        } else if(currentTool === 'arrow') {
-            const head = 15 + currentWidth;
-            const angle = Math.atan2(y-startY, x-startX);
-            ctx.moveTo(startX, startY);
-            ctx.lineTo(x, y);
-            ctx.lineTo(x - head * Math.cos(angle - Math.PI/6), y - head * Math.sin(angle - Math.PI/6));
-            ctx.moveTo(x, y);
-            ctx.lineTo(x - head * Math.cos(angle + Math.PI/6), y - head * Math.sin(angle + Math.PI/6));
-            ctx.stroke();
-        }
+        if(!isDrawing) return; const r=canvas.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+        let i=new Image(); i.src=paintHistory[paintHistory.length-1]; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(i,0,0);
+        ctx.strokeStyle=currentColor; ctx.lineWidth=currentWidth; ctx.beginPath();
+        if(currentTool==='circle'){ let rad=Math.sqrt(Math.pow(x-startX,2)+Math.pow(y-startY,2)); ctx.arc(startX,startY,rad,0,2*Math.PI); ctx.stroke(); }
+        else if(currentTool==='rect'){ ctx.strokeRect(startX,startY,x-startX,y-startY); }
+        else if(currentTool==='arrow'){ const h=15+currentWidth*0.5, a=Math.atan2(y-startY,x-startX); ctx.moveTo(startX,startY); ctx.lineTo(x,y); ctx.lineTo(x-h*Math.cos(a-Math.PI/6),y-h*Math.sin(a-Math.PI/6)); ctx.moveTo(x,y); ctx.lineTo(x-h*Math.cos(a+Math.PI/6),y-h*Math.sin(a+Math.PI/6)); ctx.stroke(); }
     }
+    function stopDraw() { isDrawing=false; }
+    function savePaint() { db[curP].data[curB][currentPhotoIndex].img=canvas.toDataURL('image/jpeg',0.9); save(); closePaint(); refreshMain(); }
+    function closePaint() { document.getElementById('paint-modal').style.display='none'; paintHistory=[]; }
 
-    function stopDraw() { isDrawing = false; }
-
-    function savePaint() {
-        db[curP].data[curB][currentPhotoIndex].img = canvas.toDataURL('image/jpeg', 0.85);
-        save();
-        closePaint();
-        refreshMain();
-    }
-    function closePaint() { document.getElementById('paint-modal').style.display = 'none'; paintHistory = []; }
-
-    // --- USB ---
-    function saveToUSB() {
-        const exportData = { db: db, config: appConfig };
-        const blob = new Blob([JSON.stringify(exportData)], {type: "application/json"});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `CCAS_SAUVEGARDE_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click();
-    }
-    function loadFile(i) {
-        const f = i.files[0]; if(!f) return;
-        const r = new FileReader();
-        r.onload = e => {
-            try { const json = JSON.parse(e.target.result); if(json.config) { appConfig = json.config; db = { ...db, ...json.db }; saveConfig(); } else { db = { ...db, ...json }; } save(); refreshGrid(); alert("Dossiers récupérés !"); } catch(err) { alert("Fichier invalide."); }
-        }; r.readAsText(f);
-    }
-
-    // --- ZIP ---
     function generateZip() {
         if(!window.JSZip) { alert("Erreur moteur ZIP"); return; }
-        const proj = db[curP];
-        document.getElementById('overlay').style.display = 'flex';
+        const proj = db[curP]; document.getElementById('overlay').style.display='flex';
         const finalLogo = appConfig.logo || "";
-
         setTimeout(() => {
             const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
-            const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
+            const h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
             body{font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;background:#000;color:#F4F7FD;overflow:hidden}
             #side{width:280px;background:#050E24;border-right:3px solid #CCA43B;display:flex;flex-direction:column;z-index:10;box-shadow:5px 0 15px rgba(0,0,0,0.5)}
             .head{padding:25px;color:#CCA43B;font-weight:800;border-bottom:1px solid #1f2d40;text-transform:uppercase;text-align:center}
             .btn{width:100%;padding:20px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #111;transition:0.2s}
-            .btn.active{color:#CCA43B;background:rgba(204,164,59,0.1);border-left:5px solid #CCA43B;font-weight:bold}
-            .btn:hover{color:white}
+            .btn.active{color:#CCA43B;background:rgba(204,164,59,0.1);border-left:5px solid #CCA43B;font-weight:bold}.btn:hover{color:white}
             #main{flex:1;display:flex;flex-direction:column;position:relative;background:radial-gradient(circle at center,#142850,#0A1A3C)}
             .top-zone{position:absolute;top:15px;right:15px;display:flex;align-items:center;gap:10px;background:rgba(10,26,60,0.9);padding:5px 10px;border:1px solid #CCA43B;border-radius:4px;z-index:100}
-            .logo{width:50px !important;height:auto;display:block}
-            .txt{margin:0;font-size:9px !important;color:#CCA43B;font-weight:700;text-transform:uppercase;line-height:1.1;text-align:left}
+            .logo{width:50px !important;height:auto;display:block}.txt{margin:0;font-size:9px !important;color:#CCA43B;font-weight:700;text-transform:uppercase;line-height:1.1;text-align:left}
             .view{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
             .frame{width:100%;max-width:1400px;aspect-ratio:16/9;border:4px solid #CCA43B;background:#000;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 80px rgba(0,0,0,0.8)}
             .frame img{width:100%;height:100%;object-fit:contain}
             .bot{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:4px solid #CCA43B;min-height:150px;z-index:50}
-            .arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,26,60,0.8);color:#CCA43B;border:2px solid #CCA43B;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:24px;z-index:60}
-            .al{left:-25px} .ar{right:-25px}
-            </style></head><body>
-            <div id="side"><div class="head">${proj.name}</div><div id="nav" style="flex:1;overflow-y:auto"></div></div>
-            <div id="main"><div class="view"><div class="frame" id="fr">
-                <div class="top-zone"><img src="${finalLogo}" class="logo"><div class="txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div>
-                <div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div>
-            </div></div>
-            <div class="bot"><h2 id="tit" style="color:#CCA43B;margin:0 0 10px 0;text-transform:uppercase"></h2><div id="desc" style="font-size:1.3rem;line-height:1.5"></div></div></div>
-            <script>
-            const d=${json};let cB=Object.keys(d)[0],cI=0;
-            function rn(){const n=document.getElementById('nav');n.innerHTML='';Object.keys(d).forEach(k=>{const b=document.createElement('button');b.className='btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rn()};n.appendChild(b)})}
-            function sh(){const s=document.getElementById('sc'),f=document.getElementById('fr'),i=d[cB];
-            if(!i||!i.length){s.innerHTML='';document.getElementById('desc').innerHTML='';f.querySelectorAll('.arr').forEach(a=>a.remove());return}
-            s.innerHTML='<img src="'+i[cI].img+'">';document.getElementById('tit').innerText=cB;document.getElementById('desc').innerHTML=i[cI].desc||"";
-            f.querySelectorAll('.arr').forEach(a=>a.remove());
-            if(i.length>1){const l=document.createElement('div');l.className='arr al';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};
-            const r=document.createElement('div');r.className='arr ar';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};f.appendChild(l);f.appendChild(r)}}
-            window.onload=()=>{if(cB){rn();sh()}};
-            <\/script></body></html>`;
-
-            const zip = new JSZip();
-            const safeName = proj.name.replace(/[^a-z0-9]/gi, '_');
-            zip.file(safeName + ".html", htmlContent);
-            zip.generateAsync({type:"blob"}).then(function(content) {
-                const a = document.createElement('a'); a.href = URL.createObjectURL(content); a.download = safeName + ".zip"; a.click();
-                document.getElementById('overlay').style.display = 'none';
-                document.getElementById('success-modal').style.display = 'flex';
-            });
+            .arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,26,60,0.8);color:#CCA43B;border:2px solid #CCA43B;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:24px;z-index:60}.al{left:-25px}.ar{right:-25px}
+            </style></head><body><div id="side"><div class="head">${proj.name}</div><div id="nav" style="flex:1;overflow-y:auto"></div></div><div id="main"><div class="view"><div class="frame" id="fr"><div class="top-zone"><img src="${finalLogo}" class="logo"><div class="txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div><div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div></div></div><div class="bot"><h2 id="tit" style="color:#CCA43B;margin:0 0 10px 0;text-transform:uppercase"></h2><div id="desc" style="font-size:1.3rem;line-height:1.5"></div></div></div><script>
+            const d=${json};let cB=Object.keys(d)[0],cI=0;function rn(){const n=document.getElementById('nav');n.innerHTML='';Object.keys(d).forEach(k=>{const b=document.createElement('button');b.className='btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rn()};n.appendChild(b)})}function sh(){const s=document.getElementById('sc'),f=document.getElementById('fr'),i=d[cB];if(!i||!i.length){s.innerHTML='';document.getElementById('desc').innerHTML='';f.querySelectorAll('.arr').forEach(a=>a.remove());return}s.innerHTML='<img src="'+i[cI].img+'">';document.getElementById('tit').innerText=cB;document.getElementById('desc').innerHTML=i[cI].desc||"";f.querySelectorAll('.arr').forEach(a=>a.remove());if(i.length>1){const l=document.createElement('div');l.className='arr al';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};const r=document.createElement('div');r.className='arr ar';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};f.appendChild(l);f.appendChild(r)}}window.onload=()=>{if(cB){rn();sh()}};<\/script></body></html>`;
+            const zip = new JSZip(); const sn = proj.name.replace(/[^a-z0-9]/gi, '_'); zip.file(sn + ".html", h);
+            zip.generateAsync({type:"blob"}).then(function(c) { const a = document.createElement('a'); a.href = URL.createObjectURL(c); a.download = sn + ".zip"; a.click(); document.getElementById('overlay').style.display='none'; document.getElementById('success-modal').style.display='flex'; });
         }, 1500);
     }
 </script>
