@@ -2,73 +2,83 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v24 Finale</title>
+    <title>Studio CCAS | v25 Intégrale</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f7f6; --panel: #ffffff; --green: #27ae60; --red: #e74c3c; }
+        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f7f6; --panel: #ffffff; --green: #27ae60; --red: #e74c3c; --gray-toolbar: #f0f2f5; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
         * { box-sizing: border-box; outline: none; }
+        button { cursor: pointer; transition: 0.1s; font-family: inherit; } button:active { transform: translateY(1px); }
         
-        /* HEADER */
-        .header { background: var(--panel); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
-        .btn-save-main { background: var(--green); color: white; padding: 10px 25px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; cursor:pointer; }
-        .btn-usb { padding: 8px 15px; border: 1px solid #ccc; border-radius: 6px; background: white; cursor:pointer; font-weight:bold; color:#333; }
-
         /* DASHBOARD */
         #view-dashboard { flex: 1; padding: 30px; display: flex; flex-direction: column; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; overflow-y: auto; padding: 10px; }
-        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; display:flex; flex-direction:column; align-items:center; }
-        .card:hover { border-color: var(--gold); transform: translateY(-3px); }
-        .del-btn { position: absolute; top: 10px; right: 10px; color: var(--red); font-weight: bold; background:#fee2e2; width: 30px; height: 30px; border-radius:50%; display: flex; align-items: center; justify-content: center; }
-        
+        .header { background: var(--panel); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 4px solid var(--gold); }
+        .btn-save-main { background: var(--green); color: white; padding: 12px 30px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); display: flex; align-items: center; gap: 8px; }
+        .btn-usb { padding: 10px 20px; border: 1px solid #d1d5db; border-radius: 6px; font-weight: 600; background: white; color: #374151; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; overflow-y: auto; padding: 10px; }
+        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; align-items: center; transition: all 0.2s; }
+        .card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .card.dragging { opacity: 0.4; border: 2px dashed var(--blue); }
+        .del-btn { position: absolute; top: 12px; right: 12px; color: var(--red); font-weight: bold; background:#fee2e2; width: 32px; height: 32px; border-radius:50%; display: flex; align-items: center; justify-content: center; }
+        .drag-handle-card { cursor: grab; color: #cbd5e1; font-size: 24px; width: 100%; text-align: center; padding-bottom: 10px; margin-bottom: 5px; border-bottom: 1px solid #f3f4f6; }
+
         /* STUDIO */
         #view-studio { display: none; height: 100vh; flex-direction: row; }
-        #sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; }
+        #sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
         .back-home { padding: 20px; background: rgba(0,0,0,0.2); color: var(--gold); font-weight: 700; cursor: pointer; border: none; text-align: left; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        
         #editor-main { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
         .top-bar { background: white; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; height: 75px; }
         .logo-box { width: 55px; height: 55px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; overflow: hidden; background: #f9fafb; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
-        .gen-btn { background: linear-gradient(135deg, var(--blue), #1e3a8a); color: white; padding: 12px 25px; border-radius: 8px; border: none; font-weight: bold; cursor:pointer; }
+        .gen-btn { background: linear-gradient(135deg, var(--blue), #1e3a8a); color: white; padding: 12px 25px; border-radius: 8px; border: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .content-area { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
         
-        .content-area { flex: 1; overflow-y: auto; padding: 40px; }
+        /* BLOC PHOTO & ÉDITION */
+        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #e5e7eb; box-shadow: 0 2px 10px rgba(0,0,0,0.03); overflow: hidden; }
+        .photo-block.dragging { opacity: 0.5; border: 2px dashed var(--blue); }
+        .drag-handle-photo { width: 30px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #e5e7eb; color: #cbd5e1; font-size: 20px; }
         
-        /* PHOTOS */
-        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #ccc; overflow: hidden; }
-        .photo-col { width: 280px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #eee; position:relative; }
-        .photo-img { width: 100%; height: 180px; object-fit: contain; border: 1px solid #ccc; background: white; border-radius: 6px; cursor: pointer; }
-        .btn-edit-photo { background: #333; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor:pointer; }
-        .del-p-btn { position: absolute; top: 10px; left: 10px; background: var(--red); color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index:5; }
-        
+        .photo-col { width: 280px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #e5e7eb; position:relative; }
+        .photo-img { width: 100%; height: 180px; object-fit: contain; border: 1px solid #e5e7eb; background: white; border-radius: 6px; cursor: pointer; }
+        .btn-edit-photo { background: #374151; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: 600; font-size: 13px; display:flex; justify-content:center; align-items:center; gap:8px; }
+        .del-p-btn { position: absolute; top: 10px; left: 10px; background: var(--red); color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index:5; }
+
         .text-col { flex: 1; padding: 15px; display: flex; flex-direction: column; }
-        .rich-text { flex: 1; min-height: 150px; border: 1px solid #ccc; padding: 15px; border-radius: 6px; font-size: 16px; overflow-y: auto; background: #fff; color: black; }
+        
+        /* BARRE D'OUTILS TEXTE (RÉTABLIE) */
+        .toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: var(--gray-toolbar); padding: 8px; border-radius: 8px; border: 1px solid #e5e7eb; flex-wrap: wrap; align-items: center; }
+        .toolbar button, .toolbar select, .toolbar input[type=color] { height: 32px; border: 1px solid transparent; background: white; border-radius: 4px; font-weight: 600; font-size: 13px; color: #4b5563; border-color: #d1d5db; cursor: pointer; min-width: 32px; display:flex; align-items:center; justify-content:center; padding: 0 8px; }
+        .rich-text { flex: 1; min-height: 150px; border: 1px solid #d1d5db; padding: 15px; border-radius: 6px; font-size: 15px; overflow-y: auto; background: #fff; cursor: text; line-height: 1.6; color: #000; }
         
         /* BATIMENTS */
-        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #eee; }
-        .bat-item.active { background: white; color: var(--blue); font-weight: bold; }
+        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #e2e8f0; transition: 0.2s; }
+        .bat-item.active { background: white; color: var(--blue); font-weight: bold; border-color: var(--gold); }
+        .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
         .drag-handle-bat { cursor: grab; padding-right: 12px; color: rgba(255,255,255,0.3); font-size: 20px; }
 
-        /* PAINT */
+        /* PAINT MODAL */
         #paint-modal { position: fixed; inset: 0; background: #1e1e1e; z-index: 20000; display: none; flex-direction: column; }
         .paint-header { height: 60px; background: #252526; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color:white; }
         .paint-toolbar { height: 80px; background: #333; display: flex; align-items: center; justify-content: center; gap: 20px; }
         #paint-canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; background: #111; overflow: hidden; }
         #paint-canvas { cursor: crosshair; box-shadow: 0 0 20px #000; }
-        .p-btn { width: 40px; height: 40px; background: #444; border: 1px solid #555; color: white; font-size: 20px; cursor:pointer; }
+        .p-btn { width: 36px; height: 36px; background: #444; border: 1px solid #555; color: white; font-size: 18px; display:flex; align-items:center; justify-content:center; border-radius:4px; }
         .p-btn.active { background: var(--gold); color: black; }
-        
+        .color-swatch { width: 28px; height: 28px; border-radius: 4px; border: 2px solid transparent; cursor: pointer; }
+        .color-swatch.active { border-color: white; transform: scale(1.1); box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+
         /* MODALS */
-        #overlay, #success-modal { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .success-box { background: white; width: 600px; padding: 40px; border-radius: 16px; text-align: left; color: #333; border-top: 8px solid var(--green); }
-        #save-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--green); color: white; padding: 10px 30px; border-radius: 50px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 30000; pointer-events: none; }
+        #overlay, #success-modal { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; backdrop-filter: blur(5px); }
+        .success-box { background: white; width: 600px; padding: 40px; border-radius: 16px; text-align: left; color: #1f2937; border-top: 8px solid var(--green); }
+        #save-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--green); color: white; padding: 12px 35px; border-radius: 50px; font-weight: bold; opacity: 0; transition: 0.4s; z-index: 30000; pointer-events: none; }
         #save-toast.show { opacity: 1; top: 40px; }
+        #photo-courage { width: 200px; height: 200px; border-radius: 50%; border: 6px solid var(--gold); object-fit: cover; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div id="save-toast">✅ SAUVEGARDÉ !</div>
+<div id="save-toast">✅ ENREGISTRÉ !</div>
 
 <input type="file" id="import-input" style="display:none" onchange="loadFile(this)">
 <input type="file" id="photo-input" style="display:none" multiple onchange="processPhotos(this)">
@@ -77,7 +87,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">PRO v24</span></h1><p style="margin:5px 0 0 0;color:#666;">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v25</span></h1><p style="margin:5px 0 0 0;color:#666;">Direction des Finances</p></div>
         <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER TOUT</button>
         <div style="display:flex; gap:10px;">
             <button class="btn-usb" onclick="saveToUSB()">Sauvegarde USB</button>
@@ -92,7 +102,7 @@
         <button class="back-home" onclick="goDashboard()">⬅️ DOSSIERS</button>
         <div style="padding:20px; text-align:center; color:var(--gold); font-weight:bold; font-size:1.1rem; border-bottom:1px solid rgba(255,255,255,0.1);" id="lbl-proj">Projet</div>
         <div id="list-bat" style="flex:1; overflow-y:auto; padding:10px;"></div>
-        <div style="padding:20px;"><button onclick="newBat()" style="width:100%; padding:15px; background:transparent; border:2px dashed rgba(255,255,255,0.3); color:white; font-weight:bold; cursor:pointer;">+ BÂTIMENT</button></div>
+        <div style="padding:20px;"><button onclick="newBat()" style="width:100%; padding:15px; background:transparent; border:2px dashed rgba(255,255,255,0.3); color:white; font-weight:bold; cursor:pointer;">+ NOUVEAU BÂTIMENT</button></div>
     </div>
     <div id="editor-main">
         <div class="top-bar">
@@ -100,7 +110,7 @@
             <div id="lbl-bat" style="font-weight:bold; color:var(--blue); font-size:1.5rem;">Accueil</div>
             <div style="display:flex; gap:15px;">
                 <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER</button>
-                <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER POUR MAIL (PDF)</button>
+                <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER (MAIL)</button>
             </div>
         </div>
         <div id="area-photos" class="content-area"></div>
@@ -111,8 +121,8 @@
     <div class="paint-header">
         <div style="font-weight:bold; font-size:1.2rem;">🎨 RETOUCHE</div>
         <div style="display:flex; gap:10px;">
-            <button onclick="savePaint()" style="background:var(--gold); color:black; border:none; padding:8px 20px; font-weight:bold;">💾 OK</button>
-            <button onclick="closePaint()" style="background:#555; color:white; border:none; padding:8px 20px;">Annuler</button>
+            <button onclick="savePaint()" style="background:var(--gold); color:black; border:none; padding:8px 25px; font-weight:bold; border-radius:4px;">💾 OK</button>
+            <button onclick="closePaint()" style="background:#555; color:white; border:none; padding:8px 20px; border-radius:4px;">Annuler</button>
         </div>
     </div>
     <div class="paint-toolbar">
@@ -122,40 +132,41 @@
         <button class="p-btn" onclick="setTool('free')">✏️</button>
         <button class="p-btn" onclick="undoPaint()">↩️</button>
         <div style="width:20px"></div>
-        <input type="color" onchange="setColor(this.value)" value="#ff0000" style="height:40px; width:40px;">
+        <div class="color-swatch active" style="background:#ff0000;" onclick="setColor('#ff0000', this)"></div>
+        <div class="color-swatch" style="background:#ffff00;" onclick="setColor('#ffff00', this)"></div>
+        <div class="color-swatch" style="background:#0000ff;" onclick="setColor('#0000ff', this)"></div>
+        <div class="color-swatch" style="background:#ffffff;" onclick="setColor('#ffffff', this)"></div>
         <input type="range" min="2" max="20" value="5" oninput="setLineWidth(this.value)" style="width:100px;">
     </div>
     <div id="paint-canvas-container"><canvas id="paint-canvas"></canvas></div>
 </div>
 
 <div id="overlay">
-    <img src="courage.jpg.JPG" id="photo-courage" onclick="document.getElementById('courage-input').click()" onerror="this.src='https://via.placeholder.com/300?text=PHOTO+MANQUANTE'" style="width:200px; height:200px; border-radius:50%; border:5px solid var(--gold); object-fit:cover;">
+    <img src="courage.jpg.JPG" id="photo-courage" onclick="document.getElementById('courage-input').click()" onerror="this.src='https://via.placeholder.com/300?text=PHOTO+MANQUANTE'">
     <h2 style="color:var(--gold);">COURAGE MAMIE ! ❤️</h2>
     <p>Création du dossier en cours...</p>
 </div>
 
 <div id="success-modal">
     <div class="success-box">
-        <h2 style="color:var(--blue);">📦 Dossier prêt !</h2>
-        <p>Le fichier <strong>Dossier_Complet.zip</strong> est dans <strong>Téléchargements</strong>.</p>
+        <h2 style="color:var(--blue); margin-top:0;">📦 Dossier Prêt !</h2>
+        <p>Le fichier <strong>Dossier_Final.zip</strong> est dans <strong>Téléchargements</strong>.</p>
         <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin:15px 0; border:1px solid #bae6fd;">
-            <strong>POUR IMPRIMER EN PDF :</strong>
-            <ol style="margin:10px 0 0 20px;">
-                <li>Ouvrez le ZIP.</li>
-                <li>Ouvrez le fichier 📄 <strong>..._IMPRIMABLE.html</strong></li>
-                <li>Cliquez sur le gros bouton <strong>"IMPRIMER EN PDF"</strong> en haut de la page.</li>
-            </ol>
+            <strong>Contenu du ZIP :</strong>
+            <ul style="margin:10px 0 0 20px;">
+                <li>📂 <strong>_INTERACTIF.html</strong> : Pour l'ordinateur.</li>
+                <li>📄 <strong>_IMPRIMABLE.html</strong> : Pour faire le PDF (1 photo/page).</li>
+            </ul>
         </div>
         <button style="background:var(--blue); color:white; border:none; padding:15px 30px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('success-modal').style.display='none'">FERMER</button>
     </div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v24')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v25')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
-    let canvas, ctx, paintImg, isDrawing=false, startX, startY, currentTool='rect', currentColor='#ff0000', currentWidth=5, paintHistory=[], currentPhotoIndex=null;
-    let dragSrcEl = null;
+    let canvas, ctx, paintImg, isDrawing=false, startX, startY, currentTool='rect', currentColor='#ff0000', currentWidth=5, paintHistory=[], currentPhotoIndex=null, dragSrcEl = null;
 
     window.onload = () => {
         refreshGrid();
@@ -168,7 +179,7 @@
 
     function notifySave() { const t = document.getElementById('save-toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
     function manualSave() { save(); notifySave(); }
-    function save() { localStorage.setItem('ccas_db_v24', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v25', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
@@ -176,28 +187,25 @@
 
     function refreshGrid() {
         const g = document.getElementById('grid-projects');
-        g.innerHTML = `<div class="card" onclick="createProj()" style="border:2px dashed #ccc; justify-content:center; color:#888;"><h1>+</h1><div style="font-weight:bold;">NOUVEAU</div></div>`;
+        g.innerHTML = `<div class="card" onclick="createProj()" style="border:2px dashed #cbd5e1; justify-content:center; color:#9ca3af;"><h1>+</h1><div style="font-weight:bold;">NOUVEAU DOSSIER</div></div>`;
         let keys = Object.keys(db).sort((a,b) => (db[a].order||0) - (db[b].order||0));
         keys.forEach(id => {
             const p = db[id];
             const div = document.createElement('div');
             div.className = 'card'; div.draggable = true; div.dataset.id = id;
-            div.innerHTML = `<div class="del-btn" onclick="delProj('${id}', event)">×</div><div style="font-size:2.5rem; margin-bottom:10px;">📁</div><div style="font-weight:bold; color:#0A1A3C;">${p.name}</div><div style="color:#666; font-size:0.8rem;">${new Date(p.date).toLocaleDateString()}</div>`;
+            div.innerHTML = `<div class="del-btn" onclick="delProj('${id}', event)">×</div><div class="drag-handle-card">⠿</div><div style="font-size:2.5rem; margin-bottom:10px;">📁</div><div style="font-weight:bold; color:#0A1A3C; font-size:1.1rem;">${p.name}</div><div style="color:#6b7280; font-size:0.8rem; margin-top:5px;">${new Date(p.date).toLocaleDateString()}</div>`;
             div.onclick = (e) => { if(!e.target.closest('.del-btn')) openProj(id); };
-            
             div.ondragstart = function(e) { dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); };
             div.ondragover = function(e) { e.preventDefault(); return false; };
             div.ondrop = function(e) {
-                if(e.stopPropagation) e.stopPropagation();
-                this.classList.remove('dragging');
+                if(e.stopPropagation) e.stopPropagation(); this.classList.remove('dragging');
                 if(dragSrcEl !== this && dragSrcEl.classList.contains('card')) {
                     let all = Array.from(g.querySelectorAll('.card:not(:first-child)'));
                     let srcI = all.indexOf(dragSrcEl); let tgtI = all.indexOf(this);
                     if(srcI < tgtI) this.after(dragSrcEl); else this.before(dragSrcEl);
                     Array.from(g.querySelectorAll('.card:not(:first-child)')).forEach((c, i) => db[c.dataset.id].order = i);
                     save();
-                }
-                return false;
+                } return false;
             };
             div.ondragend = function() { this.classList.remove('dragging'); };
             g.appendChild(div);
@@ -207,7 +215,7 @@
     function createProj() { const n = prompt("Nom du dossier :"); if(n) { const id = Date.now().toString(); db[id] = { name:n, date:Date.now(), order:9999, data:{} }; save(); openProj(id); } }
     function delProj(id, e) { e.stopPropagation(); if(confirm("Supprimer ce dossier ?")) { delete db[id]; save(); refreshGrid(); } }
     function saveToUSB() { const d = { db: db, config: appConfig }; const b = new Blob([JSON.stringify(d)], {type: "application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `CCAS_SAUVEGARDE_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); }
-    function loadFile(i) { const f = i.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { try { const j = JSON.parse(e.target.result); if(j.config) { appConfig = j.config; db = { ...db, ...j.db }; saveConfig(); } else { db = { ...db, ...j }; } save(); refreshGrid(); alert("Récupéré !"); } catch(err) { alert("Erreur fichier"); } }; r.readAsText(f); }
+    function loadFile(i) { const f = i.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { try { const j = JSON.parse(e.target.result); if(j.config) { appConfig = j.config; db = { ...db, ...j.db }; saveConfig(); } else { db = { ...db, ...j }; } save(); refreshGrid(); alert("Dossiers récupérés !"); } catch(err) { alert("Fichier invalide."); } }; r.readAsText(f); }
 
     function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; document.getElementById('lbl-proj').innerText = db[id].name; refreshSide(); refreshMain(); }
     function goDashboard() { curP = null; document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
@@ -228,8 +236,7 @@
                     keys.splice(srcI, 1); keys.splice(tgtI, 0, dragSrcEl.dataset.bat);
                     const newData = {}; keys.forEach(k => newData[k] = db[curP].data[k]);
                     db[curP].data = newData; save(); refreshSide();
-                }
-                return false;
+                } return false;
             };
             d.ondragend = function() { this.classList.remove('dragging'); };
             l.appendChild(d); 
@@ -241,8 +248,8 @@
 
     function refreshMain() {
         const area = document.getElementById('area-photos');
-        if(!curB) { area.innerHTML = '<div style="text-align:center; color:#999; margin-top:100px;">Sélectionnez un bâtiment.</div>'; return; }
-        area.innerHTML = `<div onclick="document.getElementById('photo-input').click()" style="padding:40px; border:3px dashed #ccc; text-align:center; background:white; cursor:pointer; margin-bottom:40px; font-weight:bold; color:#888; border-radius:12px;">📸 AJOUTER DES PHOTOS</div>`;
+        if(!curB) { area.innerHTML = '<div style="text-align:center; color:#999; margin-top:100px; font-size:1.5rem;">⬅️ Sélectionnez un bâtiment pour commencer.</div>'; return; }
+        area.innerHTML = `<div onclick="document.getElementById('photo-input').click()" style="padding:40px; border:3px dashed #d1d5db; text-align:center; background:white; cursor:pointer; margin-bottom:40px; font-weight:bold; color:#6b7280; border-radius:12px; font-size:1.1rem; transition:0.2s;">📸 CLIQUER ICI POUR AJOUTER DES PHOTOS</div>`;
         db[curP].data[curB].forEach((p, idx) => {
             const div = document.createElement('div');
             div.className = 'photo-block'; div.draggable = true; div.dataset.index = idx;
@@ -254,25 +261,37 @@
                     const oldIdx = parseInt(dragSrcEl.dataset.index); const newIdx = parseInt(this.dataset.index);
                     const arr = db[curP].data[curB]; const item = arr.splice(oldIdx, 1)[0]; arr.splice(newIdx, 0, item);
                     save(); refreshMain();
-                }
-                return false;
+                } return false;
             };
             div.ondragend = function(){ this.classList.remove('dragging'); };
 
             div.innerHTML = `
-                <div class="drag-handle-photo" title="Glisser">⠿</div>
+                <div class="drag-handle-photo">⠿</div>
                 <div class="photo-col">
-                    <div class="del-p-btn" onclick="delPhoto(${idx})">×</div>
+                    <div class="del-p-btn" onclick="delPhoto(${idx})" title="Supprimer">×</div>
                     <img src="${p.img}" class="photo-img" onclick="openPaint(${idx})">
                     <button class="btn-edit-photo" onclick="openPaint(${idx})">🎨 RETOUCHER</button>
                 </div>
                 <div class="text-col">
+                    <div class="toolbar">
+                        <button onclick="cmd('bold')" title="Gras"><b>B</b></button>
+                        <button onclick="cmd('italic')" title="Italique"><i>I</i></button>
+                        <button onclick="cmd('underline')" title="Souligné"><u>U</u></button>
+                        <div class="sep"></div>
+                        <input type="color" onchange="cmd('foreColor', this.value)" title="Couleur" value="#000000">
+                        <button onclick="cmd('hiliteColor', 'yellow')" style="background:yellow;border:1px solid #ccc;">🖍️</button>
+                        <div class="sep"></div>
+                        <button onclick="cmd('justifyLeft')">⫷</button><button onclick="cmd('justifyCenter')">||</button><button onclick="cmd('insertUnorderedList')">• Liste</button>
+                        <div class="sep"></div>
+                        <select onchange="cmd('fontSize', this.value)"><option value="3">Normale</option><option value="5">Grande</option><option value="6">Très Grande</option></select>
+                    </div>
                     <div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)">${p.desc}</div>
                 </div>`;
             area.appendChild(div);
         });
     }
 
+    function cmd(c, v=null) { document.execCommand(c, false, v); }
     function processPhotos(i) { 
         Array.from(i.files).forEach(f => { 
             const reader = new FileReader();
@@ -308,7 +327,7 @@
         }; paintImg.src = src;
     }
     function setTool(t) { currentTool = t; document.querySelectorAll('.p-btn').forEach(b=>b.classList.remove('active')); event.currentTarget.classList.add('active'); }
-    function setColor(c) { currentColor = c; }
+    function setColor(c, el) { currentColor = c; if(el){ document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active')); el.classList.add('active'); } }
     function setLineWidth(w) { currentWidth = w; }
     function saveHistory() { paintHistory.push(canvas.toDataURL()); if(paintHistory.length>8) paintHistory.shift(); }
     function undoPaint() { if(paintHistory.length>1) { paintHistory.pop(); let i = new Image(); i.onload=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(i,0,0);}; i.src = paintHistory[paintHistory.length-1]; } }
@@ -335,7 +354,7 @@
         setTimeout(() => {
             const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
             
-            // 1. VERSION INTERACTIVE
+            // VERSION INTERACTIVE (ECRAN) - TEXTE FORCE EN BLANC
             const htmlInteractif = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
             body{font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;background:#000;color:#F4F7FD;overflow:hidden}
             #side{width:280px;background:#050E24;border-right:3px solid #CCA43B;display:flex;flex-direction:column;z-index:10;box-shadow:5px 0 15px rgba(0,0,0,0.5)}
@@ -351,21 +370,23 @@
             .bot{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:4px solid #CCA43B;min-height:150px;z-index:50}
             .arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,26,60,0.8);color:#CCA43B;border:2px solid #CCA43B;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:24px;z-index:60}.al{left:-25px}.ar{right:-25px}
             #desc { color: #f4f7fd; font-size:1.4rem; line-height:1.6; }
-            #desc * { color: inherit !important; } 
+            #desc * { color: inherit; } 
+            #desc span[style*="color"] { color: attr(style) !important; }
+            #desc font[color] { color: attr(color) !important; }
             </style></head><body><div id="side"><div class="head">${proj.name}</div><div id="nav" style="flex:1;overflow-y:auto"></div></div><div id="main"><div class="view"><div class="frame" id="fr"><div class="top-zone"><img src="${finalLogo}" class="logo"><div class="txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div><div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div></div></div><div class="bot"><h2 id="tit" style="color:#CCA43B;margin:0 0 10px 0;text-transform:uppercase"></h2><div id="desc"></div></div></div><script>
             const d=${json};let cB=Object.keys(d)[0],cI=0;function rn(){const n=document.getElementById('nav');n.innerHTML='';Object.keys(d).forEach(k=>{const b=document.createElement('button');b.className='btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rn()};n.appendChild(b)})}function sh(){const s=document.getElementById('sc'),f=document.getElementById('fr'),i=d[cB];if(!i||!i.length){s.innerHTML='';document.getElementById('desc').innerHTML='';f.querySelectorAll('.arr').forEach(a=>a.remove());return}s.innerHTML='<img src="'+i[cI].img+'">';document.getElementById('tit').innerText=cB;document.getElementById('desc').innerHTML=i[cI].desc||"";f.querySelectorAll('.arr').forEach(a=>a.remove());if(i.length>1){const l=document.createElement('div');l.className='arr al';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};const r=document.createElement('div');r.className='arr ar';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};f.appendChild(l);f.appendChild(r)}}window.onload=()=>{if(cB){rn();sh()}};<\/script></body></html>`;
 
-            // 2. VERSION IMPRIMABLE (1 PHOTO / PAGE)
+            // VERSION IMPRIMABLE (PAGE PAR PAGE) - TEXTE FORCE EN NOIR
             let htmlPrint = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impression ${proj.name}</title><style>
             @page { size: A4; margin: 0; }
             body { font-family: 'Segoe UI', sans-serif; background: #fff; color: #000; margin: 0; padding: 0; }
-            .page-container { width: 210mm; height: 297mm; position: relative; page-break-after: always; display: flex; flex-direction: column; padding: 20mm; box-sizing: border-box; }
+            .page-container { width: 210mm; height: 297mm; position: relative; page-break-after: always; display: flex; flex-direction: column; padding: 15mm; box-sizing: border-box; border-bottom:1px solid #eee; }
             .header-print { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #CCA43B; padding-bottom: 10px; margin-bottom: 20px; }
             .logo-print { height: 50px; }
             .title-print { font-size: 18px; font-weight: bold; color: #0A1A3C; text-transform: uppercase; }
-            .photo-box { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 20px; border: 1px solid #eee; }
+            .photo-box { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 20px; border: 1px solid #ddd; background:#fafafa; }
             .p-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-            .desc-box { height: 25%; overflow: hidden; font-size: 16px; color: #000 !important; border: 1px solid #ccc; padding: 15px; background: #f9f9f9; }
+            .desc-box { min-height: 200px; font-size: 16px; color: #000 !important; border: 1px solid #ccc; padding: 15px; background: #fff; line-height:1.5; }
             .desc-box * { color: black !important; }
             .btn-print { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 30px; font-size: 20px; font-weight: bold; border: none; cursor: pointer; border-radius: 8px; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
             @media print { .btn-print { display: none; } }
