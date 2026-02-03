@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v37 Locked Layout</title>
+    <title>Studio CCAS | v38 Final Lock</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
@@ -86,7 +86,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v37</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v38</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
         <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER TOUT</button>
         <div style="display:flex; gap:10px;">
             <button class="btn-usb" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
@@ -153,8 +153,7 @@
         <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin:15px 0; border:1px solid #bae6fd;">
             <strong>Contenu :</strong>
             <ul style="margin:10px 0 0 20px;">
-                <li>📂 <strong>_INTERACTIF.html</strong> : Le rapport final (Lecture seule).</li>
-                <li>Tout est verrouillé (Image en haut, Texte en bas).</li>
+                <li>📂 <strong>_INTERACTIF.html</strong> : Rendu verrouillé (Image 70%, Texte 25%).</li>
             </ul>
         </div>
         <button style="background:var(--blue); color:white; border:none; padding:15px 30px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('success-modal').style.display='none'">FERMER</button>
@@ -162,7 +161,7 @@
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v37')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v38')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
     let canvas, ctx, paintImg, isDrawing=false, startX, startY, currentTool='rect', currentColor='#ff0000', currentWidth=5, paintHistory=[], currentPhotoIndex=null, dragSrcEl = null;
@@ -178,7 +177,7 @@
 
     function notifySave() { const t = document.getElementById('save-toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
     function manualSave() { save(); notifySave(); }
-    function save() { localStorage.setItem('ccas_db_v37', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v38', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
@@ -356,7 +355,7 @@
                 body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0A1A3C; color: #F4F7FD; height: 100vh; display: flex; overflow: hidden; }
                 
                 /* SIDEBAR GAUCHE */
-                #side { width: 280px; background: #050E24; border-right: 3px solid #CCA43B; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+                #side { width: 280px; background: #050E24; border-right: 3px solid #CCA43B; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 15px rgba(0,0,0,0.5); position: relative; }
                 .head { padding: 25px; color: #CCA43B; font-weight: 800; border-bottom: 1px solid #1f2d40; text-transform: uppercase; text-align: center; }
                 .btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #111; transition: 0.2s; font-size: 16px; }
                 .btn.active { color: #CCA43B; background: rgba(204,164,59,0.1); border-left: 5px solid #CCA43B; font-weight: bold; }
@@ -367,9 +366,9 @@
                 
                 /* ZONE CONTENU (Image + Texte) */
                 .view { 
-                    height: 70%; /* IMAGE FIGÉE A 70% */
+                    height: 75vh; /* IMAGE FIGÉE A 75% DE LA HAUTEUR ECRAN */
                     width: 100%;
-                    padding: 20px;
+                    padding: 20px 20px 0 20px;
                     box-sizing: border-box;
                     display: flex; 
                     align-items: center; 
@@ -381,6 +380,7 @@
                     width: 100%; 
                     height: 100%; 
                     border: 3px solid #CCA43B; 
+                    border-bottom: none;
                     background: #000; 
                     box-shadow: 0 0 50px rgba(0,0,0,0.8);
                     position: relative;
@@ -422,15 +422,17 @@
                     object-fit: contain; 
                 }
                 
-                /* TEXTE CONTAINER (En bas, FIGÉ A 30%) */
+                /* TEXTE CONTAINER (En bas, FIGÉ A 25% DE LA HAUTEUR ECRAN) */
                 .bot { 
-                    height: 30%; /* TEXTE FIGÉ A 30% */
+                    height: 25vh; /* TEXTE FIGÉ A 25% DE LA HAUTEUR ECRAN */
                     width: 100%;
                     padding: 20px; 
                     background: rgba(5,14,36,0.95); 
-                    border-top: 2px solid #CCA43B; 
+                    border: 3px solid #CCA43B; 
                     overflow-y: auto; 
                     box-sizing: border-box;
+                    margin: 0 20px 20px 20px;
+                    width: calc(100% - 40px);
                 }
                 
                 /* NAVIGATION */
@@ -438,11 +440,11 @@
                 .arr:hover { background: #CCA43B; color: black; }
                 .al { left: 10px; } .ar { right: 10px; }
                 
-                /* BOUTON PDF (Rouge Élégant) */
+                /* BOUTON PDF (Haut Gauche) */
                 .btn-print { 
-                    position: fixed; 
-                    bottom: 10px; 
-                    right: 10px; 
+                    position: absolute; 
+                    top: 10px; 
+                    left: 290px; /* Juste après la sidebar */
                     background: #c0392b; 
                     color: white; 
                     padding: 8px 15px; 
@@ -467,9 +469,9 @@
                     body { display: block; overflow: visible; background: #0A1A3C; -webkit-print-color-adjust: exact; }
                     #side, .btn-print, .arr { display: none !important; }
                     #main { height: auto; display: block; }
-                    .view { height: 70vh; page-break-after: avoid; padding: 0; margin-bottom: 0; display: flex; }
-                    .frame { height: 100%; border: 2px solid #CCA43B; }
-                    .bot { height: 25vh; border: 2px solid #CCA43B; border-top: none; page-break-after: always; }
+                    .view { height: 70vh; page-break-after: avoid; padding: 0; margin: 0; display: flex; width: 100%; }
+                    .frame { height: 100%; border: 2px solid #CCA43B; width: 100%; }
+                    .bot { height: 25vh; border: 2px solid #CCA43B; border-top: none; page-break-after: always; margin: 0; width: 100%; }
                 }
                 </style></head><body>
                 
@@ -521,7 +523,6 @@
                     s.innerHTML = '<img src="' + i[cI].img + '">';
                     document.getElementById('tit').innerText = cB + " (" + (cI + 1) + "/" + i.length + ")";
                     
-                    // GESTION PLACEHOLDER
                     let txt = i[cI].desc || "";
                     if(txt.includes("Cliquez ici pour écrire...")) txt = "";
                     document.getElementById('desc').innerHTML = txt;
