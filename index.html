@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v31 Corrigée</title>
+    <title>Studio CCAS | v32 Stable</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
@@ -13,14 +13,14 @@
 
         /* DASHBOARD */
         #view-dashboard { flex: 1; padding: 30px; display: flex; flex-direction: column; }
-        .header { background: var(--panel); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 4px solid var(--gold); }
+        .header { background: var(--panel); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 4px solid var(--gold); }
         .btn-save-main { background: var(--green); color: white; padding: 12px 30px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); display: flex; align-items: center; gap: 8px; }
         .btn-usb { padding: 10px 20px; border: 1px solid #d1d5db; border-radius: 6px; font-weight: 600; background: white; color: #374151; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; overflow-y: auto; padding: 10px; }
-        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; align-items: center; }
-        .card:hover { border-color: var(--gold); transform: translateY(-3px); }
+        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; align-items: center; transition: all 0.2s; }
+        .card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
         .del-btn { position: absolute; top: 12px; right: 12px; color: var(--red); font-weight: bold; background:#fee2e2; width: 32px; height: 32px; border-radius:50%; display: flex; align-items: center; justify-content: center; }
-        .drag-handle-card { cursor: grab; color: #cbd5e1; font-size: 24px; width: 100%; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #eee; }
+        .drag-handle-card { cursor: grab; color: #cbd5e1; font-size: 24px; width: 100%; text-align: center; padding-bottom: 10px; margin-bottom: 5px; border-bottom: 1px solid #f3f4f6; }
 
         /* STUDIO */
         #view-studio { display: none; height: 100vh; flex-direction: row; }
@@ -36,41 +36,41 @@
         .content-area { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
         
         /* PHOTOS & EDITEUR */
-        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #e5e7eb; box-shadow: 0 2px 10px rgba(0,0,0,0.03); overflow: visible; }
-        .drag-handle-photo { width: 30px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #e5e7eb; color: #cbd5e1; font-size: 20px; }
+        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #e5e7eb; box-shadow: 0 2px 10px rgba(0,0,0,0.03); overflow: hidden; }
         .photo-block.dragging { opacity: 0.5; border: 2px dashed var(--blue); }
+        .drag-handle-photo { width: 30px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #e5e7eb; color: #cbd5e1; font-size: 20px; }
+        
+        .photo-col { width: 300px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #e5e7eb; position:relative; }
+        .photo-img { width: 100%; height: 180px; object-fit: contain; border: 1px solid #e5e7eb; background: white; border-radius: 6px; cursor: pointer; }
+        .btn-edit-photo { background: #374151; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: 600; font-size: 13px; display:flex; justify-content:center; align-items:center; gap:8px; }
+        .del-p-btn { position: absolute; top: 10px; left: 10px; background: var(--red); color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index:5; }
 
-        .photo-col { width: 300px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #e5e7eb; position: relative; }
-        .photo-img { width: 100%; height: 200px; object-fit: contain; border: 1px solid #ccc; background: white; border-radius: 6px; cursor: pointer; }
-        .btn-edit-photo { background: #374151; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; }
-        .del-p-btn { position: absolute; top: 10px; left: 10px; background: var(--red); color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 5; }
-
-        .text-col { flex: 1; padding: 20px; display: flex; flex-direction: column; }
+        .text-col { flex: 1; padding: 20px; display: flex; flex-direction: column; background: #fff; }
         .toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: #f1f5f9; padding: 8px; border-radius: 8px; border: 1px solid #ddd; flex-wrap: wrap; }
-        .toolbar button, .toolbar input[type=color] { height: 32px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; min-width: 32px; }
-        .rich-text { flex: 1; min-height: 150px; border: 1px solid #ccc; padding: 15px; border-radius: 6px; font-size: 16px; overflow-y: auto; background: #fff; color: black; }
+        .toolbar button, .toolbar select, .toolbar input[type=color] { height: 32px; border: 1px solid transparent; background: white; border-radius: 4px; cursor: pointer; min-width: 32px; display:flex; align-items:center; justify-content:center; padding: 0 8px; border: 1px solid #ccc; }
+        .rich-text { flex: 1; min-height: 150px; border: 1px solid #ccc; padding: 15px; border-radius: 6px; font-size: 16px; overflow-y: auto; background: #fff; color: black; line-height: 1.5; }
 
-        /* LISTE BATIMENTS */
-        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #eee; }
-        .bat-item.active { background: white; color: var(--blue); font-weight: bold; }
+        /* BATIMENTS */
+        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #e2e8f0; transition: 0.2s; }
+        .bat-item.active { background: white; color: var(--blue); font-weight: bold; border-color: var(--gold); }
         .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
-        .drag-handle-bat { cursor: grab; padding-right: 10px; color: rgba(255,255,255,0.3); font-size: 20px; }
+        .drag-handle-bat { cursor: grab; padding-right: 12px; color: rgba(255,255,255,0.3); font-size: 20px; }
 
         /* PAINT */
         #paint-modal { position: fixed; inset: 0; background: #1e1e1e; z-index: 20000; display: none; flex-direction: column; }
-        .paint-header { height: 60px; background: #252526; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: white; }
+        .paint-header { height: 60px; background: #252526; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color:white; }
         .paint-toolbar { height: 80px; background: #333; display: flex; align-items: center; justify-content: center; gap: 20px; }
         #paint-canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; background: #111; overflow: hidden; }
         #paint-canvas { cursor: crosshair; box-shadow: 0 0 50px black; }
-        .p-btn { width: 40px; height: 40px; background: #444; border: 1px solid #555; color: white; font-size: 18px; cursor: pointer; }
+        .p-btn { width: 40px; height: 40px; background: #444; border: 1px solid #555; color: white; font-size: 18px; display:flex; align-items:center; justify-content:center; border-radius:4px; }
         .p-btn.active { background: var(--gold); color: black; }
         .color-swatch { width: 28px; height: 28px; border-radius: 4px; border: 2px solid transparent; cursor: pointer; }
         .color-swatch.active { border-color: white; transform: scale(1.1); box-shadow: 0 0 0 2px white; }
 
-        /* MODALS & NOTIFS */
-        #overlay, #success-modal { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        /* MODALS */
+        #overlay, #success-modal { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; backdrop-filter: blur(5px); }
         .success-box { background: white; width: 600px; padding: 40px; border-radius: 16px; text-align: left; color: #1f2937; border-top: 8px solid var(--green); }
-        #save-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--green); color: white; padding: 10px 30px; border-radius: 50px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 30000; pointer-events: none; }
+        #save-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--green); color: white; padding: 12px 35px; border-radius: 50px; font-weight: bold; opacity: 0; transition: 0.4s; z-index: 30000; pointer-events: none; }
         #save-toast.show { opacity: 1; top: 40px; }
         #photo-courage { width: 200px; height: 200px; border-radius: 50%; border: 6px solid var(--gold); object-fit: cover; margin-bottom: 20px; }
     </style>
@@ -86,7 +86,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v31</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v32</span></h1><p style="margin:5px 0 0 0;color:#666;">Direction des Finances</p></div>
         <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER TOUT</button>
         <div style="display:flex; gap:10px;">
             <button class="btn-usb" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
@@ -109,7 +109,7 @@
             <div id="lbl-bat" style="font-weight:bold; color:var(--blue); font-size:1.5rem;">Accueil</div>
             <div style="display:flex; gap:15px;">
                 <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER</button>
-                <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER (INTERACTIF)</button>
+                <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER (MAIL)</button>
             </div>
         </div>
         <div id="area-photos" class="content-area"></div>
@@ -148,13 +148,13 @@
 
 <div id="success-modal">
     <div class="success-box">
-        <h2 style="color:var(--blue); margin-top:0;">📦 Dossier Prêt !</h2>
+        <h2 style="color:var(--blue); margin-top:0;">📦 C'est prêt !</h2>
         <p>Le fichier <strong>Dossier_Final.zip</strong> est dans <strong>Téléchargements</strong>.</p>
         <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin:15px 0; border:1px solid #bae6fd;">
-            <strong>Comment imprimer en PDF Bleu & Or ?</strong>
+            <strong>Pour avoir le PDF (BLEU & OR) :</strong>
             <ol style="margin:10px 0 0 20px;">
-                <li>Ouvrez le fichier HTML généré.</li>
-                <li>Cliquez sur le bouton <strong>🖨️ IMPRIMER CE DOSSIER</strong> (en haut).</li>
+                <li>Ouvrez le fichier <strong>Dossier_Final.html</strong> (dans le ZIP).</li>
+                <li>Cliquez sur le bouton <strong>🖨️ IMPRIMER / PDF</strong> en haut à droite.</li>
                 <li>Dans les options d'impression, cochez <strong>"Graphiques d'arrière-plan"</strong> pour avoir le fond bleu.</li>
             </ol>
         </div>
@@ -163,7 +163,7 @@
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v31')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v32')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
     let canvas, ctx, paintImg, isDrawing=false, startX, startY, currentTool='rect', currentColor='#ff0000', currentWidth=5, paintHistory=[], currentPhotoIndex=null, dragSrcEl = null;
@@ -179,7 +179,7 @@
 
     function notifySave() { const t = document.getElementById('save-toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
     function manualSave() { save(); notifySave(); }
-    function save() { localStorage.setItem('ccas_db_v31', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v32', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
@@ -232,7 +232,8 @@
                 if(e.stopPropagation) e.stopPropagation(); this.classList.remove('dragging');
                 if(dragSrcEl !== this && dragSrcEl.classList.contains('bat-item')) {
                     const srcKey = dragSrcEl.dataset.bat; const tgtKey = this.dataset.bat;
-                    const keys = Object.keys(db[curP].data); const srcI = keys.indexOf(srcKey); const tgtI = keys.indexOf(tgtKey);
+                    const keys = Object.keys(db[curP].data);
+                    const srcI = keys.indexOf(srcKey); const tgtI = keys.indexOf(tgtKey);
                     keys.splice(srcI, 1); keys.splice(tgtI, 0, srcKey);
                     const newData = {}; keys.forEach(k => newData[k] = db[curP].data[k]);
                     db[curP].data = newData; save(); refreshSide();
@@ -317,9 +318,11 @@
         currentPhotoIndex = idx; const src = db[curP].data[curB][idx].img; paintImg = new Image();
         paintImg.onload = () => {
             const maxW = window.innerWidth * 0.8, maxH = window.innerHeight * 0.7;
-            let w = paintImg.width, h = paintImg.height, r = Math.min(maxW/w, maxH/h);
-            w *= r; h *= r; canvas.width = w; canvas.height = h;
-            ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.drawImage(paintImg, 0, 0, w, h);
+            let w = paintImg.width, h = paintImg.height;
+            // Pas de redimensionnement ici pour garder la qualité du dessin, on adapte juste l'affichage
+            canvas.width = w; canvas.height = h;
+            // On limite la taille visuelle dans le CSS, mais le canvas garde la résolution
+            ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.drawImage(paintImg, 0, 0);
             saveHistory(); document.getElementById('paint-modal').style.display = 'flex';
         }; paintImg.src = src;
     }
@@ -328,10 +331,20 @@
     function setLineWidth(w) { currentWidth = w; }
     function saveHistory() { paintHistory.push(canvas.toDataURL()); if(paintHistory.length>8) paintHistory.shift(); }
     function undoPaint() { if(paintHistory.length>1) { paintHistory.pop(); let i = new Image(); i.onload=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(i,0,0);}; i.src = paintHistory[paintHistory.length-1]; } }
-    function startDraw(e) { isDrawing=true; const r=canvas.getBoundingClientRect(); startX=e.clientX-r.left; startY=e.clientY-r.top; saveHistory(); }
+    function startDraw(e) { isDrawing=true; const r=canvas.getBoundingClientRect(); 
+        // Correction coordonnées souris vs canvas réel
+        const scaleX = canvas.width / r.width;
+        const scaleY = canvas.height / r.height;
+        startX=(e.clientX-r.left)*scaleX; startY=(e.clientY-r.top)*scaleY; 
+        saveHistory(); 
+    }
     function draw(e) {
-        if(!isDrawing) return; const r=canvas.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
-        if(currentTool==='free') { ctx.strokeStyle=currentColor; ctx.lineWidth=currentWidth; ctx.lineTo(x,y); ctx.stroke(); }
+        if(!isDrawing) return; const r=canvas.getBoundingClientRect();
+        const scaleX = canvas.width / r.width;
+        const scaleY = canvas.height / r.height;
+        const x=(e.clientX-r.left)*scaleX; const y=(e.clientY-r.top)*scaleY;
+        
+        if(currentTool==='free') { ctx.strokeStyle=currentColor; ctx.lineWidth=currentWidth; ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y); } // Smooth free draw
         else {
             let i=new Image(); i.src=paintHistory[paintHistory.length-1]; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(i,0,0);
             ctx.strokeStyle=currentColor; ctx.lineWidth=currentWidth; ctx.beginPath();
@@ -340,72 +353,87 @@
             else if(currentTool==='arrow'){ const h=15+currentWidth*0.5, a=Math.atan2(y-startY,x-startX); ctx.moveTo(startX,startY); ctx.lineTo(x,y); ctx.lineTo(x-h*Math.cos(a-Math.PI/6),y-h*Math.sin(a-Math.PI/6)); ctx.moveTo(x,y); ctx.lineTo(x-h*Math.cos(a+Math.PI/6),y-h*Math.sin(a+Math.PI/6)); ctx.stroke(); }
         }
     }
-    function stopDraw() { if(isDrawing && currentTool==='free') ctx.beginPath(); isDrawing=false; }
+    function stopDraw() { if(isDrawing) ctx.beginPath(); isDrawing=false; }
     function savePaint() { db[curP].data[curB][currentPhotoIndex].img=canvas.toDataURL('image/jpeg',0.9); save(); notifySave(); closePaint(); refreshMain(); }
     function closePaint() { document.getElementById('paint-modal').style.display='none'; paintHistory=[]; }
 
     function generateZip() {
-        if(!window.JSZip) { alert("Erreur moteur ZIP"); return; }
+        if(!window.JSZip) { alert("ERREUR CRITIQUE : JSZip non chargé. Vérifiez votre connexion internet."); document.getElementById('overlay').style.display='none'; return; }
         const proj = db[curP]; document.getElementById('overlay').style.display='flex';
         const finalLogo = appConfig.logo || "";
+        
         setTimeout(() => {
-            const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
-            
-            // VERSION UNIQUE ET CORRIGÉE (BLEU & OR + TEXTE BLANC DANS LE CADRE)
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
-            @page { size: A4; margin: 0; }
-            body { font-family: 'Segoe UI', sans-serif; background: #0A1A3C; color: white; margin: 0; -webkit-print-color-adjust: exact; }
-            .page { width: 210mm; height: 297mm; position: relative; page-break-after: always; display: flex; flex-direction: column; padding: 10mm; box-sizing: border-box; border-bottom: 1px solid #333; }
-            .header { height: 30mm; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #CCA43B; margin-bottom: 10mm; }
-            .logo { height: 20mm; }
-            .title { font-size: 24px; font-weight: bold; color: #CCA43B; text-transform: uppercase; }
-            .photo-zone { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; border: 2px solid #CCA43B; margin-bottom: 5mm; overflow: hidden; }
-            .photo-zone img { max-width: 100%; max-height: 100%; object-fit: contain; }
-            
-            /* ZONE TEXTE FIXE EN BAS */
-            .text-zone { 
-                height: 50mm; 
-                border: 1px solid #444; 
-                padding: 15px; 
-                background: rgba(0,0,0,0.5); 
-                font-size: 16px; 
-                overflow: hidden; 
-                color: white !important; /* FORCE LE BLANC */
-            }
-            .text-zone * { color: white !important; } /* FORCE LES ENFANTS EN BLANC */
-            
-            .btn-print { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 30px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 8px; z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-            @media print { .btn-print { display: none; } }
-            </style></head><body>
-            <button class="btn-print" onclick="window.print()">🖨️ IMPRIMER CE DOSSIER</button>`;
-            
-            Object.keys(proj.data).forEach(bat => {
-                proj.data[bat].forEach((p, idx) => {
-                    html += `
-                    <div class="page">
-                        <div class="header">
-                            <img src="${finalLogo}" class="logo">
-                            <div>
-                                <div class="title">${proj.name}</div>
-                                <div style="color:#aaa; font-size:14px;">${bat} - Photo ${idx+1}</div>
+            try {
+                const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
+                
+                // HTML FINAL : TEXTE FORCE EN BLANC ET BACKGROUND NOIR SEMI-TRANSPARENT
+                const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
+                @page { size: A4; margin: 0; }
+                body { font-family: 'Segoe UI', sans-serif; background: #0A1A3C; color: white; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                .page { width: 210mm; height: 297mm; position: relative; page-break-after: always; display: flex; flex-direction: column; padding: 10mm; box-sizing: border-box; border-bottom: 1px solid #333; }
+                .header { height: 30mm; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #CCA43B; margin-bottom: 5mm; }
+                .logo { height: 20mm; max-width: 50mm; object-fit: contain; }
+                .title { font-size: 24px; font-weight: bold; color: #CCA43B; text-transform: uppercase; text-align:right; }
+                
+                .content-wrapper { flex: 1; display: flex; flex-direction: column; border: 4px solid #CCA43B; background: #000; position: relative; }
+                
+                .photo-zone { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
+                .photo-zone img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                
+                /* ZONE TEXTE MAGIQUE : Force le texte en blanc et fond sombre */
+                .text-zone { 
+                    min-height: 50mm; 
+                    border-top: 2px solid #CCA43B; 
+                    padding: 20px; 
+                    background: rgba(0, 0, 0, 0.8); /* Fond noir semi-transparent */
+                    font-size: 18px; 
+                    line-height: 1.5;
+                    color: #FFFFFF !important; /* Force le blanc */
+                }
+                /* Écrase toutes les couleurs venant du copier-coller */
+                .text-zone * { color: #FFFFFF !important; background: transparent !important; }
+                
+                .btn-print { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 30px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 8px; z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,0.5); border: none; }
+                @media print { .btn-print { display: none; } }
+                </style></head><body>
+                <button class="btn-print" onclick="window.print()">🖨️ IMPRIMER / ENREGISTRER EN PDF</button>`;
+                
+                Object.keys(proj.data).forEach(bat => {
+                    proj.data[bat].forEach((p, idx) => {
+                        html += `
+                        <div class="page">
+                            <div class="header">
+                                <img src="${finalLogo}" class="logo">
+                                <div>
+                                    <div class="title">${proj.name}</div>
+                                    <div style="color:#aaa; font-size:14px; text-align:right;">${bat} - Photo ${idx+1}</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="photo-zone"><img src="${p.img}"></div>
-                        <div class="text-zone">${p.desc}</div>
-                    </div>`;
+                            <div class="content-wrapper">
+                                <div class="photo-zone"><img src="${p.img}"></div>
+                                <div class="text-zone">${p.desc}</div>
+                            </div>
+                        </div>`;
+                    });
                 });
-            });
-            html += `</body></html>`;
+                html += `</body></html>`;
 
-            const zip = new JSZip();
-            const safeName = proj.name.replace(/[^a-z0-9]/gi, '_');
-            zip.file("Dossier_Final.html", html);
-            
-            zip.generateAsync({type:"blob"}).then(function(c) {
-                const a = document.createElement('a'); a.href = URL.createObjectURL(c); a.download = safeName + "_FINAL.zip"; a.click();
-                document.getElementById('overlay').style.display='none'; document.getElementById('success-modal').style.display='flex';
-            });
-        }, 1500);
+                const zip = new JSZip();
+                const safeName = proj.name.replace(/[^a-z0-9]/gi, '_');
+                zip.file("Dossier_Final.html", html);
+                
+                zip.generateAsync({type:"blob"}).then(function(c) {
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(c); a.download = safeName + "_FINAL.zip"; a.click();
+                    document.getElementById('overlay').style.display='none'; document.getElementById('success-modal').style.display='flex';
+                }).catch(err => {
+                    alert("Erreur lors de la création du ZIP : " + err);
+                    document.getElementById('overlay').style.display='none';
+                });
+            } catch(e) {
+                alert("Une erreur est survenue pendant la génération : " + e);
+                document.getElementById('overlay').style.display='none';
+            }
+        }, 1000);
     }
 </script>
 </body>
