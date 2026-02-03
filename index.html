@@ -2,47 +2,45 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v35 Originale</title>
+    <title>Studio CCAS | v36 Laptop</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f7f6; --panel: #ffffff; --green: #27ae60; --red: #e74c3c; }
+        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f7f6; --panel: #ffffff; --green: #27ae60; --red: #c0392b; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
         * { box-sizing: border-box; outline: none; }
         button { cursor: pointer; transition: 0.1s; font-family: inherit; } button:active { transform: translateY(1px); }
 
-        /* HEADER */
-        .header { background: var(--panel); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin: 20px; border-bottom: 4px solid var(--gold); }
-        .btn-save-main { background: var(--green); color: white; padding: 12px 30px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); display: flex; align-items: center; gap: 8px; }
-        .btn-usb { padding: 10px 20px; border: 1px solid #ccc; border-radius: 6px; background: white; font-weight: bold; color: #333; }
-
         /* DASHBOARD */
-        #view-dashboard { flex: 1; padding: 0 30px 30px; display: flex; flex-direction: column; }
+        #view-dashboard { flex: 1; padding: 30px; display: flex; flex-direction: column; }
+        .header { background: var(--panel); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 4px solid var(--gold); }
+        .btn-save-main { background: var(--green); color: white; padding: 12px 30px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); display: flex; align-items: center; gap: 8px; }
+        .btn-usb { padding: 10px 20px; border: 1px solid #d1d5db; border-radius: 6px; font-weight: 600; background: white; color: #374151; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; overflow-y: auto; padding: 10px; }
-        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; align-items: center; }
-        .card:hover { border-color: var(--gold); transform: translateY(-3px); }
-        .del-btn { position: absolute; top: 10px; right: 10px; color: var(--red); font-weight: bold; background: #fee2e2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .drag-handle-card { cursor: grab; color: #ccc; font-size: 24px; width: 100%; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #eee; }
+        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; align-items: center; transition: all 0.2s; }
+        .card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .del-btn { position: absolute; top: 12px; right: 12px; color: var(--red); font-weight: bold; background:#fee2e2; width: 32px; height: 32px; border-radius:50%; display: flex; align-items: center; justify-content: center; }
+        .drag-handle-card { cursor: grab; color: #cbd5e1; font-size: 24px; width: 100%; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #f3f4f6; }
 
         /* STUDIO */
         #view-studio { display: none; height: 100vh; flex-direction: row; }
-        #sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 15px rgba(0,0,0,0.2); }
+        #sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
         .back-home { padding: 20px; background: rgba(0,0,0,0.2); color: var(--gold); font-weight: bold; cursor: pointer; border: none; text-align: left; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); }
         
         #editor-main { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
-        .top-bar { background: white; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; height: 75px; }
-        .logo-box { width: 55px; height: 55px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; overflow: hidden; background: #f9fafb; }
+        .top-bar { background: white; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; height: 75px; }
+        .logo-box { width: 55px; height: 55px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; overflow: hidden; background: #f9fafb; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
         .gen-btn { background: linear-gradient(135deg, var(--blue), #1e3a8a); color: white; padding: 12px 25px; border-radius: 8px; border: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
-        .content-area { flex: 1; overflow-y: auto; padding: 40px; }
+        .content-area { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
         
-        /* PHOTOS */
-        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #ccc; overflow: visible; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .drag-handle-photo { width: 30px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #ddd; color: #aaa; font-size: 20px; }
+        /* PHOTOS & EDITEUR */
+        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #e5e7eb; box-shadow: 0 2px 10px rgba(0,0,0,0.03); overflow: visible; }
+        .drag-handle-photo { width: 30px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #e5e7eb; color: #cbd5e1; font-size: 20px; }
         .photo-block.dragging { opacity: 0.5; border: 2px dashed var(--blue); }
 
-        .photo-col { width: 300px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #eee; position: relative; }
+        .photo-col { width: 300px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #e5e7eb; position: relative; }
         .photo-img { width: 100%; height: 200px; object-fit: contain; border: 1px solid #ccc; background: white; border-radius: 6px; cursor: pointer; }
         .btn-edit-photo { background: #374151; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; }
         .del-p-btn { position: absolute; top: 10px; left: 10px; background: var(--red); color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 5; }
@@ -53,7 +51,7 @@
         .rich-text { flex: 1; min-height: 150px; border: 1px solid #ccc; padding: 15px; border-radius: 6px; font-size: 16px; overflow-y: auto; background: #fff; color: black; }
 
         /* BATIMENTS */
-        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #eee; }
+        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #eee; transition: 0.2s; }
         .bat-item.active { background: white; color: var(--blue); font-weight: bold; }
         .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
         .drag-handle-bat { cursor: grab; padding-right: 10px; color: rgba(255,255,255,0.3); font-size: 20px; }
@@ -88,7 +86,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v35</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v36</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
         <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER TOUT</button>
         <div style="display:flex; gap:10px;">
             <button class="btn-usb" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
@@ -155,7 +153,7 @@
         <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin:15px 0; border:1px solid #bae6fd;">
             <strong>Contenu :</strong>
             <ul style="margin:10px 0 0 20px;">
-                <li>📂 <strong>_INTERACTIF.html</strong> : Le fichier avec la colonne de gauche et le texte visible.</li>
+                <li>📂 <strong>_INTERACTIF.html</strong> : Optimisé pour PC Portable (Image ajustée, Texte visible).</li>
             </ul>
         </div>
         <button style="background:var(--blue); color:white; border:none; padding:15px 30px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('success-modal').style.display='none'">FERMER</button>
@@ -163,7 +161,7 @@
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v35')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v36')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
     let canvas, ctx, paintImg, isDrawing=false, startX, startY, currentTool='rect', currentColor='#ff0000', currentWidth=5, paintHistory=[], currentPhotoIndex=null, dragSrcEl = null;
@@ -179,7 +177,7 @@
 
     function notifySave() { const t = document.getElementById('save-toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
     function manualSave() { save(); notifySave(); }
-    function save() { localStorage.setItem('ccas_db_v35', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v36', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
@@ -231,8 +229,8 @@
             d.ondrop = function(e) {
                 if(e.stopPropagation) e.stopPropagation(); this.classList.remove('dragging');
                 if(dragSrcEl !== this && dragSrcEl.classList.contains('bat-item')) {
-                    const keys = Object.keys(db[curP].data);
-                    const srcI = keys.indexOf(dragSrcEl.dataset.bat); const tgtI = keys.indexOf(this.dataset.bat);
+                    const srcKey = dragSrcEl.dataset.bat; const tgtKey = this.dataset.bat;
+                    const keys = Object.keys(db[curP].data); const srcI = keys.indexOf(srcKey); const tgtI = keys.indexOf(tgtKey);
                     keys.splice(srcI, 1); keys.splice(tgtI, 0, srcKey);
                     const newData = {}; keys.forEach(k => newData[k] = db[curP].data[k]);
                     db[curP].data = newData; save(); refreshSide();
@@ -353,70 +351,134 @@
             try {
                 const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
                 
-                // CORRECTION MAJEURE: UTILISATION DE 'LET' + STRUCTURE EXACTE DEMANDÉE
                 let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
-                body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #000; color: #F4F7FD; height: 100vh; display: flex; overflow: hidden; }
+                body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0A1A3C; color: #F4F7FD; height: 100vh; display: flex; overflow: hidden; }
                 
-                /* SIDEBAR GAUCHE (Liste Bâtiments) */
+                /* SIDEBAR GAUCHE */
                 #side { width: 280px; background: #050E24; border-right: 3px solid #CCA43B; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
                 .head { padding: 25px; color: #CCA43B; font-weight: 800; border-bottom: 1px solid #1f2d40; text-transform: uppercase; text-align: center; }
                 .btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #111; transition: 0.2s; font-size: 16px; }
                 .btn.active { color: #CCA43B; background: rgba(204,164,59,0.1); border-left: 5px solid #CCA43B; font-weight: bold; }
                 .btn:hover { color: white; }
                 
-                /* ZONE PRINCIPALE (Image Droite + Texte Bas) */
-                #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center,#142850,#0A1A3C); }
+                /* MAIN (Flexbox Vertical) */
+                #main { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
                 
-                /* HEADER SUR L'IMAGE */
-                .top-zone { position: absolute; top: 15px; right: 15px; display: flex; align-items: center; gap: 10px; background: rgba(10,26,60,0.9); padding: 5px 10px; border: 1px solid #CCA43B; border-radius: 4px; z-index: 100; }
-                .logo { width: 50px !important; height: auto; display: block; }
+                /* ZONE CONTENU (Image + Texte) */
+                .view { 
+                    flex: 1; 
+                    display: flex; 
+                    flex-direction: column; 
+                    padding: 15px; 
+                    overflow: hidden; 
+                }
+                
+                .frame { 
+                    flex: 1; 
+                    display: flex; 
+                    flex-direction: column; 
+                    border: 3px solid #CCA43B; 
+                    background: #000; 
+                    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+                    position: relative;
+                }
+                
+                /* HEADER IMAGE (Fixe en haut de l'image) */
+                .top-zone { 
+                    position: absolute; 
+                    top: 10px; 
+                    right: 10px; 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 10px; 
+                    background: rgba(10,26,60,0.9); 
+                    padding: 5px 10px; 
+                    border: 1px solid #CCA43B; 
+                    border-radius: 4px; 
+                    z-index: 100; 
+                }
+                .logo { height: 40px; width: auto; display: block; }
                 .txt { margin: 0; font-size: 9px !important; color: #CCA43B; font-weight: 700; text-transform: uppercase; line-height: 1.1; text-align: left; }
                 
-                /* CADRE PHOTO */
-                .view { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; height: 75%; }
-                .frame { width: 100%; max-width: 1400px; height: 100%; border: 4px solid #CCA43B; background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.8); }
-                .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                /* IMAGE CONTAINER (Flexible mais prioritaire) */
+                #sc { 
+                    flex: 2; /* Prend 2/3 de l'espace dispo */
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    overflow: hidden; 
+                    background: #000;
+                    position: relative;
+                }
+                #sc img { 
+                    max-width: 100%; 
+                    max-height: 100%; 
+                    object-fit: contain; 
+                }
                 
-                /* ZONE TEXTE BAS (BLEU ET OR) */
-                .bot { height: 25%; padding: 20px; background: rgba(5,14,36,0.95); border-top: 4px solid #CCA43B; overflow-y: auto; box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
+                /* TEXTE CONTAINER (En bas, fixe ou flexible) */
+                .bot { 
+                    flex: 0 0 25%; /* Fixe à 25% de la hauteur totale du cadre */
+                    padding: 15px; 
+                    background: rgba(5,14,36,0.95); 
+                    border-top: 2px solid #CCA43B; 
+                    overflow-y: auto; 
+                }
                 
-                /* FLÈCHES NAVIGATION */
-                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10,26,60,0.8); color: #CCA43B; border: 2px solid #CCA43B; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; font-size: 24px; z-index: 60; transition:0.2s; }
+                /* NAVIGATION */
+                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10,26,60,0.8); color: #CCA43B; border: 2px solid #CCA43B; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; font-size: 20px; z-index: 60; transition:0.2s; }
                 .arr:hover { background: #CCA43B; color: black; }
-                .al { left: -25px; } .ar { right: -25px; }
+                .al { left: 10px; } .ar { right: 10px; }
                 
-                /* BOUTON IMPRESSION */
-                .btn-print { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 10px 20px; border-radius: 50px; border:none; font-weight:bold; cursor:pointer; z-index:9999; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+                /* BOUTON PDF (Rouge Élégant) */
+                .btn-print { 
+                    position: absolute; 
+                    top: 15px; 
+                    right: 20px; 
+                    background: #c0392b; /* Rouge Rubis */
+                    color: white; 
+                    padding: 8px 15px; 
+                    border-radius: 4px; 
+                    border: none; 
+                    font-weight: bold; 
+                    font-size: 12px; 
+                    cursor: pointer; 
+                    z-index: 9999; 
+                    opacity: 0.6; 
+                    transition: 0.3s;
+                }
+                .btn-print:hover { opacity: 1; transform: scale(1.05); }
                 
                 /* FORCE LE TEXTE EN BLANC */
-                #desc { color: #f4f7fd !important; font-size: 1.4rem; line-height: 1.6; }
+                #desc { color: #ffffff !important; font-size: 1.1rem; line-height: 1.5; }
                 #desc * { color: inherit !important; background-color: transparent !important; }
-                #tit { color: #CCA43B; margin: 0 0 10px 0; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; }
+                #tit { color: #CCA43B; margin: 0 0 5px 0; text-transform: uppercase; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px; }
                 
-                /* MODE IMPRESSION PROPRE */
+                /* MODE IMPRESSION */
                 @media print {
-                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #0A1A3C; color: white; height: auto; overflow: visible; display: block; }
-                    #side, .arr, .btn-print { display: none; }
-                    #main { height: auto; display: block; page-break-inside: avoid; }
-                    .view { height: auto; padding: 0; page-break-after: avoid; }
-                    .bot { height: auto; border: 2px solid #CCA43B; margin-top: 10px; page-break-before: avoid; }
-                    .frame { border: 2px solid #CCA43B; page-break-inside: avoid; }
+                    body { display: block; overflow: visible; background: #0A1A3C; -webkit-print-color-adjust: exact; }
+                    #side, .btn-print, .arr { display: none !important; }
+                    #main { height: auto; display: block; }
+                    .view { height: auto; page-break-after: always; padding: 0; margin-bottom: 20px; display: block; }
+                    .frame { height: 100vh; border: 2px solid #CCA43B; page-break-inside: avoid; }
+                    #sc { height: 70%; }
+                    .bot { height: 30%; }
                 }
                 </style></head><body>
                 
-                <button class="btn-print" onclick="window.print()">🖨️ IMPRIMER / PDF</button>
+                <button class="btn-print" onclick="window.print()">🖨️ PDF</button>
                 
                 <div id="side"><div class="head">${proj.name}</div><div id="nav" style="flex:1;overflow-y:auto"></div></div>
                 <div id="main">
                     <div class="view">
                         <div class="frame" id="fr">
                             <div class="top-zone"><img src="${finalLogo}" class="logo"><div class="txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div>
-                            <div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div>
+                            <div id="sc"></div>
+                            <div class="bot">
+                                <h2 id="tit"></h2>
+                                <div id="desc"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bot">
-                        <h2 id="tit"></h2>
-                        <div id="desc"></div>
                     </div>
                 </div>
                 
@@ -449,12 +511,10 @@
                         return;
                     }
                     
-                    // Image et Texte
                     s.innerHTML = '<img src="' + i[cI].img + '">';
                     document.getElementById('tit').innerText = cB + " (" + (cI + 1) + "/" + i.length + ")";
-                    document.getElementById('desc').innerHTML = i[cI].desc || "Aucune description";
+                    document.getElementById('desc').innerHTML = i[cI].desc || "";
                     
-                    // Navigation
                     f.querySelectorAll('.arr').forEach(a => a.remove());
                     if (i.length > 1) {
                         const l = document.createElement('div'); l.className = 'arr al'; l.innerHTML = '❮';
@@ -475,12 +535,9 @@
                 zip.generateAsync({type:"blob"}).then(function(c) {
                     const a = document.createElement('a'); a.href = URL.createObjectURL(c); a.download = safeName + "_FINAL.zip"; a.click();
                     document.getElementById('overlay').style.display='none'; document.getElementById('success-modal').style.display='flex';
-                }).catch(err => {
-                    alert("Erreur ZIP : " + err);
-                    document.getElementById('overlay').style.display='none';
                 });
             } catch(e) {
-                alert("ERREUR : " + e); // Affiche l'erreur si elle persiste
+                alert("ERREUR : " + e);
                 document.getElementById('overlay').style.display='none';
             }
         }, 1000);
