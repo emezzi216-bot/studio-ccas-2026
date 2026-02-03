@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v36 Laptop</title>
+    <title>Studio CCAS | v37 Locked Layout</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
@@ -86,7 +86,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v36</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v37</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
         <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER TOUT</button>
         <div style="display:flex; gap:10px;">
             <button class="btn-usb" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
@@ -153,7 +153,8 @@
         <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin:15px 0; border:1px solid #bae6fd;">
             <strong>Contenu :</strong>
             <ul style="margin:10px 0 0 20px;">
-                <li>📂 <strong>_INTERACTIF.html</strong> : Optimisé pour PC Portable (Image ajustée, Texte visible).</li>
+                <li>📂 <strong>_INTERACTIF.html</strong> : Le rapport final (Lecture seule).</li>
+                <li>Tout est verrouillé (Image en haut, Texte en bas).</li>
             </ul>
         </div>
         <button style="background:var(--blue); color:white; border:none; padding:15px 30px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('success-modal').style.display='none'">FERMER</button>
@@ -161,7 +162,7 @@
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v36')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v37')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
     let canvas, ctx, paintImg, isDrawing=false, startX, startY, currentTool='rect', currentColor='#ff0000', currentWidth=5, paintHistory=[], currentPhotoIndex=null, dragSrcEl = null;
@@ -177,7 +178,7 @@
 
     function notifySave() { const t = document.getElementById('save-toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
     function manualSave() { save(); notifySave(); }
-    function save() { localStorage.setItem('ccas_db_v36', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v37', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
@@ -366,21 +367,25 @@
                 
                 /* ZONE CONTENU (Image + Texte) */
                 .view { 
-                    flex: 1; 
+                    height: 70%; /* IMAGE FIGÉE A 70% */
+                    width: 100%;
+                    padding: 20px;
+                    box-sizing: border-box;
                     display: flex; 
-                    flex-direction: column; 
-                    padding: 15px; 
-                    overflow: hidden; 
+                    align-items: center; 
+                    justify-content: center;
+                    position: relative;
                 }
                 
                 .frame { 
-                    flex: 1; 
-                    display: flex; 
-                    flex-direction: column; 
+                    width: 100%; 
+                    height: 100%; 
                     border: 3px solid #CCA43B; 
                     background: #000; 
                     box-shadow: 0 0 50px rgba(0,0,0,0.8);
                     position: relative;
+                    display: flex;
+                    flex-direction: column;
                 }
                 
                 /* HEADER IMAGE (Fixe en haut de l'image) */
@@ -400,15 +405,16 @@
                 .logo { height: 40px; width: auto; display: block; }
                 .txt { margin: 0; font-size: 9px !important; color: #CCA43B; font-weight: 700; text-transform: uppercase; line-height: 1.1; text-align: left; }
                 
-                /* IMAGE CONTAINER (Flexible mais prioritaire) */
+                /* IMAGE CONTAINER */
                 #sc { 
-                    flex: 2; /* Prend 2/3 de l'espace dispo */
+                    flex: 1; 
                     display: flex; 
                     align-items: center; 
                     justify-content: center; 
                     overflow: hidden; 
                     background: #000;
                     position: relative;
+                    width: 100%;
                 }
                 #sc img { 
                     max-width: 100%; 
@@ -416,13 +422,15 @@
                     object-fit: contain; 
                 }
                 
-                /* TEXTE CONTAINER (En bas, fixe ou flexible) */
+                /* TEXTE CONTAINER (En bas, FIGÉ A 30%) */
                 .bot { 
-                    flex: 0 0 25%; /* Fixe à 25% de la hauteur totale du cadre */
-                    padding: 15px; 
+                    height: 30%; /* TEXTE FIGÉ A 30% */
+                    width: 100%;
+                    padding: 20px; 
                     background: rgba(5,14,36,0.95); 
                     border-top: 2px solid #CCA43B; 
                     overflow-y: auto; 
+                    box-sizing: border-box;
                 }
                 
                 /* NAVIGATION */
@@ -432,10 +440,10 @@
                 
                 /* BOUTON PDF (Rouge Élégant) */
                 .btn-print { 
-                    position: absolute; 
-                    top: 15px; 
-                    right: 20px; 
-                    background: #c0392b; /* Rouge Rubis */
+                    position: fixed; 
+                    bottom: 10px; 
+                    right: 10px; 
+                    background: #c0392b; 
                     color: white; 
                     padding: 8px 15px; 
                     border-radius: 4px; 
@@ -444,7 +452,7 @@
                     font-size: 12px; 
                     cursor: pointer; 
                     z-index: 9999; 
-                    opacity: 0.6; 
+                    opacity: 0.3; 
                     transition: 0.3s;
                 }
                 .btn-print:hover { opacity: 1; transform: scale(1.05); }
@@ -459,10 +467,9 @@
                     body { display: block; overflow: visible; background: #0A1A3C; -webkit-print-color-adjust: exact; }
                     #side, .btn-print, .arr { display: none !important; }
                     #main { height: auto; display: block; }
-                    .view { height: auto; page-break-after: always; padding: 0; margin-bottom: 20px; display: block; }
-                    .frame { height: 100vh; border: 2px solid #CCA43B; page-break-inside: avoid; }
-                    #sc { height: 70%; }
-                    .bot { height: 30%; }
+                    .view { height: 70vh; page-break-after: avoid; padding: 0; margin-bottom: 0; display: flex; }
+                    .frame { height: 100%; border: 2px solid #CCA43B; }
+                    .bot { height: 25vh; border: 2px solid #CCA43B; border-top: none; page-break-after: always; }
                 }
                 </style></head><body>
                 
@@ -474,11 +481,11 @@
                         <div class="frame" id="fr">
                             <div class="top-zone"><img src="${finalLogo}" class="logo"><div class="txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div>
                             <div id="sc"></div>
-                            <div class="bot">
-                                <h2 id="tit"></h2>
-                                <div id="desc"></div>
-                            </div>
                         </div>
+                    </div>
+                    <div class="bot">
+                        <h2 id="tit"></h2>
+                        <div id="desc"></div>
                     </div>
                 </div>
                 
@@ -513,7 +520,11 @@
                     
                     s.innerHTML = '<img src="' + i[cI].img + '">';
                     document.getElementById('tit').innerText = cB + " (" + (cI + 1) + "/" + i.length + ")";
-                    document.getElementById('desc').innerHTML = i[cI].desc || "";
+                    
+                    // GESTION PLACEHOLDER
+                    let txt = i[cI].desc || "";
+                    if(txt.includes("Cliquez ici pour écrire...")) txt = "";
+                    document.getElementById('desc').innerHTML = txt;
                     
                     f.querySelectorAll('.arr').forEach(a => a.remove());
                     if (i.length > 1) {
