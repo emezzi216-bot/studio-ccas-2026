@@ -1,257 +1,407 @@
-<!DOCTYPE html><html lang="fr"><head>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
     <meta charset="UTF-8">
-    <title>STUDIO CCAS | Expertise Totale</title>
+    <title>Studio CCAS | v17 Maman</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
     <style>
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f7f9; --green: #27ae60; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* HEADER */
-        .main-header { background: var(--blue); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--gold); z-index: 100; }
-        .save-indicator { font-size: 0.8rem; background: rgba(39, 174, 96, 0.2); color: #2ecc71; padding: 5px 12px; border-radius: 20px; font-weight: bold; }
+        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; --panel: #ffffff; --green: #27ae60; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
 
+        /* GENERAL UI */
+        button { cursor: pointer; transition: 0.1s; }
+        button:active { transform: scale(0.98); }
+        
         /* DASHBOARD */
-        #view-dashboard { flex:1; padding: 40px; overflow-y: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .folder-card { background: white; border-radius: 12px; padding: 25px; text-align: center; cursor: grab; border: 1px solid #ddd; position: relative; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .folder-card:active { cursor: grabbing; }
-        .folder-card.dragging { opacity: 0.5; border: 2px dashed var(--gold); }
-        .del-btn { position: absolute; top: 8px; right: 10px; color: #e74c3c; cursor: pointer; font-weight: bold; font-size: 1.2rem; }
+        #view-dashboard { flex: 1; padding: 30px; display: flex; flex-direction: column; }
+        .header { background: var(--panel); padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 3px solid var(--gold); }
+        
+        .save-indicator { font-weight: bold; color: var(--green); display: flex; align-items: center; gap: 5px; opacity: 0; transition: opacity 0.5s; font-size: 14px; }
+        .save-indicator.visible { opacity: 1; }
+
+        .btn-big { padding: 12px 25px; border: none; border-radius: 6px; font-weight: bold; background: #eef2ff; color: var(--blue); border: 1px solid var(--blue); display:flex; align-items:center; gap:10px; }
+        .btn-big:hover { background: var(--blue); color: white; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; overflow-y: auto; padding: 10px; }
+        .card { background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
+        .card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .card.dragging { opacity: 0.4; border: 2px dashed var(--blue); }
+        
+        .del-btn { position: absolute; top: 8px; right: 8px; color: #ff4d4d; font-weight: bold; width: 28px; height: 28px; background:#fff0f0; border-radius:50%; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .drag-handle-card { cursor: grab; color: #ccc; font-size: 20px; margin-bottom: 5px; }
+        .drag-handle-card:hover { color: var(--blue); }
 
         /* STUDIO */
-        #view-studio { display: none; height: calc(100vh - 75px); flex-direction: row; }
-        #sidebar { width: 300px; background: var(--blue); border-right: 2px solid var(--gold); display: flex; flex-direction: column; color: white; }
-        .bat-nav-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: move; display: flex; justify-content: space-between; }
-        .bat-nav-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
+        #view-studio { display: none; height: 100vh; flex-direction: row; }
+        #sidebar { width: 280px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 10px rgba(0,0,0,0.2); }
+        .back-home { padding: 18px; background: rgba(255,255,255,0.05); color: var(--gold); font-weight: bold; cursor: pointer; border: none; text-align: left; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .back-home:hover { background: rgba(255,255,255,0.1); }
         
-        #editor-content { flex: 1; background: #0A1A3C; display: flex; flex-direction: column; }
-        .toolbar-top { background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+        #editor-main { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
+        .top-bar { background: white; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; height: 65px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        .photo-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; margin: 0 30px 20px 30px; display: flex; gap: 20px; border-left: 5px solid var(--gold); color: white; cursor: move; }
-        .img-container img { width: 200px; height: 140px; object-fit: cover; border-radius: 4px; border: 1px solid var(--gold); }
+        .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; overflow: hidden; }
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
         
-        .text-area { flex: 1; min-height: 100px; padding: 15px; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; outline: none; background: rgba(0,0,0,0.2); color: white; font-size: 1rem; }
-        .btn-expert { background: var(--green); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .gen-btn { background: linear-gradient(135deg, var(--blue), #1a2b50); color: white; padding: 10px 30px; border-radius: 30px; border: none; font-weight: bold; box-shadow: 0 4px 10px rgba(10, 26, 60, 0.3); }
+        .gen-btn:hover { transform: scale(1.05); }
 
-        /* OVERLAY COURAGE */
-        #overlay { position: fixed; inset: 0; background: var(--blue); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .img-courage { width: 220px; height: 220px; border-radius: 50%; border: 5px solid var(--gold); object-fit: cover; margin-bottom: 20px; }
+        .content-area { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
+        
+        /* EDITOR CARDS */
+        .photo-block { background: white; padding: 20px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 20px; border: 1px solid #ddd; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: 0.2s; }
+        .photo-block.dragging { opacity: 0.5; border: 2px dashed var(--blue); transform: scale(0.98); }
+        .drag-handle { cursor: grab; font-size: 24px; color: #ccc; display: flex; align-items: center; justify-content: center; padding-right: 10px; }
+        
+        .photo-col { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 240px; flex-shrink: 0; }
+        .photo-img { width: 100%; height: 160px; object-fit: contain; border: 1px solid #eee; background: #fafafa; border-radius: 4px; cursor: pointer; }
+        .btn-edit-photo { background: #333; color: white; border: none; padding: 8px 0; border-radius: 4px; width: 100%; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-edit-photo:hover { background: var(--gold); color: black; }
+        
+        .del-p-btn { position: absolute; top: -12px; right: -12px; background: #ff4d4d; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; border:3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5; }
+        
+        .toolbar { display: flex; gap: 4px; margin-bottom: 8px; background: #f8f9fa; padding: 6px; border-radius: 6px; border: 1px solid #e9ecef; flex-wrap: wrap; }
+        .toolbar button { width: 30px; height: 30px; border: 1px solid transparent; background: white; border-radius: 4px; font-weight: bold; font-size: 13px; color: #444; border-color: #ddd; }
+        .toolbar button:hover { background: #e2e6ea; border-color: #adb5bd; }
+        .rich-text { min-height: 130px; border: 1px solid #ccc; padding: 12px; border-radius: 6px; font-size: 14px; overflow-y: auto; background: #fff; line-height: 1.5; color: #333; cursor: text; }
+        .rich-text:focus { border-color: var(--blue); outline: none; background: #fdfdff; }
+
+        .bat-item { padding: 12px; margin-bottom: 6px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; justify-content: space-between; border-radius: 6px; color: #ccc; }
+        .bat-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; border-left: 4px solid #fff; }
+        .bat-item.dragging { opacity: 0.5; background: rgba(255,255,255,0.2); }
+
+        /* PAINT MODAL */
+        #paint-modal { position: fixed; inset: 0; background: rgba(20, 20, 25, 0.95); z-index: 20000; display: none; flex-direction: column; }
+        .paint-header { height: 60px; background: #333; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #555; }
+        .paint-toolbar { height: 70px; background: #444; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 0 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .tool-group { display: flex; gap: 5px; background: #333; padding: 5px; border-radius: 8px; align-items: center; }
+        .p-btn { width: 40px; height: 40px; border: 1px solid #555; background: #444; border-radius: 5px; color: white; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .p-btn.active { background: var(--gold); color: black; border-color: var(--gold); }
+        .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .color-swatch.active { border-color: white; box-shadow: 0 0 0 2px var(--blue); }
+        #paint-canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #222; }
+        #paint-canvas { box-shadow: 0 0 30px rgba(0,0,0,0.5); background: transparent; cursor: crosshair; }
+
+        /* OVERLAYS */
+        #overlay, #success-modal { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .success-box { background: white; width: 600px; padding: 40px; border-radius: 15px; text-align: left; color: #333; border-top: 6px solid var(--green); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        #photo-courage { width: 300px; height: 300px; border-radius: 50%; border: 8px solid var(--gold); object-fit: cover; cursor: pointer; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.02);} 100% {transform: scale(1);} }
     </style>
 </head>
 <body>
 
-<img src="Logo_Créteil_Val_Marne.svg.png" id="sys-logo" style="display:none" crossorigin="anonymous">
-
-<div class="main-header">
-    <div style="display:flex; align-items:center; gap:20px;">
-        <h2 style="margin:0; letter-spacing:1px;">STUDIO <span style="color:var(--gold)">CCAS</span></h2>
-        <div id="status" class="save-indicator">✅ TRAVAIL SAUVEGARDÉ</div>
-    </div>
-    <div style="text-align:right;">
-        <div style="font-size:0.7rem; color:var(--gold); font-weight:bold;">DIRECTION GÉNÉRALE DES FINANCES</div>
-        <div style="font-size:0.6rem; opacity:0.8;">HÔTEL DE VILLE DE CRÉTEIL</div>
-    </div>
-</div>
+<input type="file" id="import-input" style="display:none" onchange="loadFile(this)">
+<input type="file" id="photo-input" style="display:none" multiple onchange="processPhotos(this)">
+<input type="file" id="courage-input" style="display:none" onchange="updateCourage(this)">
+<input type="file" id="logo-input" style="display:none" onchange="updateLogo(this)">
 
 <div id="view-dashboard">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h1 style="color:var(--blue); margin:0;">Mes Dossiers (Glisser pour ordonner)</h1>
-        <button onclick="createProj()" style="background:var(--blue); color:white; border:none; padding:15px 30px; border-radius:8px; font-weight:bold; cursor:pointer;">+ NOUVEAU DOSSIER</button>
+    <div class="header">
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:14px; opacity:0.6;">v17</span></h1><p style="margin:0;color:#666">Direction des Finances</p></div>
+        
+        <div id="save-badge" class="save-indicator">✅ Sauvegardé</div>
+
+        <div style="display:flex; gap:10px;">
+            <button class="btn-big" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
+            <button class="btn-big" onclick="document.getElementById('import-input').click()">📂 OUVRIR USB</button>
+        </div>
     </div>
     <div id="grid-projects" class="grid"></div>
 </div>
 
 <div id="view-studio">
     <div id="sidebar">
-        <button onclick="goDashboard()" style="padding:20px; background:rgba(255,255,255,0.1); border:none; color:white; cursor:pointer; font-weight:bold;">🏠 RETOUR À L'ACCUEIL</button>
-        <div id="list-bat" style="flex:1; overflow-y:auto;"></div>
-        <button onclick="newBat()" style="padding:20px; background:var(--gold); color:var(--blue); border:none; font-weight:bold; cursor:pointer;">+ AJOUTER UN BÂTIMENT</button>
+        <button class="back-home" onclick="goDashboard()">🏠 REVENIR AUX DOSSIERS</button>
+        <div style="padding:20px; text-align:center; color:var(--gold); font-weight:bold; font-size:1.1rem;" id="lbl-proj">Projet</div>
+        <div id="list-bat" style="flex:1; overflow-y:auto; padding:10px;"></div>
+        <div style="padding:20px;"><button onclick="newBat()" style="width:100%; padding:12px; background:transparent; border:2px dashed var(--gold); color:white; font-weight:bold; cursor:pointer; border-radius:6px;">+ AJOUTER BÂTIMENT</button></div>
     </div>
-    <div id="editor-content">
-        <div class="toolbar-top">
-            <h2 id="lbl-bat" style="margin:0; color:var(--blue);">Bâtiment</h2>
-            <button class="btn-expert" onclick="generateReport()">🚀 GÉNÉRER LE RAPPORT FINAL</button>
+    <div id="editor-main">
+        <div class="top-bar">
+            <div class="logo-box" onclick="document.getElementById('logo-input').click()" title="Changer le logo"><img id="logo-preview" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'"></div>
+            <div id="lbl-bat" style="font-weight:bold; color:var(--blue); font-size:1.3rem;">Accueil</div>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <div id="save-badge-studio" class="save-indicator">✅ Sauvegardé</div>
+                <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER ZIP (MAIL)</button>
+            </div>
         </div>
-        <div id="area-photos" style="flex:1; padding-top:30px; overflow-y:auto;"></div>
+        <div id="area-photos" class="content-area"></div>
     </div>
+</div>
+
+<div id="paint-modal">
+    <div class="paint-header">
+        <div style="color:white; font-weight:bold;">🎨 RETOUCHE PHOTO</div>
+        <div style="display:flex; gap:10px;">
+            <button onclick="savePaint()" style="background:var(--gold); border:none; padding:8px 20px; border-radius:4px; font-weight:bold;">💾 ENREGISTRER</button>
+            <button onclick="closePaint()" style="background:#555; color:white; border:none; padding:8px 20px; border-radius:4px;">Annuler</button>
+        </div>
+    </div>
+    <div class="paint-toolbar">
+        <div class="tool-group">
+            <button class="p-btn active" onclick="setTool('rect')">⬜</button>
+            <button class="p-btn" onclick="setTool('circle')">⭕</button>
+            <button class="p-btn" onclick="setTool('arrow')">↗️</button>
+            <button class="p-btn" onclick="undoPaint()">↩️</button>
+        </div>
+        <div class="tool-group">
+            <div class="color-swatch active" style="background:#ff0000;" onclick="setColor('#ff0000', this)"></div>
+            <div class="color-swatch" style="background:#ffff00;" onclick="setColor('#ffff00', this)"></div>
+            <div class="color-swatch" style="background:#00ff00;" onclick="setColor('#00ff00', this)"></div>
+            <div class="color-swatch" style="background:#ffffff;" onclick="setColor('#ffffff', this)"></div>
+            <input type="color" onchange="setColor(this.value, null)" style="width:30px; height:30px; border:none; padding:0; background:none;">
+        </div>
+        <div class="tool-group" style="color:white; font-size:12px; padding:0 15px;">
+            Épaisseur<br><input type="range" min="2" max="20" value="5" oninput="setLineWidth(this.value)" style="width:100px;">
+        </div>
+    </div>
+    <div id="paint-canvas-container"><canvas id="paint-canvas"></canvas></div>
 </div>
 
 <div id="overlay">
-    <img src="courage.jpg.JPG" class="img-courage" onerror="this.src='https://via.placeholder.com/200?text=COURAGE'">
-    <h2 style="color:var(--gold);">COURAGE MAMAN ! ❤️</h2>
-    <p>Ton superbe rapport est en préparation...</p>
+    <img src="courage.jpg.JPG" id="photo-courage" onclick="document.getElementById('courage-input').click()" onerror="this.src='https://via.placeholder.com/300?text=PHOTO+MANQUANTE'">
+    <h2 style="color:var(--gold); margin-top:20px;">COURAGE MAMIE ! ❤️</h2>
+    <p>Création du dossier ZIP en cours...</p>
 </div>
 
-<input type="file" id="photo-input" style="display:none" multiple onchange="processPhotos(this)">
+<div id="success-modal">
+    <div class="success-box">
+        <h2 style="color:var(--blue); margin:0 0 15px 0;">📦 Dossier ZIP prêt !</h2>
+        <p style="font-size:1.1rem; line-height:1.6; color:#555;">Le fichier <strong>Dossier_Final.zip</strong> est dans <strong>Téléchargements</strong>.</p>
+        <button style="background:var(--blue); color:white; border:none; padding:12px 20px; font-weight:bold; cursor:pointer; width:100%; border-radius:6px; margin-top:25px;" onclick="document.getElementById('success-modal').style.display='none'">OK, C'EST NOTÉ</button>
+    </div>
+</div>
 
 <script>
-    const CLOUD_ID = "ccas_maman_ultra_v20"; 
-    let db = JSON.parse(localStorage.getItem('ccas_db_v20')) || { order: [], projects: {} };
-    let curP = null, curB = null, logoData = "";
+    // --- COEUR DU SYSTEME ---
+    let db = JSON.parse(localStorage.getItem('ccas_db_v17')) || {};
+    let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
+    let curP = null, curB = null;
+    let canvas, ctx, paintImg, isDrawing = false, startX, startY, currentTool = 'rect', currentColor = '#ff0000', currentWidth = 5, paintHistory = [], currentPhotoIndex = null;
+    let dragSrcEl = null;
 
-    window.onload = () => { refreshGrid(); getLogo(); syncCloud(); };
+    window.onload = () => {
+        refreshGrid();
+        if(appConfig.logo) document.getElementById('logo-preview').src = appConfig.logo;
+        if(appConfig.courage) document.getElementById('photo-courage').src = appConfig.courage;
+        if(!appConfig.logo) { const img = document.getElementById('logo-preview'); if(img.complete && img.naturalWidth > 0) imgTo64(img, r => { appConfig.logo = r; saveConfig(); }); }
+        canvas = document.getElementById('paint-canvas'); ctx = canvas.getContext('2d');
+        canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); window.addEventListener('mouseup', stopDraw);
+    };
 
-    function getLogo() {
-        const img = document.getElementById('sys-logo');
-        img.onload = () => {
-            const c = document.createElement('canvas');
-            c.width = img.width; c.height = img.height;
-            c.getContext('2d').drawImage(img, 0, 0);
-            logoData = c.toDataURL();
-        };
+    function showSave() {
+        const els = document.querySelectorAll('.save-indicator');
+        els.forEach(el => { el.classList.add('visible'); setTimeout(() => el.classList.remove('visible'), 2000); });
     }
 
-    async function syncCloud() {
-        try {
-            await fetch(`https://api.keyvalue.xyz/${CLOUD_ID}/data`, { method: 'POST', body: JSON.stringify(db) });
-            document.getElementById('status').innerText = "✅ SAUVEGARDE CLOUD OK";
-        } catch (e) {
-            const res = await fetch(`https://api.keyvalue.xyz/${CLOUD_ID}/data`);
-            if(res.ok) { db = await res.json(); refreshGrid(); }
-        }
+    function save() { 
+        localStorage.setItem('ccas_db_v17', JSON.stringify(db)); 
+        showSave(); 
     }
+    function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
+    function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
+    function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
+    function updateCourage(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('photo-courage').src=e.target.result; appConfig.courage=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
 
-    function save() {
-        localStorage.setItem('ccas_db_v20', JSON.stringify(db));
-        document.getElementById('status').innerText = "⏳ ENREGISTREMENT...";
-        syncCloud();
-    }
-
-    // --- GESTION DES DOSSIERS ---
+    // --- DASHBOARD AVEC DRAG & DROP ---
     function refreshGrid() {
-        const g = document.getElementById('grid-projects'); g.innerHTML = '';
-        (db.order || []).forEach(id => {
-            const p = db.projects[id];
-            if(!p) return;
+        const g = document.getElementById('grid-projects');
+        g.innerHTML = `<div class="card" onclick="createProj()" style="border:2px dashed #ccc; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#888;"><h1>+</h1><div>NOUVEAU</div></div>`;
+        
+        // Convertir en tableau et trier par 'order' (ou date si pas d'order)
+        let keys = Object.keys(db).sort((a,b) => (db[a].order || db[a].date) - (db[b].order || db[b].date));
+        
+        keys.forEach(id => {
+            const p = db[id];
             const div = document.createElement('div');
-            div.className = 'folder-card';
+            div.className = 'card';
             div.draggable = true;
-            div.innerHTML = `<div class="del-btn" onclick="event.stopPropagation(); deleteProj('${id}')">×</div>
-                             <div style="font-size:2.5rem;">📁</div><h3 style="margin:10px 0 0 0;">${p.name}</h3>`;
-            div.onclick = () => openProj(id);
-            div.ondragstart = (e) => { e.dataTransfer.setData('text/plain', id); div.classList.add('dragging'); };
-            div.ondragend = () => div.classList.remove('dragging');
-            div.ondragover = (e) => e.preventDefault();
-            div.ondrop = (e) => {
-                e.preventDefault();
-                const draggedId = e.dataTransfer.getData('text/plain');
-                const fromIdx = db.order.indexOf(draggedId);
-                const toIdx = db.order.indexOf(id);
-                db.order.splice(fromIdx, 1);
-                db.order.splice(toIdx, 0, draggedId);
-                save(); refreshGrid();
+            div.dataset.id = id;
+            
+            // Events Drag Projet
+            div.ondragstart = function(e) { dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); };
+            div.ondragover = function(e) { if(e.preventDefault) e.preventDefault(); return false; };
+            div.ondragleave = function(e) { this.classList.remove('drag-over'); };
+            div.ondrop = function(e) {
+                if(e.stopPropagation) e.stopPropagation();
+                this.classList.remove('dragging');
+                if(dragSrcEl !== this) {
+                    // Réorganisation
+                    let allCards = Array.from(g.querySelectorAll('.card:not(:first-child)'));
+                    let srcIdx = allCards.indexOf(dragSrcEl);
+                    let targetIdx = allCards.indexOf(this);
+                    if(srcIdx < targetIdx) { this.after(dragSrcEl); } else { this.before(dragSrcEl); }
+                    
+                    // Sauvegarde du nouvel ordre
+                    let newOrderCards = Array.from(g.querySelectorAll('.card:not(:first-child)'));
+                    newOrderCards.forEach((card, index) => {
+                        db[card.dataset.id].order = index;
+                    });
+                    save();
+                }
+                return false;
             };
+            div.ondragend = function() { this.classList.remove('dragging'); };
+
+            div.innerHTML = `<div class="del-btn" onclick="delProj('${id}', event)">×</div>
+                             <div class="drag-handle-card">⠿</div>
+                             <div style="font-size:2rem;">📁</div>
+                             <div style="font-weight:bold; color:#0A1A3C;">${p.name}</div>
+                             <div style="color:#888; font-size:0.8rem;">${new Date(p.date).toLocaleDateString()}</div>`;
+            div.onclick = (e) => { if(!e.target.closest('.del-btn') && !e.target.closest('.drag-handle-card')) openProj(id); };
             g.appendChild(div);
         });
     }
 
-    function createProj() {
-        const n = prompt("Nom du dossier :");
-        if(n) {
-            const id = "p" + Date.now();
-            db.projects[id] = { name: n, data: {}, batOrder: [] };
-            db.order.push(id);
-            save(); refreshGrid();
-        }
+    function createProj() { 
+        const n = prompt("Nom du dossier (ex: Crèche Jaurès) :"); 
+        if(n) { 
+            const id = Date.now().toString(); 
+            // Ordre = à la fin
+            const maxOrder = Object.values(db).length > 0 ? Math.max(...Object.values(db).map(o => o.order || 0)) : 0;
+            db[id] = { name:n, date:Date.now(), order: maxOrder + 1, data:{} }; 
+            save(); openProj(id); 
+        } 
+    }
+    
+    function delProj(id, e) { 
+        e.stopPropagation(); 
+        if(confirm("Supprimer ce dossier définitivement ?")) { delete db[id]; save(); refreshGrid(); } 
     }
 
-    function deleteProj(id) { if(confirm("Supprimer ce dossier définitivement ?")) { delete db.projects[id]; db.order = db.order.filter(x => x !== id); save(); refreshGrid(); } }
+    function saveToUSB() { const d = { db: db, config: appConfig }; const b = new Blob([JSON.stringify(d)], {type: "application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `CCAS_SAUVEGARDE_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); }
+    function loadFile(i) { const f = i.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { try { const j = JSON.parse(e.target.result); if(j.config) { appConfig = j.config; db = { ...db, ...j.db }; saveConfig(); } else { db = { ...db, ...j }; } save(); refreshGrid(); alert("Dossiers récupérés !"); } catch(err) { alert("Erreur fichier"); } }; r.readAsText(f); }
 
-    function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; refreshSide(); refreshMain(); }
-    function goDashboard() { document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
-
-    // --- GESTION BÂTIMENTS ---
-    function newBat() {
-        const n = prompt("Nom du bâtiment :");
-        if(n) {
-            if(!db.projects[curP].data[n]) {
-                db.projects[curP].data[n] = [];
-                db.projects[curP].batOrder.push(n);
-                save(); openBat(n);
-            }
-        }
+    // --- STUDIO ---
+    function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; document.getElementById('lbl-proj').innerText = db[id].name; refreshSide(); refreshMain(); }
+    function goDashboard() { curP = null; document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
+    function newBat() { const n = prompt("Nom du bâtiment :"); if(n) { if(!db[curP].data[n]) { db[curP].data[n] = []; save(); openBat(n); refreshSide(); } else alert("Existe déjà"); } }
+    
+    function refreshSide() { 
+        const l = document.getElementById('list-bat'); l.innerHTML = ''; 
+        // Bâtiments triables ? Pour l'instant on garde l'ordre de création/alpha ou simple
+        Object.keys(db[curP].data).forEach(b => { 
+            const d = document.createElement('div'); d.className = `bat-item ${curB === b ? 'active' : ''}`; 
+            d.innerHTML = `<span>${b}</span><span onclick="delBat('${b}', event)" style="color:#ff6b6b; font-weight:bold; padding:0 5px;">×</span>`; 
+            d.onclick = () => openBat(b); l.appendChild(d); 
+        }); 
     }
-
-    function refreshSide() {
-        const l = document.getElementById('list-bat'); l.innerHTML = '';
-        (db.projects[curP].batOrder || []).forEach(b => {
-            const div = document.createElement('div');
-            div.className = 'bat-nav-item' + (curB === b ? ' active' : '');
-            div.innerHTML = `<span>${b}</span><span onclick="event.stopPropagation(); deleteBat('${b}')">×</span>`;
-            div.onclick = () => openBat(b);
-            l.appendChild(div);
-        });
-    }
-
-    function deleteBat(b) { if(confirm("Supprimer ce bâtiment ?")) { delete db.projects[curP].data[b]; db.projects[curP].batOrder = db.projects[curP].batOrder.filter(x => x !== b); save(); refreshSide(); refreshMain(); } }
+    
+    function delBat(b, e) { e.stopPropagation(); if(confirm("Supprimer "+b+" ?")) { delete db[curP].data[b]; if(curB === b) curB = null; save(); refreshSide(); refreshMain(); } }
     function openBat(b) { curB = b; document.getElementById('lbl-bat').innerText = b; refreshSide(); refreshMain(); }
 
     function refreshMain() {
-        const area = document.getElementById('area-photos'); area.innerHTML = '';
-        if(!curB) return;
-        area.innerHTML = `<button onclick="document.getElementById('photo-input').click()" style="width:calc(100% - 60px); padding:20px; margin:0 30px 20px 30px; cursor:pointer; font-weight:bold; background:white; border:2px dashed var(--gold); border-radius:8px;">📸 CLIQUEZ ICI POUR AJOUTER LES PHOTOS</button>`;
-        db.projects[curP].data[curB].forEach((p, i) => {
-            const div = document.createElement('div'); div.className = 'photo-card';
-            div.innerHTML = `<div class="img-container"><img src="${p.img}"></div>
-                <div class="text-area" contenteditable="true" oninput="db.projects[curP].data['${curB}'][${i}].desc=this.innerHTML; save()">${p.desc}</div>
-                <div onclick="db.projects[curP].data['${curB}'].splice(${i},1); save(); refreshMain();" style="color:red; cursor:pointer; font-weight:bold;">🗑️</div>`;
+        const area = document.getElementById('area-photos');
+        if(!curB) { area.innerHTML = '<div style="text-align:center; color:#999; margin-top:50px;">Sélectionnez un bâtiment.</div>'; return; }
+        area.innerHTML = `<div onclick="document.getElementById('photo-input').click()" style="padding:30px; border:3px dashed #ddd; text-align:center; background:white; cursor:pointer; margin-bottom:30px; font-weight:bold; color:#888; border-radius:10px;">📸 AJOUTER DES PHOTOS ICI</div>`;
+        db[curP].data[curB].forEach((p, idx) => {
+            const div = document.createElement('div');
+            div.className = 'photo-block';
+            div.draggable = true;
+            div.dataset.index = idx;
+            div.ondragstart = function(e){ dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); };
+            div.ondragover = function(e){ if(e.preventDefault) e.preventDefault(); return false; };
+            div.ondrop = function(e){
+                if(e.stopPropagation) e.stopPropagation();
+                if(dragSrcEl !== this && dragSrcEl.classList.contains('photo-block')) {
+                    const oldIdx = parseInt(dragSrcEl.dataset.index);
+                    const newIdx = parseInt(this.dataset.index);
+                    const arr = db[curP].data[curB];
+                    const item = arr.splice(oldIdx, 1)[0];
+                    arr.splice(newIdx, 0, item);
+                    save(); refreshMain();
+                }
+                return false;
+            };
+            div.ondragend = function(){ this.classList.remove('dragging'); };
+
+            div.innerHTML = `
+                <div class="del-p-btn" onclick="delPhoto(${idx})">×</div>
+                <div class="drag-handle" title="Glisser pour déplacer">⠿</div>
+                <div class="photo-col">
+                    <img src="${p.img}" class="photo-img" onclick="openPaint(${idx})">
+                    <button class="btn-edit-photo" onclick="openPaint(${idx})">🎨 RETOUCHER</button>
+                </div>
+                <div style="flex:1">
+                    <div class="toolbar">
+                        <button onclick="cmd('bold')"><b>B</b></button><button onclick="cmd('italic')"><i>I</i></button><button onclick="cmd('underline')"><u>U</u></button>
+                        <div style="width:1px; background:#ccc; margin:0 5px;"></div>
+                        <input type="color" onchange="cmd('foreColor', this.value)" style="height:28px; width:30px;">
+                        <button onclick="cmd('hiliteColor', 'yellow')" style="background:yellow;">🖍️</button>
+                        <div style="width:1px; background:#ccc; margin:0 5px;"></div>
+                        <button onclick="cmd('insertUnorderedList')">• Liste</button>
+                        <select onchange="cmd('fontSize', this.value)" style="height:28px; border:1px solid #ccc; border-radius:3px;"><option value="3">Taille Normale</option><option value="5">Grand</option><option value="6">Très Grand</option></select>
+                    </div>
+                    <div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)">${p.desc}</div>
+                </div>`;
             area.appendChild(div);
         });
     }
 
-    function processPhotos(input) {
-        Array.from(input.files).forEach(f => {
-            const r = new FileReader();
-            r.onload = e => { db.projects[curP].data[curB].push({img: e.target.result, desc: "Notes..."}); save(); refreshMain(); };
-            r.readAsDataURL(f);
-        });
-    }
+    function cmd(c, v=null) { document.execCommand(c, false, v); }
+    function processPhotos(i) { Array.from(i.files).forEach(f => { const r = new FileReader(); r.onload = e => { db[curP].data[curB].push({img: e.target.result, desc: ""}); save(); refreshMain(); }; r.readAsDataURL(f); }); }
+    function delPhoto(idx) { if(confirm("Supprimer ?")) { db[curP].data[curB].splice(idx, 1); save(); refreshMain(); } }
+    function updateTxt(idx, h) { db[curP].data[curB][idx].desc = h; save(); }
 
-    function generateReport() {
-        const proj = db.projects[curP];
-        document.getElementById('overlay').style.display = 'flex';
+    // --- PAINT ---
+    function openPaint(idx) {
+        currentPhotoIndex = idx; const src = db[curP].data[curB][idx].img; paintImg = new Image();
+        paintImg.onload = () => {
+            const maxW = window.innerWidth * 0.8, maxH = window.innerHeight * 0.7;
+            let w = paintImg.width, h = paintImg.height, r = Math.min(maxW/w, maxH/h);
+            w *= r; h *= r; canvas.width = w; canvas.height = h;
+            ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.drawImage(paintImg, 0, 0, w, h);
+            saveHistory(); document.getElementById('paint-modal').style.display = 'flex';
+        }; paintImg.src = src;
+    }
+    function setTool(t) { currentTool = t; document.querySelectorAll('.p-btn').forEach(b=>b.classList.remove('active')); event.currentTarget.classList.add('active'); }
+    function setColor(c, el) { currentColor = c; if(el){ document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active')); el.classList.add('active'); } }
+    function setLineWidth(w) { currentWidth = w; }
+    function saveHistory() { paintHistory.push(canvas.toDataURL()); if(paintHistory.length>8) paintHistory.shift(); }
+    function undoPaint() { if(paintHistory.length>1) { paintHistory.pop(); let i = new Image(); i.onload=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(i,0,0);}; i.src = paintHistory[paintHistory.length-1]; } }
+    function startDraw(e) { isDrawing=true; const r=canvas.getBoundingClientRect(); startX=e.clientX-r.left; startY=e.clientY-r.top; saveHistory(); }
+    function draw(e) {
+        if(!isDrawing) return; const r=canvas.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+        let i=new Image(); i.src=paintHistory[paintHistory.length-1]; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(i,0,0);
+        ctx.strokeStyle=currentColor; ctx.lineWidth=currentWidth; ctx.beginPath();
+        if(currentTool==='circle'){ let rad=Math.sqrt(Math.pow(x-startX,2)+Math.pow(y-startY,2)); ctx.arc(startX,startY,rad,0,2*Math.PI); ctx.stroke(); }
+        else if(currentTool==='rect'){ ctx.strokeRect(startX,startY,x-startX,y-startY); }
+        else if(currentTool==='arrow'){ const h=15+currentWidth*0.5, a=Math.atan2(y-startY,x-startX); ctx.moveTo(startX,startY); ctx.lineTo(x,y); ctx.lineTo(x-h*Math.cos(a-Math.PI/6),y-h*Math.sin(a-Math.PI/6)); ctx.moveTo(x,y); ctx.lineTo(x-h*Math.cos(a+Math.PI/6),y-h*Math.sin(a+Math.PI/6)); ctx.stroke(); }
+    }
+    function stopDraw() { isDrawing=false; }
+    function savePaint() { db[curP].data[curB][currentPhotoIndex].img=canvas.toDataURL('image/jpeg',0.9); save(); closePaint(); refreshMain(); }
+    function closePaint() { document.getElementById('paint-modal').style.display='none'; paintHistory=[]; }
+
+    // --- ZIP ---
+    function generateZip() {
+        if(!window.JSZip) { alert("Erreur moteur ZIP"); return; }
+        const proj = db[curP]; document.getElementById('overlay').style.display='flex';
+        const finalLogo = appConfig.logo || "";
         setTimeout(() => {
-            const reportHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
-                body{font-family:sans-serif;margin:0;display:flex;height:100vh;background:#050E24;color:white;overflow:hidden}
-                #side{width:260px;background:#0A1A3C;border-right:3px solid #CCA43B}
-                .btn{width:100%;padding:18px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #1f2d40}
-                .btn.active{color:#CCA43B;background:rgba(204,164,59,0.1);border-left:5px solid #CCA43B;font-weight:bold}
-                #main{flex:1;display:flex;flex-direction:column;position:relative;background:radial-gradient(circle at center, #142850, #050E24)}
-                .top-logo{position:absolute;top:20px;right:25px;display:flex;align-items:center;gap:12px;background:rgba(10,26,60,0.9);padding:10px 15px;border:1px solid #CCA43B;border-radius:6px}
-                .logo-img{width:55px}
-                .logo-txt{font-size:9px;font-weight:bold;color:#CCA43B;line-height:1.2;text-transform:uppercase}
-                .frame{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
-                .frame img{max-width:95%;max-height:95%;border:3px solid #CCA43B;box-shadow:0 0 50px #000;border-radius:4px}
-                .bot{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:3px solid #CCA43B;min-height:120px}
-                .arr{position:absolute;top:50%;transform:translateY(-50%);background:#CCA43B;color:#0A1A3C;width:55px;height:55px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-weight:bold;font-size:24px}
-            </style></head><body>
-                <div id="side"><div style="padding:25px;color:#CCA43B;font-weight:bold;font-size:18px;border-bottom:1px solid #1f2d40">${proj.name}</div><div id="nav"></div></div>
-                <div id="main">
-                    <div class="top-logo"><img src="${logoData}" class="logo-img"><div class="logo-txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div>
-                    <div class="frame" id="fr"><div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div></div>
-                    <div class="bot"><h2 id="tit" style="color:#CCA43B;margin:0 0 10px 0;text-transform:uppercase;letter-spacing:1px"></h2><div id="desc" style="font-size:1.3rem;line-height:1.5"></div></div>
-                </div>
-                <script>
-                const data = ${JSON.stringify(proj.data)}; let cB = Object.keys(data)[0], cI = 0;
-                function sh(){
-                    const s=document.getElementById('sc'),f=document.getElementById('fr'),i=data[cB];
-                    if(!i||!i.length)return;
-                    s.innerHTML='<img src="'+i[cI].img+'">';
-                    document.getElementById('tit').innerText=cB; document.getElementById('desc').innerHTML=i[cI].desc;
-                    document.querySelectorAll('.arr').forEach(a=>a.remove());
-                    if(i.length>1){
-                        const l=document.createElement('div');l.className='arr';l.style.left='25px';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};
-                        const r=document.createElement('div');r.className='arr';r.style.right='25px';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};
-                        f.appendChild(l);f.appendChild(r);
-                    }
-                }
-                function rn(){const n=document.getElementById('nav');n.innerHTML='';Object.keys(data).forEach(k=>{const b=document.createElement('button');b.className='btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rn()};n.appendChild(b)})}
-                window.onload=()=>{if(cB){rn();sh()}};
-                <\/script></body></html>`;
-            
-            const b = new Blob([reportHtml], {type: 'text/html'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = proj.name + "_INTERACTIF.html"; a.click();
-            document.getElementById('overlay').style.display='none';
+            const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
+            const h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
+            body{font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;background:#000;color:#F4F7FD;overflow:hidden}
+            #side{width:280px;background:#050E24;border-right:3px solid #CCA43B;display:flex;flex-direction:column;z-index:10;box-shadow:5px 0 15px rgba(0,0,0,0.5)}
+            .head{padding:25px;color:#CCA43B;font-weight:800;border-bottom:1px solid #1f2d40;text-transform:uppercase;text-align:center}
+            .btn{width:100%;padding:20px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #111;transition:0.2s}
+            .btn.active{color:#CCA43B;background:rgba(204,164,59,0.1);border-left:5px solid #CCA43B;font-weight:bold}.btn:hover{color:white}
+            #main{flex:1;display:flex;flex-direction:column;position:relative;background:radial-gradient(circle at center,#142850,#0A1A3C)}
+            .top-zone{position:absolute;top:15px;right:15px;display:flex;align-items:center;gap:10px;background:rgba(10,26,60,0.9);padding:5px 10px;border:1px solid #CCA43B;border-radius:4px;z-index:100}
+            .logo{width:50px !important;height:auto;display:block}.txt{margin:0;font-size:9px !important;color:#CCA43B;font-weight:700;text-transform:uppercase;line-height:1.1;text-align:left}
+            .view{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+            .frame{width:100%;max-width:1400px;aspect-ratio:16/9;border:4px solid #CCA43B;background:#000;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 80px rgba(0,0,0,0.8)}
+            .frame img{width:100%;height:100%;object-fit:contain}
+            .bot{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:4px solid #CCA43B;min-height:150px;z-index:50}
+            .arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,26,60,0.8);color:#CCA43B;border:2px solid #CCA43B;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:24px;z-index:60}.al{left:-25px}.ar{right:-25px}
+            </style></head><body><div id="side"><div class="head">${proj.name}</div><div id="nav" style="flex:1;overflow-y:auto"></div></div><div id="main"><div class="view"><div class="frame" id="fr"><div class="top-zone"><img src="${finalLogo}" class="logo"><div class="txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div><div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div></div></div><div class="bot"><h2 id="tit" style="color:#CCA43B;margin:0 0 10px 0;text-transform:uppercase"></h2><div id="desc" style="font-size:1.3rem;line-height:1.5"></div></div></div><script>
+            const d=${json};let cB=Object.keys(d)[0],cI=0;function rn(){const n=document.getElementById('nav');n.innerHTML='';Object.keys(d).forEach(k=>{const b=document.createElement('button');b.className='btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rn()};n.appendChild(b)})}function sh(){const s=document.getElementById('sc'),f=document.getElementById('fr'),i=d[cB];if(!i||!i.length){s.innerHTML='';document.getElementById('desc').innerHTML='';f.querySelectorAll('.arr').forEach(a=>a.remove());return}s.innerHTML='<img src="'+i[cI].img+'">';document.getElementById('tit').innerText=cB;document.getElementById('desc').innerHTML=i[cI].desc||"";f.querySelectorAll('.arr').forEach(a=>a.remove());if(i.length>1){const l=document.createElement('div');l.className='arr al';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};const r=document.createElement('div');r.className='arr ar';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};f.appendChild(l);f.appendChild(r)}}window.onload=()=>{if(cB){rn();sh()}};<\/script></body></html>`;
+            const zip = new JSZip(); const sn = proj.name.replace(/[^a-z0-9]/gi, '_'); zip.file(sn + ".html", h);
+            zip.generateAsync({type:"blob"}).then(function(c) { const a = document.createElement('a'); a.href = URL.createObjectURL(c); a.download = sn + ".zip"; a.click(); document.getElementById('overlay').style.display='none'; document.getElementById('success-modal').style.display='flex'; });
         }, 1500);
     }
 </script>
-</body></html>
+</body>
+</html>
