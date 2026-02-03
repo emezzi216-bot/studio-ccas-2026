@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v33 NO BUG</title>
+    <title>Studio CCAS | v34 Interactive</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
@@ -11,38 +11,36 @@
         * { box-sizing: border-box; outline: none; }
         button { cursor: pointer; transition: 0.1s; font-family: inherit; } button:active { transform: translateY(1px); }
 
-        /* HEADER */
-        .header { background: var(--panel); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin: 20px; border-bottom: 4px solid var(--gold); }
-        .btn-save-main { background: var(--green); color: white; padding: 12px 30px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); display: flex; align-items: center; gap: 8px; }
-        .btn-usb { padding: 10px 20px; border: 1px solid #ccc; border-radius: 6px; background: white; font-weight: bold; color: #333; }
-
         /* DASHBOARD */
-        #view-dashboard { flex: 1; padding: 0 30px 30px; display: flex; flex-direction: column; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; overflow-y: auto; padding: 10px; }
-        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; align-items: center; }
-        .card:hover { border-color: var(--gold); transform: translateY(-3px); }
-        .del-btn { position: absolute; top: 10px; right: 10px; color: var(--red); font-weight: bold; background: #fee2e2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .drag-handle-card { cursor: grab; color: #ccc; font-size: 24px; width: 100%; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #eee; }
+        #view-dashboard { flex: 1; padding: 30px; display: flex; flex-direction: column; }
+        .header { background: var(--panel); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 4px solid var(--gold); }
+        .btn-save-main { background: var(--green); color: white; padding: 12px 30px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); display: flex; align-items: center; gap: 8px; }
+        .btn-usb { padding: 10px 20px; border: 1px solid #d1d5db; border-radius: 6px; font-weight: 600; background: white; color: #374151; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; overflow-y: auto; padding: 10px; }
+        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
+        .card:hover { border-color: var(--gold); transform: translateY(-4px); }
+        .card.dragging { opacity: 0.4; border: 2px dashed var(--blue); }
+        .del-btn { position: absolute; top: 12px; right: 12px; color: var(--red); font-weight: bold; background:#fee2e2; width: 32px; height: 32px; border-radius:50%; display: flex; align-items: center; justify-content: center; }
+        .drag-handle-card { cursor: grab; color: #cbd5e1; font-size: 24px; width: 100%; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #f3f4f6; }
 
         /* STUDIO */
         #view-studio { display: none; height: 100vh; flex-direction: row; }
-        #sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 15px rgba(0,0,0,0.2); }
-        .back-home { padding: 20px; background: rgba(0,0,0,0.2); color: var(--gold); font-weight: bold; cursor: pointer; border: none; text-align: left; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        
+        #sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
+        .back-home { padding: 20px; background: rgba(0,0,0,0.2); color: var(--gold); font-weight: 700; cursor: pointer; border: none; text-align: left; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); }
         #editor-main { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
-        .top-bar { background: white; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; height: 75px; }
-        .logo-box { width: 55px; height: 55px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; overflow: hidden; background: #f9fafb; }
+        .top-bar { background: white; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; height: 75px; }
+        .logo-box { width: 55px; height: 55px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; overflow: hidden; background: #f9fafb; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
-        .gen-btn { background: var(--blue); color: white; padding: 12px 25px; border-radius: 8px; border: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-
+        .gen-btn { background: linear-gradient(135deg, var(--blue), #1e3a8a); color: white; padding: 12px 25px; border-radius: 8px; border: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .content-area { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
         
-        /* PHOTOS */
-        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #ccc; overflow: visible; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .drag-handle-photo { width: 30px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #ddd; color: #aaa; font-size: 20px; }
-        .photo-col { width: 300px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #eee; position: relative; }
+        /* PHOTOS & EDITEUR */
+        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #e5e7eb; box-shadow: 0 2px 10px rgba(0,0,0,0.03); overflow: visible; }
+        .photo-block.dragging { opacity: 0.5; border: 2px dashed var(--blue); }
+        .drag-handle-photo { width: 30px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #e5e7eb; color: #cbd5e1; font-size: 20px; }
+        .photo-col { width: 300px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #e5e7eb; position: relative; }
         .photo-img { width: 100%; height: 200px; object-fit: contain; border: 1px solid #ccc; background: white; border-radius: 6px; cursor: pointer; }
-        .btn-edit-photo { background: #333; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; }
+        .btn-edit-photo { background: #374151; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; }
         .del-p-btn { position: absolute; top: 10px; left: 10px; background: var(--red); color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 5; }
 
         .text-col { flex: 1; padding: 20px; display: flex; flex-direction: column; }
@@ -50,10 +48,11 @@
         .toolbar button, .toolbar input[type=color] { height: 32px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; min-width: 32px; }
         .rich-text { flex: 1; min-height: 150px; border: 1px solid #ccc; padding: 15px; border-radius: 6px; font-size: 16px; overflow-y: auto; background: #fff; color: black; }
 
-        /* LISTE BATIMENTS */
-        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #eee; }
+        /* BATIMENTS */
+        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #eee; transition: 0.2s; }
         .bat-item.active { background: white; color: var(--blue); font-weight: bold; }
-        .drag-handle-bat { cursor: grab; padding-right: 10px; color: rgba(255,255,255,0.3); font-size: 20px; }
+        .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
+        .drag-handle-bat { cursor: grab; padding-right: 12px; color: rgba(255,255,255,0.3); font-size: 20px; }
 
         /* PAINT */
         #paint-modal { position: fixed; inset: 0; background: #1e1e1e; z-index: 20000; display: none; flex-direction: column; }
@@ -63,7 +62,7 @@
         #paint-canvas { cursor: crosshair; box-shadow: 0 0 50px black; }
         .p-btn { width: 40px; height: 40px; background: #444; border: 1px solid #555; color: white; font-size: 18px; cursor: pointer; }
         .p-btn.active { background: var(--gold); color: black; }
-        .color-swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+        .color-swatch { width: 28px; height: 28px; border-radius: 4px; border: 2px solid transparent; cursor: pointer; }
         .color-swatch.active { border-color: white; transform: scale(1.1); box-shadow: 0 0 0 2px white; }
 
         /* MODALS */
@@ -85,7 +84,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v33</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v34</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
         <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER TOUT</button>
         <div style="display:flex; gap:10px;">
             <button class="btn-usb" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
@@ -100,7 +99,7 @@
         <button class="back-home" onclick="goDashboard()">⬅️ DOSSIERS</button>
         <div style="padding:20px; text-align:center; color:var(--gold); font-weight:bold; font-size:1.1rem; border-bottom:1px solid rgba(255,255,255,0.1);" id="lbl-proj">Projet</div>
         <div id="list-bat" style="flex:1; overflow-y:auto; padding:10px;"></div>
-        <div style="padding:20px;"><button onclick="newBat()" style="width:100%; padding:15px; background:transparent; border:2px dashed rgba(255,255,255,0.3); color:white; font-weight:bold; cursor:pointer;">+ BÂTIMENT</button></div>
+        <div style="padding:20px;"><button onclick="newBat()" style="width:100%; padding:15px; background:transparent; border:2px dashed rgba(255,255,255,0.3); color:white; font-weight:bold; cursor:pointer;">+ NOUVEAU BÂTIMENT</button></div>
     </div>
     <div id="editor-main">
         <div class="top-bar">
@@ -108,7 +107,7 @@
             <div id="lbl-bat" style="font-weight:bold; color:var(--blue); font-size:1.5rem;">Accueil</div>
             <div style="display:flex; gap:15px;">
                 <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER</button>
-                <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER (MAIL)</button>
+                <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER (INTERACTIF)</button>
             </div>
         </div>
         <div id="area-photos" class="content-area"></div>
@@ -150,19 +149,15 @@
         <h2 style="color:var(--blue); margin-top:0;">📦 Dossier Prêt !</h2>
         <p>Le fichier <strong>Dossier_Final.zip</strong> est dans <strong>Téléchargements</strong>.</p>
         <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin:15px 0; border:1px solid #bae6fd;">
-            <strong>Pour l'envoyer :</strong>
-            <ul style="margin:10px 0 0 20px;">
-                <li>Ouvrez le fichier HTML contenu dans le ZIP.</li>
-                <li>Cliquez sur le bouton <strong>🖨️ IMPRIMER / ENREGISTRER PDF</strong> en haut.</li>
-                <li>Cochez <strong>"Graphiques d'arrière-plan"</strong> pour avoir le fond bleu.</li>
-            </ul>
+            <strong>C'est le format INTERACTIF :</strong><br>
+            Le texte s'affichera en <strong>BLANC</strong> sur fond sombre, même s'il est noir dans l'éditeur.
         </div>
         <button style="background:var(--blue); color:white; border:none; padding:15px 30px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('success-modal').style.display='none'">FERMER</button>
     </div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v33')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v34')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
     let canvas, ctx, paintImg, isDrawing=false, startX, startY, currentTool='rect', currentColor='#ff0000', currentWidth=5, paintHistory=[], currentPhotoIndex=null, dragSrcEl = null;
@@ -178,7 +173,7 @@
 
     function notifySave() { const t = document.getElementById('save-toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
     function manualSave() { save(); notifySave(); }
-    function save() { localStorage.setItem('ccas_db_v33', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v34', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
@@ -231,7 +226,8 @@
                 if(e.stopPropagation) e.stopPropagation(); this.classList.remove('dragging');
                 if(dragSrcEl !== this && dragSrcEl.classList.contains('bat-item')) {
                     const srcKey = dragSrcEl.dataset.bat; const tgtKey = this.dataset.bat;
-                    const keys = Object.keys(db[curP].data); const srcI = keys.indexOf(srcKey); const tgtI = keys.indexOf(tgtKey);
+                    const keys = Object.keys(db[curP].data);
+                    const srcI = keys.indexOf(srcKey); const tgtI = keys.indexOf(tgtKey);
                     keys.splice(srcI, 1); keys.splice(tgtI, 0, srcKey);
                     const newData = {}; keys.forEach(k => newData[k] = db[curP].data[k]);
                     db[curP].data = newData; save(); refreshSide();
@@ -276,12 +272,9 @@
                         <button onclick="cmd('bold')" title="Gras"><b>B</b></button>
                         <button onclick="cmd('italic')" title="Italique"><i>I</i></button>
                         <button onclick="cmd('underline')" title="Souligné"><u>U</u></button>
-                        <div class="sep" style="width:1px;height:20px;background:#ddd;margin:0 5px;"></div>
                         <input type="color" onchange="cmd('foreColor', this.value)" title="Couleur" value="#000000">
                         <button onclick="cmd('hiliteColor', 'yellow')" style="background:yellow;border:1px solid #ccc;">🖍️</button>
-                        <div class="sep" style="width:1px;height:20px;background:#ddd;margin:0 5px;"></div>
                         <button onclick="cmd('justifyLeft')">⫷</button><button onclick="cmd('justifyCenter')">||</button><button onclick="cmd('insertUnorderedList')">• Liste</button>
-                        <div class="sep" style="width:1px;height:20px;background:#ddd;margin:0 5px;"></div>
                         <select onchange="cmd('fontSize', this.value)"><option value="3">Normale</option><option value="5">Grande</option><option value="6">Très Grande</option></select>
                     </div>
                     <div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)">${p.desc}</div>
@@ -355,8 +348,7 @@
             try {
                 const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
                 
-                // --- ICI EST LA CORRECTION DE L'ERREUR "CONST" ---
-                // On utilise 'let' pour pouvoir modifier la variable html
+                // HTML INTERACTIF : DIAPORAMA AVEC TEXTE FORCE EN BLANC
                 let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
                 @page { size: A4; margin: 0; }
                 body { font-family: 'Segoe UI', sans-serif; background: #0A1A3C; color: white; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -367,32 +359,44 @@
                 
                 .content-wrapper { flex: 1; display: flex; flex-direction: column; border: 4px solid #CCA43B; background: #000; position: relative; }
                 
-                /* ZONE PHOTO : 75% de hauteur */
-                .photo-zone { height: 75%; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
+                /* PHOTO 80% */
+                .photo-zone { height: 80%; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
                 .photo-zone img { max-width: 100%; max-height: 100%; object-fit: contain; }
                 
-                /* ZONE TEXTE : 25% de hauteur, FOND NOIR, TEXTE BLANC */
+                /* TEXTE 20% : FOND NOIR, TEXTE BLANC OBLIGATOIRE */
                 .text-zone { 
-                    height: 25%; 
+                    height: 20%; 
                     border-top: 2px solid #CCA43B; 
                     padding: 20px; 
                     background: rgba(0, 0, 0, 0.9); 
                     font-size: 18px; 
                     line-height: 1.5;
-                    color: white !important; /* FORCE LE BLANC */
+                    color: white !important; 
                     overflow-y: auto;
                 }
                 .text-zone * { color: white !important; background: transparent !important; }
                 
-                .btn-print { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 30px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 8px; z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,0.5); border: none; }
-                @media print { .btn-print { display: none; } }
+                /* BOUTON NAVIGATION */
+                .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(204, 164, 59, 0.5); color: white; border: none; font-size: 30px; padding: 20px; cursor: pointer; border-radius: 50%; z-index: 1000; transition: 0.3s; }
+                .nav-btn:hover { background: #CCA43B; }
+                .prev { left: 20px; }
+                .next { right: 20px; }
+                
+                .slide { display: none; height: 100%; }
+                .slide.active { display: flex; flex-direction: column; }
+
+                .btn-print { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 30px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 8px; z-index: 9999; border:none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+                @media print { .btn-print, .nav-btn { display: none; } .slide { display: flex !important; break-after: page; height: 100vh; } }
                 </style></head><body>
-                <button class="btn-print" onclick="window.print()">🖨️ IMPRIMER / ENREGISTRER EN PDF</button>`;
+                <button class="btn-print" onclick="window.print()">🖨️ IMPRIMER / PDF</button>
+                <button class="nav-btn prev" onclick="move(-1)">❮</button>
+                <button class="nav-btn next" onclick="move(1)">❯</button>
+                <div id="container">`;
                 
                 Object.keys(proj.data).forEach(bat => {
                     proj.data[bat].forEach((p, idx) => {
                         html += `
-                        <div class="page">
+                        <div class="page slide">
                             <div class="header">
                                 <img src="${finalLogo}" class="logo">
                                 <div>
@@ -407,11 +411,26 @@
                         </div>`;
                     });
                 });
-                html += `</body></html>`;
+                html += `</div>
+                <script>
+                    let idx = 0;
+                    const slides = document.querySelectorAll('.slide');
+                    function show(n) {
+                        slides.forEach(s => s.classList.remove('active'));
+                        slides[n].classList.add('active');
+                    }
+                    function move(n) {
+                        idx += n;
+                        if(idx >= slides.length) idx = 0;
+                        if(idx < 0) idx = slides.length - 1;
+                        show(idx);
+                    }
+                    if(slides.length > 0) show(0);
+                <\/script></body></html>`;
 
                 const zip = new JSZip();
                 const safeName = proj.name.replace(/[^a-z0-9]/gi, '_');
-                zip.file("Dossier_Final.html", html);
+                zip.file("Dossier_INTERACTIF.html", html);
                 
                 zip.generateAsync({type:"blob"}).then(function(c) {
                     const a = document.createElement('a'); a.href = URL.createObjectURL(c); a.download = safeName + "_FINAL.zip"; a.click();
@@ -421,7 +440,7 @@
                     document.getElementById('overlay').style.display='none';
                 });
             } catch(e) {
-                alert("ERREUR : " + e); // Affiche l'erreur si elle persiste
+                alert("ERREUR : " + e);
                 document.getElementById('overlay').style.display='none';
             }
         }, 1000);
