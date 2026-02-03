@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v34 Interactive</title>
+    <title>Studio CCAS | v35 Originale</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
@@ -11,34 +11,38 @@
         * { box-sizing: border-box; outline: none; }
         button { cursor: pointer; transition: 0.1s; font-family: inherit; } button:active { transform: translateY(1px); }
 
-        /* DASHBOARD */
-        #view-dashboard { flex: 1; padding: 30px; display: flex; flex-direction: column; }
-        .header { background: var(--panel); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 4px solid var(--gold); }
+        /* HEADER */
+        .header { background: var(--panel); padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin: 20px; border-bottom: 4px solid var(--gold); }
         .btn-save-main { background: var(--green); color: white; padding: 12px 30px; border-radius: 8px; border: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); display: flex; align-items: center; gap: 8px; }
-        .btn-usb { padding: 10px 20px; border: 1px solid #d1d5db; border-radius: 6px; font-weight: 600; background: white; color: #374151; }
+        .btn-usb { padding: 10px 20px; border: 1px solid #ccc; border-radius: 6px; background: white; font-weight: bold; color: #333; }
+
+        /* DASHBOARD */
+        #view-dashboard { flex: 1; padding: 0 30px 30px; display: flex; flex-direction: column; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; overflow-y: auto; padding: 10px; }
-        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
-        .card:hover { border-color: var(--gold); transform: translateY(-4px); }
-        .card.dragging { opacity: 0.4; border: 2px dashed var(--blue); }
-        .del-btn { position: absolute; top: 12px; right: 12px; color: var(--red); font-weight: bold; background:#fee2e2; width: 32px; height: 32px; border-radius:50%; display: flex; align-items: center; justify-content: center; }
-        .drag-handle-card { cursor: grab; color: #cbd5e1; font-size: 24px; width: 100%; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #f3f4f6; }
+        .card { background: white; padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; align-items: center; }
+        .card:hover { border-color: var(--gold); transform: translateY(-3px); }
+        .del-btn { position: absolute; top: 10px; right: 10px; color: var(--red); font-weight: bold; background: #fee2e2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .drag-handle-card { cursor: grab; color: #ccc; font-size: 24px; width: 100%; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #eee; }
 
         /* STUDIO */
         #view-studio { display: none; height: 100vh; flex-direction: row; }
-        #sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
-        .back-home { padding: 20px; background: rgba(0,0,0,0.2); color: var(--gold); font-weight: 700; cursor: pointer; border: none; text-align: left; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        #sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 15px rgba(0,0,0,0.2); }
+        .back-home { padding: 20px; background: rgba(0,0,0,0.2); color: var(--gold); font-weight: bold; cursor: pointer; border: none; text-align: left; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        
         #editor-main { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
-        .top-bar { background: white; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; height: 75px; }
-        .logo-box { width: 55px; height: 55px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; overflow: hidden; background: #f9fafb; }
+        .top-bar { background: white; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; height: 75px; }
+        .logo-box { width: 55px; height: 55px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; overflow: hidden; background: #f9fafb; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
         .gen-btn { background: linear-gradient(135deg, var(--blue), #1e3a8a); color: white; padding: 12px 25px; border-radius: 8px; border: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .content-area { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
+
+        .content-area { flex: 1; overflow-y: auto; padding: 40px; }
         
-        /* PHOTOS & EDITEUR */
-        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #e5e7eb; box-shadow: 0 2px 10px rgba(0,0,0,0.03); overflow: visible; }
+        /* PHOTOS */
+        .photo-block { background: white; padding: 0; border-radius: 12px; margin-bottom: 30px; display: flex; border: 1px solid #ccc; overflow: visible; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .drag-handle-photo { width: 30px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #ddd; color: #aaa; font-size: 20px; }
         .photo-block.dragging { opacity: 0.5; border: 2px dashed var(--blue); }
-        .drag-handle-photo { width: 30px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #e5e7eb; color: #cbd5e1; font-size: 20px; }
-        .photo-col { width: 300px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #e5e7eb; position: relative; }
+
+        .photo-col { width: 300px; background: #f9fafb; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; border-right: 1px solid #eee; position: relative; }
         .photo-img { width: 100%; height: 200px; object-fit: contain; border: 1px solid #ccc; background: white; border-radius: 6px; cursor: pointer; }
         .btn-edit-photo { background: #374151; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; }
         .del-p-btn { position: absolute; top: 10px; left: 10px; background: var(--red); color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 5; }
@@ -49,10 +53,10 @@
         .rich-text { flex: 1; min-height: 150px; border: 1px solid #ccc; padding: 15px; border-radius: 6px; font-size: 16px; overflow-y: auto; background: #fff; color: black; }
 
         /* BATIMENTS */
-        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #eee; transition: 0.2s; }
+        .bat-item { padding: 12px 15px; margin-bottom: 8px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; border-radius: 6px; color: #eee; }
         .bat-item.active { background: white; color: var(--blue); font-weight: bold; }
         .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
-        .drag-handle-bat { cursor: grab; padding-right: 12px; color: rgba(255,255,255,0.3); font-size: 20px; }
+        .drag-handle-bat { cursor: grab; padding-right: 10px; color: rgba(255,255,255,0.3); font-size: 20px; }
 
         /* PAINT */
         #paint-modal { position: fixed; inset: 0; background: #1e1e1e; z-index: 20000; display: none; flex-direction: column; }
@@ -84,7 +88,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v34</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v35</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
         <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER TOUT</button>
         <div style="display:flex; gap:10px;">
             <button class="btn-usb" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
@@ -149,15 +153,17 @@
         <h2 style="color:var(--blue); margin-top:0;">📦 Dossier Prêt !</h2>
         <p>Le fichier <strong>Dossier_Final.zip</strong> est dans <strong>Téléchargements</strong>.</p>
         <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin:15px 0; border:1px solid #bae6fd;">
-            <strong>C'est le format INTERACTIF :</strong><br>
-            Le texte s'affichera en <strong>BLANC</strong> sur fond sombre, même s'il est noir dans l'éditeur.
+            <strong>Contenu :</strong>
+            <ul style="margin:10px 0 0 20px;">
+                <li>📂 <strong>_INTERACTIF.html</strong> : Le fichier avec la colonne de gauche et le texte visible.</li>
+            </ul>
         </div>
         <button style="background:var(--blue); color:white; border:none; padding:15px 30px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('success-modal').style.display='none'">FERMER</button>
     </div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v34')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v35')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
     let canvas, ctx, paintImg, isDrawing=false, startX, startY, currentTool='rect', currentColor='#ff0000', currentWidth=5, paintHistory=[], currentPhotoIndex=null, dragSrcEl = null;
@@ -173,7 +179,7 @@
 
     function notifySave() { const t = document.getElementById('save-toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
     function manualSave() { save(); notifySave(); }
-    function save() { localStorage.setItem('ccas_db_v34', JSON.stringify(db)); }
+    function save() { localStorage.setItem('ccas_db_v35', JSON.stringify(db)); }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
@@ -225,9 +231,8 @@
             d.ondrop = function(e) {
                 if(e.stopPropagation) e.stopPropagation(); this.classList.remove('dragging');
                 if(dragSrcEl !== this && dragSrcEl.classList.contains('bat-item')) {
-                    const srcKey = dragSrcEl.dataset.bat; const tgtKey = this.dataset.bat;
                     const keys = Object.keys(db[curP].data);
-                    const srcI = keys.indexOf(srcKey); const tgtI = keys.indexOf(tgtKey);
+                    const srcI = keys.indexOf(dragSrcEl.dataset.bat); const tgtI = keys.indexOf(this.dataset.bat);
                     keys.splice(srcI, 1); keys.splice(tgtI, 0, srcKey);
                     const newData = {}; keys.forEach(k => newData[k] = db[curP].data[k]);
                     db[curP].data = newData; save(); refreshSide();
@@ -348,84 +353,119 @@
             try {
                 const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
                 
-                // HTML INTERACTIF : DIAPORAMA AVEC TEXTE FORCE EN BLANC
+                // CORRECTION MAJEURE: UTILISATION DE 'LET' + STRUCTURE EXACTE DEMANDÉE
                 let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
-                @page { size: A4; margin: 0; }
-                body { font-family: 'Segoe UI', sans-serif; background: #0A1A3C; color: white; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                .page { width: 210mm; height: 297mm; position: relative; page-break-after: always; display: flex; flex-direction: column; padding: 10mm; box-sizing: border-box; border-bottom: 1px solid #333; }
-                .header { height: 30mm; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #CCA43B; margin-bottom: 5mm; }
-                .logo { height: 20mm; max-width: 50mm; object-fit: contain; }
-                .title { font-size: 24px; font-weight: bold; color: #CCA43B; text-transform: uppercase; text-align:right; }
+                body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #000; color: #F4F7FD; height: 100vh; display: flex; overflow: hidden; }
                 
-                .content-wrapper { flex: 1; display: flex; flex-direction: column; border: 4px solid #CCA43B; background: #000; position: relative; }
+                /* SIDEBAR GAUCHE (Liste Bâtiments) */
+                #side { width: 280px; background: #050E24; border-right: 3px solid #CCA43B; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+                .head { padding: 25px; color: #CCA43B; font-weight: 800; border-bottom: 1px solid #1f2d40; text-transform: uppercase; text-align: center; }
+                .btn { width: 100%; padding: 20px; text-align: left; border: none; background: none; color: #8E8E93; cursor: pointer; border-bottom: 1px solid #111; transition: 0.2s; font-size: 16px; }
+                .btn.active { color: #CCA43B; background: rgba(204,164,59,0.1); border-left: 5px solid #CCA43B; font-weight: bold; }
+                .btn:hover { color: white; }
                 
-                /* PHOTO 80% */
-                .photo-zone { height: 80%; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
-                .photo-zone img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                /* ZONE PRINCIPALE (Image Droite + Texte Bas) */
+                #main { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center,#142850,#0A1A3C); }
                 
-                /* TEXTE 20% : FOND NOIR, TEXTE BLANC OBLIGATOIRE */
-                .text-zone { 
-                    height: 20%; 
-                    border-top: 2px solid #CCA43B; 
-                    padding: 20px; 
-                    background: rgba(0, 0, 0, 0.9); 
-                    font-size: 18px; 
-                    line-height: 1.5;
-                    color: white !important; 
-                    overflow-y: auto;
+                /* HEADER SUR L'IMAGE */
+                .top-zone { position: absolute; top: 15px; right: 15px; display: flex; align-items: center; gap: 10px; background: rgba(10,26,60,0.9); padding: 5px 10px; border: 1px solid #CCA43B; border-radius: 4px; z-index: 100; }
+                .logo { width: 50px !important; height: auto; display: block; }
+                .txt { margin: 0; font-size: 9px !important; color: #CCA43B; font-weight: 700; text-transform: uppercase; line-height: 1.1; text-align: left; }
+                
+                /* CADRE PHOTO */
+                .view { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; height: 75%; }
+                .frame { width: 100%; max-width: 1400px; height: 100%; border: 4px solid #CCA43B; background: #000; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 80px rgba(0,0,0,0.8); }
+                .frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                
+                /* ZONE TEXTE BAS (BLEU ET OR) */
+                .bot { height: 25%; padding: 20px; background: rgba(5,14,36,0.95); border-top: 4px solid #CCA43B; overflow-y: auto; box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
+                
+                /* FLÈCHES NAVIGATION */
+                .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10,26,60,0.8); color: #CCA43B; border: 2px solid #CCA43B; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; font-size: 24px; z-index: 60; transition:0.2s; }
+                .arr:hover { background: #CCA43B; color: black; }
+                .al { left: -25px; } .ar { right: -25px; }
+                
+                /* BOUTON IMPRESSION */
+                .btn-print { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 10px 20px; border-radius: 50px; border:none; font-weight:bold; cursor:pointer; z-index:9999; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+                
+                /* FORCE LE TEXTE EN BLANC */
+                #desc { color: #f4f7fd !important; font-size: 1.4rem; line-height: 1.6; }
+                #desc * { color: inherit !important; background-color: transparent !important; }
+                #tit { color: #CCA43B; margin: 0 0 10px 0; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; }
+                
+                /* MODE IMPRESSION PROPRE */
+                @media print {
+                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #0A1A3C; color: white; height: auto; overflow: visible; display: block; }
+                    #side, .arr, .btn-print { display: none; }
+                    #main { height: auto; display: block; page-break-inside: avoid; }
+                    .view { height: auto; padding: 0; page-break-after: avoid; }
+                    .bot { height: auto; border: 2px solid #CCA43B; margin-top: 10px; page-break-before: avoid; }
+                    .frame { border: 2px solid #CCA43B; page-break-inside: avoid; }
                 }
-                .text-zone * { color: white !important; background: transparent !important; }
-                
-                /* BOUTON NAVIGATION */
-                .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(204, 164, 59, 0.5); color: white; border: none; font-size: 30px; padding: 20px; cursor: pointer; border-radius: 50%; z-index: 1000; transition: 0.3s; }
-                .nav-btn:hover { background: #CCA43B; }
-                .prev { left: 20px; }
-                .next { right: 20px; }
-                
-                .slide { display: none; height: 100%; }
-                .slide.active { display: flex; flex-direction: column; }
-
-                .btn-print { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 30px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 8px; z-index: 9999; border:none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-                @media print { .btn-print, .nav-btn { display: none; } .slide { display: flex !important; break-after: page; height: 100vh; } }
                 </style></head><body>
-                <button class="btn-print" onclick="window.print()">🖨️ IMPRIMER / PDF</button>
-                <button class="nav-btn prev" onclick="move(-1)">❮</button>
-                <button class="nav-btn next" onclick="move(1)">❯</button>
-                <div id="container">`;
                 
-                Object.keys(proj.data).forEach(bat => {
-                    proj.data[bat].forEach((p, idx) => {
-                        html += `
-                        <div class="page slide">
-                            <div class="header">
-                                <img src="${finalLogo}" class="logo">
-                                <div>
-                                    <div class="title">${proj.name}</div>
-                                    <div style="color:#aaa; font-size:14px; text-align:right;">${bat} - Photo ${idx+1}</div>
-                                </div>
-                            </div>
-                            <div class="content-wrapper">
-                                <div class="photo-zone"><img src="${p.img}"></div>
-                                <div class="text-zone">${p.desc}</div>
-                            </div>
-                        </div>`;
-                    });
-                });
-                html += `</div>
+                <button class="btn-print" onclick="window.print()">🖨️ IMPRIMER / PDF</button>
+                
+                <div id="side"><div class="head">${proj.name}</div><div id="nav" style="flex:1;overflow-y:auto"></div></div>
+                <div id="main">
+                    <div class="view">
+                        <div class="frame" id="fr">
+                            <div class="top-zone"><img src="${finalLogo}" class="logo"><div class="txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div>
+                            <div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div>
+                        </div>
+                    </div>
+                    <div class="bot">
+                        <h2 id="tit"></h2>
+                        <div id="desc"></div>
+                    </div>
+                </div>
+                
                 <script>
-                    let idx = 0;
-                    const slides = document.querySelectorAll('.slide');
-                    function show(n) {
-                        slides.forEach(s => s.classList.remove('active'));
-                        slides[n].classList.add('active');
+                const d=${json};
+                let cB = Object.keys(d)[0];
+                let cI = 0;
+                
+                function rn() {
+                    const n = document.getElementById('nav');
+                    n.innerHTML = '';
+                    Object.keys(d).forEach(k => {
+                        const b = document.createElement('button');
+                        b.className = 'btn' + (cB === k ? ' active' : '');
+                        b.innerText = k;
+                        b.onclick = () => { cB = k; cI = 0; sh(); rn(); };
+                        n.appendChild(b);
+                    });
+                }
+                
+                function sh() {
+                    const s = document.getElementById('sc');
+                    const f = document.getElementById('fr');
+                    const i = d[cB];
+                    
+                    if (!i || !i.length) {
+                        s.innerHTML = '';
+                        document.getElementById('desc').innerHTML = 'Aucune photo';
+                        f.querySelectorAll('.arr').forEach(a => a.remove());
+                        return;
                     }
-                    function move(n) {
-                        idx += n;
-                        if(idx >= slides.length) idx = 0;
-                        if(idx < 0) idx = slides.length - 1;
-                        show(idx);
+                    
+                    // Image et Texte
+                    s.innerHTML = '<img src="' + i[cI].img + '">';
+                    document.getElementById('tit').innerText = cB + " (" + (cI + 1) + "/" + i.length + ")";
+                    document.getElementById('desc').innerHTML = i[cI].desc || "Aucune description";
+                    
+                    // Navigation
+                    f.querySelectorAll('.arr').forEach(a => a.remove());
+                    if (i.length > 1) {
+                        const l = document.createElement('div'); l.className = 'arr al'; l.innerHTML = '❮';
+                        l.onclick = () => { cI = (cI - 1 + i.length) % i.length; sh(); };
+                        const r = document.createElement('div'); r.className = 'arr ar'; r.innerHTML = '❯';
+                        r.onclick = () => { cI = (cI + 1) % i.length; sh(); };
+                        f.appendChild(l); f.appendChild(r);
                     }
-                    if(slides.length > 0) show(0);
+                }
+                
+                window.onload = () => { if (cB) { rn(); sh(); } };
                 <\/script></body></html>`;
 
                 const zip = new JSZip();
@@ -440,7 +480,7 @@
                     document.getElementById('overlay').style.display='none';
                 });
             } catch(e) {
-                alert("ERREUR : " + e);
+                alert("ERREUR : " + e); // Affiche l'erreur si elle persiste
                 document.getElementById('overlay').style.display='none';
             }
         }, 1000);
