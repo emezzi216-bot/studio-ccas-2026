@@ -1,359 +1,257 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
+<!DOCTYPE html><html lang="fr"><head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionnaire Bâtiments & Intérieurs</title>
+    <title>STUDIO CCAS | Expertise Totale</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #e67e22;
-            --danger: #e74c3c;
-            --bg: #f4f7f6;
-            --text: #333;
-        }
-
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
-            margin: 0;
-            user-select: none;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-        }
-
-        /* En-tête de navigation */
-        .nav-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-            min-height: 40px;
-        }
-
-        .back-btn {
-            background: #95a5a6;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-right: 15px;
-            font-weight: bold;
-            display: none; /* Caché par défaut */
-        }
-        .back-btn:hover { background: #7f8c8d; }
-
-        h2 { 
-            margin: 0; 
-            color: var(--primary);
-            font-size: 1.5rem;
-            flex-grow: 1;
-        }
-
-        /* Zone de saisie */
-        .input-group { display: flex; gap: 10px; margin-bottom: 25px; }
+        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f7f9; --green: #27ae60; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        input {
-            flex-grow: 1;
-            padding: 12px;
-            border: 2px solid #dfe6e9;
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
-        }
-        input:focus { border-color: var(--accent); }
+        /* HEADER */
+        .main-header { background: var(--blue); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--gold); z-index: 100; }
+        .save-indicator { font-size: 0.8rem; background: rgba(39, 174, 96, 0.2); color: #2ecc71; padding: 5px 12px; border-radius: 20px; font-weight: bold; }
 
-        button.add-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button.add-btn:hover { background: #34495e; }
+        /* DASHBOARD */
+        #view-dashboard { flex:1; padding: 40px; overflow-y: auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .folder-card { background: white; border-radius: 12px; padding: 25px; text-align: center; cursor: grab; border: 1px solid #ddd; position: relative; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .folder-card:active { cursor: grabbing; }
+        .folder-card.dragging { opacity: 0.5; border: 2px dashed var(--gold); }
+        .del-btn { position: absolute; top: 8px; right: 10px; color: #e74c3c; cursor: pointer; font-weight: bold; font-size: 1.2rem; }
 
-        /* Liste */
-        ul { list-style: none; padding: 0; margin: 0; }
+        /* STUDIO */
+        #view-studio { display: none; height: calc(100vh - 75px); flex-direction: row; }
+        #sidebar { width: 300px; background: var(--blue); border-right: 2px solid var(--gold); display: flex; flex-direction: column; color: white; }
+        .bat-nav-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: move; display: flex; justify-content: space-between; }
+        .bat-nav-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
+        
+        #editor-content { flex: 1; background: #0A1A3C; display: flex; flex-direction: column; }
+        .toolbar-top { background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .photo-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px; margin: 0 30px 20px 30px; display: flex; gap: 20px; border-left: 5px solid var(--gold); color: white; cursor: move; }
+        .img-container img { width: 200px; height: 140px; object-fit: cover; border-radius: 4px; border: 1px solid var(--gold); }
+        
+        .text-area { flex: 1; min-height: 100px; padding: 15px; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; outline: none; background: rgba(0,0,0,0.2); color: white; font-size: 1rem; }
+        .btn-expert { background: var(--green); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
 
-        .item {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            margin-bottom: 12px;
-            padding: 15px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: grab;
-            transition: all 0.2s;
-        }
-
-        .item:hover {
-            border-color: var(--accent);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .item-content {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-grow: 1;
-            cursor: pointer; /* Indique qu'on peut cliquer */
-        }
-
-        .item-content:hover .name {
-            color: var(--accent);
-            text-decoration: underline;
-        }
-
-        .icon { font-size: 1.6rem; }
-        .name { font-size: 1.1rem; font-weight: 600; color: #2c3e50; }
-        .count-badge {
-            background: #eee;
-            color: #777;
-            font-size: 0.8rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 10px;
-        }
-
-        .delete-btn {
-            background: white;
-            border: 1px solid #eee;
-            color: #bdc3c7;
-            cursor: pointer;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            margin-left: 10px;
-        }
-        .delete-btn:hover { background: var(--danger); color: white; border-color: var(--danger); }
-
-        /* Dragging styles */
-        .item.dragging { opacity: 0.5; background: #fcf3cf; border: 2px dashed var(--accent); }
-        .item.over { border-top: 3px solid var(--accent); }
-
-        .status { text-align: center; color: #27ae60; height: 20px; margin-top: 20px; opacity: 0; transition: opacity 0.5s; }
-        .status.visible { opacity: 1; }
+        /* OVERLAY COURAGE */
+        #overlay { position: fixed; inset: 0; background: var(--blue); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .img-courage { width: 220px; height: 220px; border-radius: 50%; border: 5px solid var(--gold); object-fit: cover; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="nav-header">
-        <button id="backBtn" class="back-btn" onclick="goUp()">⬅ Retour</button>
-        <h2 id="pageTitle">Mes Bâtiments</h2>
-    </div>
-    
-    <div class="input-group">
-        <input type="text" id="inputField" placeholder="Ajouter..." autocomplete="off">
-        <button class="add-btn" onclick="addItem()">Ajouter</button>
-    </div>
+<img src="Logo_Créteil_Val_Marne.svg.png" id="sys-logo" style="display:none" crossorigin="anonymous">
 
-    <ul id="itemList"></ul>
-
-    <div class="status" id="statusMsg">Sauvegarde effectuée</div>
+<div class="main-header">
+    <div style="display:flex; align-items:center; gap:20px;">
+        <h2 style="margin:0; letter-spacing:1px;">STUDIO <span style="color:var(--gold)">CCAS</span></h2>
+        <div id="status" class="save-indicator">✅ TRAVAIL SAUVEGARDÉ</div>
+    </div>
+    <div style="text-align:right;">
+        <div style="font-size:0.7rem; color:var(--gold); font-weight:bold;">DIRECTION GÉNÉRALE DES FINANCES</div>
+        <div style="font-size:0.6rem; opacity:0.8;">HÔTEL DE VILLE DE CRÉTEIL</div>
+    </div>
 </div>
 
+<div id="view-dashboard">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <h1 style="color:var(--blue); margin:0;">Mes Dossiers (Glisser pour ordonner)</h1>
+        <button onclick="createProj()" style="background:var(--blue); color:white; border:none; padding:15px 30px; border-radius:8px; font-weight:bold; cursor:pointer;">+ NOUVEAU DOSSIER</button>
+    </div>
+    <div id="grid-projects" class="grid"></div>
+</div>
+
+<div id="view-studio">
+    <div id="sidebar">
+        <button onclick="goDashboard()" style="padding:20px; background:rgba(255,255,255,0.1); border:none; color:white; cursor:pointer; font-weight:bold;">🏠 RETOUR À L'ACCUEIL</button>
+        <div id="list-bat" style="flex:1; overflow-y:auto;"></div>
+        <button onclick="newBat()" style="padding:20px; background:var(--gold); color:var(--blue); border:none; font-weight:bold; cursor:pointer;">+ AJOUTER UN BÂTIMENT</button>
+    </div>
+    <div id="editor-content">
+        <div class="toolbar-top">
+            <h2 id="lbl-bat" style="margin:0; color:var(--blue);">Bâtiment</h2>
+            <button class="btn-expert" onclick="generateReport()">🚀 GÉNÉRER LE RAPPORT FINAL</button>
+        </div>
+        <div id="area-photos" style="flex:1; padding-top:30px; overflow-y:auto;"></div>
+    </div>
+</div>
+
+<div id="overlay">
+    <img src="courage.jpg.JPG" class="img-courage" onerror="this.src='https://via.placeholder.com/200?text=COURAGE'">
+    <h2 style="color:var(--gold);">COURAGE MAMAN ! ❤️</h2>
+    <p>Ton superbe rapport est en préparation...</p>
+</div>
+
+<input type="file" id="photo-input" style="display:none" multiple onchange="processPhotos(this)">
+
 <script>
-    // --- DONNÉES & NAVIGATION ---
-    const STORAGE_KEY = 'buildings_v2';
-    
-    // Structure de données hiérarchique
-    let rootData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
-        { id: 1, name: 'Résidence A', items: [] },
-        { id: 2, name: 'Tour Centrale', items: [] }
-    ];
+    const CLOUD_ID = "ccas_maman_ultra_v20"; 
+    let db = JSON.parse(localStorage.getItem('ccas_db_v20')) || { order: [], projects: {} };
+    let curP = null, curB = null, logoData = "";
 
-    // Navigation : Pile pour savoir où on est (Fil d'Ariane)
-    // navStack vide = Racine. 
-    // navStack contient des index = on est dans des sous-dossiers.
-    let navStack = []; 
+    window.onload = () => { refreshGrid(); getLogo(); syncCloud(); };
 
-    const listElement = document.getElementById('itemList');
-    const titleElement = document.getElementById('pageTitle');
-    const backBtn = document.getElementById('backBtn');
-    const inputField = document.getElementById('inputField');
-    const statusMsg = document.getElementById('statusMsg');
+    function getLogo() {
+        const img = document.getElementById('sys-logo');
+        img.onload = () => {
+            const c = document.createElement('canvas');
+            c.width = img.width; c.height = img.height;
+            c.getContext('2d').drawImage(img, 0, 0);
+            logoData = c.toDataURL();
+        };
+    }
 
-    render();
-
-    // --- FONCTIONS NAVIGATION ---
-
-    // Retourne le tableau (array) courant selon où on est
-    function getCurrentArray() {
-        let currentLevel = rootData;
-        for (let index of navStack) {
-            currentLevel = currentLevel[index].items;
+    async function syncCloud() {
+        try {
+            await fetch(`https://api.keyvalue.xyz/${CLOUD_ID}/data`, { method: 'POST', body: JSON.stringify(db) });
+            document.getElementById('status').innerText = "✅ SAUVEGARDE CLOUD OK";
+        } catch (e) {
+            const res = await fetch(`https://api.keyvalue.xyz/${CLOUD_ID}/data`);
+            if(res.ok) { db = await res.json(); refreshGrid(); }
         }
-        return currentLevel;
     }
 
-    // Entrer dans un dossier
-    function enterFolder(index) {
-        navStack.push(index);
-        render();
+    function save() {
+        localStorage.setItem('ccas_db_v20', JSON.stringify(db));
+        document.getElementById('status').innerText = "⏳ ENREGISTREMENT...";
+        syncCloud();
     }
 
-    // Remonter d'un niveau
-    function goUp() {
-        navStack.pop();
-        render();
-    }
-
-    // --- RENDU VISUEL ---
-
-    function render() {
-        listElement.innerHTML = '';
-        const currentData = getCurrentArray();
-
-        // Gestion du Titre et du Bouton Retour
-        if (navStack.length === 0) {
-            titleElement.innerText = "🏗️ Mes Bâtiments";
-            backBtn.style.display = 'none';
-            inputField.placeholder = "Nouveau bâtiment...";
-        } else {
-            // Récupérer le nom du dossier parent pour le titre
-            let parent = rootData;
-            for(let i=0; i<navStack.length-1; i++) parent = parent[navStack[i]].items;
-            const currentFolderName = parent[navStack[navStack.length-1]].name;
-            
-            titleElement.innerText = "📂 " + currentFolderName;
-            backBtn.style.display = 'block';
-            inputField.placeholder = "Ajouter un étage/appart...";
-        }
-
-        // Affichage des éléments
-        currentData.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.className = 'item';
-            li.draggable = true;
-            li.dataset.index = index;
-            
-            // Icône différente si on est à la racine (Bâtiment) ou dedans (Étage/Appart)
-            const icon = navStack.length === 0 ? '🏢' : '🚪';
-            
-            // Compteur d'éléments à l'intérieur (si existe)
-            const count = item.items ? `(${item.items.length})` : '';
-
-            li.innerHTML = `
-                <div class="item-content" onclick="enterFolder(${index})">
-                    <span class="icon">${icon}</span>
-                    <span class="name">${item.name}</span>
-                    ${item.items && item.items.length > 0 ? `<span class="count-badge">${item.items.length} éléments</span>` : ''}
-                </div>
-                <button class="delete-btn" onclick="deleteItem(event, ${index})" title="Supprimer">✖</button>
-            `;
-
-            addDragEvents(li);
-            listElement.appendChild(li);
+    // --- GESTION DES DOSSIERS ---
+    function refreshGrid() {
+        const g = document.getElementById('grid-projects'); g.innerHTML = '';
+        (db.order || []).forEach(id => {
+            const p = db.projects[id];
+            if(!p) return;
+            const div = document.createElement('div');
+            div.className = 'folder-card';
+            div.draggable = true;
+            div.innerHTML = `<div class="del-btn" onclick="event.stopPropagation(); deleteProj('${id}')">×</div>
+                             <div style="font-size:2.5rem;">📁</div><h3 style="margin:10px 0 0 0;">${p.name}</h3>`;
+            div.onclick = () => openProj(id);
+            div.ondragstart = (e) => { e.dataTransfer.setData('text/plain', id); div.classList.add('dragging'); };
+            div.ondragend = () => div.classList.remove('dragging');
+            div.ondragover = (e) => e.preventDefault();
+            div.ondrop = (e) => {
+                e.preventDefault();
+                const draggedId = e.dataTransfer.getData('text/plain');
+                const fromIdx = db.order.indexOf(draggedId);
+                const toIdx = db.order.indexOf(id);
+                db.order.splice(fromIdx, 1);
+                db.order.splice(toIdx, 0, draggedId);
+                save(); refreshGrid();
+            };
+            g.appendChild(div);
         });
     }
 
-    // --- AJOUT / SUPPRESSION ---
+    function createProj() {
+        const n = prompt("Nom du dossier :");
+        if(n) {
+            const id = "p" + Date.now();
+            db.projects[id] = { name: n, data: {}, batOrder: [] };
+            db.order.push(id);
+            save(); refreshGrid();
+        }
+    }
 
-    function addItem() {
-        const name = inputField.value.trim();
-        if (name) {
-            const currentArr = getCurrentArray();
-            // On ajoute un objet qui a aussi un tableau 'items' pour permettre des sous-niveaux infinis si besoin
-            currentArr.push({ id: Date.now(), name: name, items: [] });
+    function deleteProj(id) { if(confirm("Supprimer ce dossier définitivement ?")) { delete db.projects[id]; db.order = db.order.filter(x => x !== id); save(); refreshGrid(); } }
+
+    function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; refreshSide(); refreshMain(); }
+    function goDashboard() { document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
+
+    // --- GESTION BÂTIMENTS ---
+    function newBat() {
+        const n = prompt("Nom du bâtiment :");
+        if(n) {
+            if(!db.projects[curP].data[n]) {
+                db.projects[curP].data[n] = [];
+                db.projects[curP].batOrder.push(n);
+                save(); openBat(n);
+            }
+        }
+    }
+
+    function refreshSide() {
+        const l = document.getElementById('list-bat'); l.innerHTML = '';
+        (db.projects[curP].batOrder || []).forEach(b => {
+            const div = document.createElement('div');
+            div.className = 'bat-nav-item' + (curB === b ? ' active' : '');
+            div.innerHTML = `<span>${b}</span><span onclick="event.stopPropagation(); deleteBat('${b}')">×</span>`;
+            div.onclick = () => openBat(b);
+            l.appendChild(div);
+        });
+    }
+
+    function deleteBat(b) { if(confirm("Supprimer ce bâtiment ?")) { delete db.projects[curP].data[b]; db.projects[curP].batOrder = db.projects[curP].batOrder.filter(x => x !== b); save(); refreshSide(); refreshMain(); } }
+    function openBat(b) { curB = b; document.getElementById('lbl-bat').innerText = b; refreshSide(); refreshMain(); }
+
+    function refreshMain() {
+        const area = document.getElementById('area-photos'); area.innerHTML = '';
+        if(!curB) return;
+        area.innerHTML = `<button onclick="document.getElementById('photo-input').click()" style="width:calc(100% - 60px); padding:20px; margin:0 30px 20px 30px; cursor:pointer; font-weight:bold; background:white; border:2px dashed var(--gold); border-radius:8px;">📸 CLIQUEZ ICI POUR AJOUTER LES PHOTOS</button>`;
+        db.projects[curP].data[curB].forEach((p, i) => {
+            const div = document.createElement('div'); div.className = 'photo-card';
+            div.innerHTML = `<div class="img-container"><img src="${p.img}"></div>
+                <div class="text-area" contenteditable="true" oninput="db.projects[curP].data['${curB}'][${i}].desc=this.innerHTML; save()">${p.desc}</div>
+                <div onclick="db.projects[curP].data['${curB}'].splice(${i},1); save(); refreshMain();" style="color:red; cursor:pointer; font-weight:bold;">🗑️</div>`;
+            area.appendChild(div);
+        });
+    }
+
+    function processPhotos(input) {
+        Array.from(input.files).forEach(f => {
+            const r = new FileReader();
+            r.onload = e => { db.projects[curP].data[curB].push({img: e.target.result, desc: "Notes..."}); save(); refreshMain(); };
+            r.readAsDataURL(f);
+        });
+    }
+
+    function generateReport() {
+        const proj = db.projects[curP];
+        document.getElementById('overlay').style.display = 'flex';
+        setTimeout(() => {
+            const reportHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
+                body{font-family:sans-serif;margin:0;display:flex;height:100vh;background:#050E24;color:white;overflow:hidden}
+                #side{width:260px;background:#0A1A3C;border-right:3px solid #CCA43B}
+                .btn{width:100%;padding:18px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #1f2d40}
+                .btn.active{color:#CCA43B;background:rgba(204,164,59,0.1);border-left:5px solid #CCA43B;font-weight:bold}
+                #main{flex:1;display:flex;flex-direction:column;position:relative;background:radial-gradient(circle at center, #142850, #050E24)}
+                .top-logo{position:absolute;top:20px;right:25px;display:flex;align-items:center;gap:12px;background:rgba(10,26,60,0.9);padding:10px 15px;border:1px solid #CCA43B;border-radius:6px}
+                .logo-img{width:55px}
+                .logo-txt{font-size:9px;font-weight:bold;color:#CCA43B;line-height:1.2;text-transform:uppercase}
+                .frame{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+                .frame img{max-width:95%;max-height:95%;border:3px solid #CCA43B;box-shadow:0 0 50px #000;border-radius:4px}
+                .bot{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:3px solid #CCA43B;min-height:120px}
+                .arr{position:absolute;top:50%;transform:translateY(-50%);background:#CCA43B;color:#0A1A3C;width:55px;height:55px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-weight:bold;font-size:24px}
+            </style></head><body>
+                <div id="side"><div style="padding:25px;color:#CCA43B;font-weight:bold;font-size:18px;border-bottom:1px solid #1f2d40">${proj.name}</div><div id="nav"></div></div>
+                <div id="main">
+                    <div class="top-logo"><img src="${logoData}" class="logo-img"><div class="logo-txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div>
+                    <div class="frame" id="fr"><div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div></div>
+                    <div class="bot"><h2 id="tit" style="color:#CCA43B;margin:0 0 10px 0;text-transform:uppercase;letter-spacing:1px"></h2><div id="desc" style="font-size:1.3rem;line-height:1.5"></div></div>
+                </div>
+                <script>
+                const data = ${JSON.stringify(proj.data)}; let cB = Object.keys(data)[0], cI = 0;
+                function sh(){
+                    const s=document.getElementById('sc'),f=document.getElementById('fr'),i=data[cB];
+                    if(!i||!i.length)return;
+                    s.innerHTML='<img src="'+i[cI].img+'">';
+                    document.getElementById('tit').innerText=cB; document.getElementById('desc').innerHTML=i[cI].desc;
+                    document.querySelectorAll('.arr').forEach(a=>a.remove());
+                    if(i.length>1){
+                        const l=document.createElement('div');l.className='arr';l.style.left='25px';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};
+                        const r=document.createElement('div');r.className='arr';r.style.right='25px';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};
+                        f.appendChild(l);f.appendChild(r);
+                    }
+                }
+                function rn(){const n=document.getElementById('nav');n.innerHTML='';Object.keys(data).forEach(k=>{const b=document.createElement('button');b.className='btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rn()};n.appendChild(b)})}
+                window.onload=()=>{if(cB){rn();sh()}};
+                <\/script></body></html>`;
             
-            inputField.value = '';
-            saveData();
-            render();
-            inputField.focus();
-        }
+            const b = new Blob([reportHtml], {type: 'text/html'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = proj.name + "_INTERACTIF.html"; a.click();
+            document.getElementById('overlay').style.display='none';
+        }, 1500);
     }
-
-    inputField.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addItem();
-    });
-
-    function deleteItem(e, index) {
-        e.stopPropagation(); // Empêche d'entrer dans le dossier quand on supprime
-        if(confirm('Supprimer ? Tout le contenu sera perdu.')) {
-            const currentArr = getCurrentArray();
-            currentArr.splice(index, 1);
-            saveData();
-            render();
-        }
-    }
-
-    function saveData() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(rootData));
-        statusMsg.innerText = "✅ Sauvegardé !";
-        statusMsg.classList.add('visible');
-        setTimeout(() => statusMsg.classList.remove('visible'), 2000);
-    }
-
-    // --- DRAG & DROP (LOGIQUE UNIVERSELLE) ---
-    
-    let dragStartIndex;
-
-    function addDragEvents(li) {
-        li.addEventListener('dragstart', dragStart);
-        li.addEventListener('dragover', dragOver);
-        li.addEventListener('drop', drop);
-        li.addEventListener('dragenter', dragEnter);
-        li.addEventListener('dragleave', dragLeave);
-        li.addEventListener('dragend', dragEnd);
-    }
-
-    function dragStart(e) {
-        dragStartIndex = +this.dataset.index;
-        this.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/html', this.innerHTML);
-    }
-
-    function dragOver(e) { e.preventDefault(); return false; }
-    function dragEnter() { this.classList.add('over'); }
-    function dragLeave() { this.classList.remove('over'); }
-
-    function drop(e) {
-        e.stopPropagation();
-        const dragEndIndex = +this.dataset.index;
-        if (dragStartIndex !== dragEndIndex) {
-            swapItems(dragStartIndex, dragEndIndex);
-        }
-        this.classList.remove('over');
-        return false;
-    }
-
-    function dragEnd() {
-        this.classList.remove('dragging');
-        document.querySelectorAll('.item').forEach(item => item.classList.remove('over'));
-    }
-
-    function swapItems(from, to) {
-        const currentArr = getCurrentArray();
-        const itemToMove = currentArr[from];
-        currentArr.splice(from, 1);
-        currentArr.splice(to, 0, itemToMove);
-        saveData();
-        render();
-    }
-
 </script>
-</body>
-</html>
+</body></html>
