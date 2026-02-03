@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionnaire de Bâtiments</title>
+    <title>Gestionnaire Bâtiments & Intérieurs</title>
     <style>
         :root {
-            --primary: #2c3e50; /* Bleu nuit pro pour Bâtiment */
-            --accent: #e67e22;  /* Orange chantier/action */
+            --primary: #2c3e50;
+            --accent: #e67e22;
             --danger: #e74c3c;
             --bg: #f4f7f6;
             --text: #333;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background-color: var(--bg);
             color: var(--text);
             display: flex;
             justify-content: center;
             padding: 40px 20px;
             margin: 0;
-            user-select: none; /* Améliore l'expérience tactile/souris */
+            user-select: none;
         }
 
         .container {
@@ -33,12 +33,34 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.12);
         }
 
+        /* En-tête de navigation */
+        .nav-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            min-height: 40px;
+        }
+
+        .back-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 15px;
+            font-weight: bold;
+            display: none; /* Caché par défaut */
+        }
+        .back-btn:hover { background: #7f8c8d; }
+
         h2 { 
-            text-align: center; 
-            margin-top: 0; 
+            margin: 0; 
             color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 1.5rem;
+            flex-grow: 1;
         }
 
         /* Zone de saisie */
@@ -51,7 +73,6 @@
             border-radius: 8px;
             font-size: 16px;
             outline: none;
-            transition: border-color 0.3s;
         }
         input:focus { border-color: var(--accent); }
 
@@ -63,16 +84,13 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 16px;
-            transition: background 0.3s, transform 0.1s;
         }
         button.add-btn:hover { background: #34495e; }
-        button.add-btn:active { transform: scale(0.98); }
 
-        /* Liste des bâtiments */
+        /* Liste */
         ul { list-style: none; padding: 0; margin: 0; }
 
-        .building-item {
+        .item {
             background: #fff;
             border: 1px solid #e0e0e0;
             margin-bottom: 12px;
@@ -81,49 +99,41 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: grab; /* Main ouverte */
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
-            position: relative;
+            cursor: grab;
+            transition: all 0.2s;
         }
 
-        .building-item:hover {
+        .item:hover {
             border-color: var(--accent);
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            z-index: 2;
         }
 
-        .building-item:active {
-            cursor: grabbing; /* Main fermée */
-        }
-
-        /* Styles pendant le déplacement */
-        .building-item.dragging {
-            opacity: 0.5;
-            background: #fcf3cf; /* Légère teinte jaune */
-            border: 2px dashed var(--accent);
-            transform: scale(0.98);
-        }
-
-        .building-item.over {
-            border-top: 3px solid var(--accent);
-            transform: translateY(2px);
-        }
-
-        /* Contenu du bâtiment */
         .item-content {
             display: flex;
             align-items: center;
             gap: 15px;
-            pointer-events: none; /* CRUCIAL : empêche les bugs de drag sur le texte */
             flex-grow: 1;
+            cursor: pointer; /* Indique qu'on peut cliquer */
+        }
+
+        .item-content:hover .name {
+            color: var(--accent);
+            text-decoration: underline;
         }
 
         .icon { font-size: 1.6rem; }
         .name { font-size: 1.1rem; font-weight: 600; color: #2c3e50; }
+        .count-badge {
+            background: #eee;
+            color: #777;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+        }
 
-        /* Bouton supprimer */
         .delete-btn {
-            background: #fff;
+            background: white;
             border: 1px solid #eee;
             color: #bdc3c7;
             cursor: pointer;
@@ -134,37 +144,28 @@
             align-items: center;
             justify-content: center;
             font-size: 1rem;
-            transition: all 0.2s;
             margin-left: 10px;
         }
+        .delete-btn:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
-        .delete-btn:hover {
-            background: var(--danger);
-            color: white;
-            border-color: var(--danger);
-        }
+        /* Dragging styles */
+        .item.dragging { opacity: 0.5; background: #fcf3cf; border: 2px dashed var(--accent); }
+        .item.over { border-top: 3px solid var(--accent); }
 
-        /* Message de statut */
-        .status {
-            text-align: center;
-            color: #27ae60;
-            font-weight: bold;
-            height: 20px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
+        .status { text-align: center; color: #27ae60; height: 20px; margin-top: 20px; opacity: 0; transition: opacity 0.5s; }
         .status.visible { opacity: 1; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🏗️ Mes Bâtiments</h2>
+    <div class="nav-header">
+        <button id="backBtn" class="back-btn" onclick="goUp()">⬅ Retour</button>
+        <h2 id="pageTitle">Mes Bâtiments</h2>
+    </div>
     
     <div class="input-group">
-        <input type="text" id="inputField" placeholder="Nom du bâtiment (ex: Tour A)..." autocomplete="off">
+        <input type="text" id="inputField" placeholder="Ajouter..." autocomplete="off">
         <button class="add-btn" onclick="addItem()">Ajouter</button>
     </div>
 
@@ -174,47 +175,93 @@
 </div>
 
 <script>
-    // --- DONNÉES & SAUVEGARDE ---
-    // Clé unique pour les bâtiments pour ne pas mélanger avec les dossiers précédents
-    const STORAGE_KEY = 'myBuildingsData';
-
-    let items = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
-        { id: 1, name: 'Résidence Les Lilas' },
-        { id: 2, name: 'Tour Centrale' },
-        { id: 3, name: 'Entrepôt Nord' }
+    // --- DONNÉES & NAVIGATION ---
+    const STORAGE_KEY = 'buildings_v2';
+    
+    // Structure de données hiérarchique
+    let rootData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+        { id: 1, name: 'Résidence A', items: [] },
+        { id: 2, name: 'Tour Centrale', items: [] }
     ];
 
-    const listElement = document.getElementById('itemList');
-    const statusMsg = document.getElementById('statusMsg');
-    const inputField = document.getElementById('inputField');
+    // Navigation : Pile pour savoir où on est (Fil d'Ariane)
+    // navStack vide = Racine. 
+    // navStack contient des index = on est dans des sous-dossiers.
+    let navStack = []; 
 
-    // Premier affichage
+    const listElement = document.getElementById('itemList');
+    const titleElement = document.getElementById('pageTitle');
+    const backBtn = document.getElementById('backBtn');
+    const inputField = document.getElementById('inputField');
+    const statusMsg = document.getElementById('statusMsg');
+
     render();
 
-    // Fonction de sauvegarde automatique
-    function saveData() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-        showStatus("✅ Sauvegardé !");
+    // --- FONCTIONS NAVIGATION ---
+
+    // Retourne le tableau (array) courant selon où on est
+    function getCurrentArray() {
+        let currentLevel = rootData;
+        for (let index of navStack) {
+            currentLevel = currentLevel[index].items;
+        }
+        return currentLevel;
     }
 
-    // --- FONCTIONS PRINCIPALES ---
+    // Entrer dans un dossier
+    function enterFolder(index) {
+        navStack.push(index);
+        render();
+    }
+
+    // Remonter d'un niveau
+    function goUp() {
+        navStack.pop();
+        render();
+    }
+
+    // --- RENDU VISUEL ---
 
     function render() {
         listElement.innerHTML = '';
-        
-        items.forEach((item, index) => {
+        const currentData = getCurrentArray();
+
+        // Gestion du Titre et du Bouton Retour
+        if (navStack.length === 0) {
+            titleElement.innerText = "🏗️ Mes Bâtiments";
+            backBtn.style.display = 'none';
+            inputField.placeholder = "Nouveau bâtiment...";
+        } else {
+            // Récupérer le nom du dossier parent pour le titre
+            let parent = rootData;
+            for(let i=0; i<navStack.length-1; i++) parent = parent[navStack[i]].items;
+            const currentFolderName = parent[navStack[navStack.length-1]].name;
+            
+            titleElement.innerText = "📂 " + currentFolderName;
+            backBtn.style.display = 'block';
+            inputField.placeholder = "Ajouter un étage/appart...";
+        }
+
+        // Affichage des éléments
+        currentData.forEach((item, index) => {
             const li = document.createElement('li');
-            li.className = 'building-item';
+            li.className = 'item';
             li.draggable = true;
             li.dataset.index = index;
             
-            // Structure HTML interne
+            // Icône différente si on est à la racine (Bâtiment) ou dedans (Étage/Appart)
+            const icon = navStack.length === 0 ? '🏢' : '🚪';
+            
+            // Compteur d'éléments à l'intérieur (si existe)
+            const count = item.items ? `(${item.items.length})` : '';
+
             li.innerHTML = `
-                <div class="item-content">
-                    <span class="icon">🏢</span>
+                <div class="item-content" onclick="enterFolder(${index})">
+                    <span class="icon">${icon}</span>
                     <span class="name">${item.name}</span>
+                    ${item.items && item.items.length > 0 ? `<span class="count-badge">${item.items.length} éléments</span>` : ''}
                 </div>
-                <button class="delete-btn" onclick="deleteItem(${index})" title="Supprimer">✖</button>
+                <button class="delete-btn" onclick="deleteItem(event, ${index})" title="Supprimer">✖</button>
             `;
 
             addDragEvents(li);
@@ -222,32 +269,44 @@
         });
     }
 
+    // --- AJOUT / SUPPRESSION ---
+
     function addItem() {
         const name = inputField.value.trim();
-        
         if (name) {
-            items.push({ id: Date.now(), name: name });
+            const currentArr = getCurrentArray();
+            // On ajoute un objet qui a aussi un tableau 'items' pour permettre des sous-niveaux infinis si besoin
+            currentArr.push({ id: Date.now(), name: name, items: [] });
+            
             inputField.value = '';
             saveData();
             render();
-            inputField.focus(); // Remet le curseur dans la case
+            inputField.focus();
         }
     }
 
-    // Touche Entrée pour valider
     inputField.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') addItem();
     });
 
-    function deleteItem(index) {
-        if(confirm('Supprimer ce bâtiment ?')) {
-            items.splice(index, 1);
+    function deleteItem(e, index) {
+        e.stopPropagation(); // Empêche d'entrer dans le dossier quand on supprime
+        if(confirm('Supprimer ? Tout le contenu sera perdu.')) {
+            const currentArr = getCurrentArray();
+            currentArr.splice(index, 1);
             saveData();
             render();
         }
     }
 
-    // --- MOTEUR DRAG & DROP (VERIFIÉ & OPTIMISÉ) ---
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(rootData));
+        statusMsg.innerText = "✅ Sauvegardé !";
+        statusMsg.classList.add('visible');
+        setTimeout(() => statusMsg.classList.remove('visible'), 2000);
+    }
+
+    // --- DRAG & DROP (LOGIQUE UNIVERSELLE) ---
     
     let dragStartIndex;
 
@@ -263,63 +322,38 @@
     function dragStart(e) {
         dragStartIndex = +this.dataset.index;
         this.classList.add('dragging');
-        
-        // Optimisation du rendu visuel lors du drag
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/html', this.innerHTML);
     }
 
-    function dragOver(e) {
-        e.preventDefault(); // Indispensable pour autoriser le drop
-        return false;
-    }
-
-    function dragEnter() {
-        this.classList.add('over');
-    }
-
-    function dragLeave() {
-        this.classList.remove('over');
-    }
+    function dragOver(e) { e.preventDefault(); return false; }
+    function dragEnter() { this.classList.add('over'); }
+    function dragLeave() { this.classList.remove('over'); }
 
     function drop(e) {
-        e.stopPropagation(); // Arrête les conflits d'événements
-        
+        e.stopPropagation();
         const dragEndIndex = +this.dataset.index;
-        
-        // Si la position a changé, on met à jour le tableau
         if (dragStartIndex !== dragEndIndex) {
             swapItems(dragStartIndex, dragEndIndex);
         }
-        
         this.classList.remove('over');
         return false;
     }
 
     function dragEnd() {
-        // Nettoyage visuel garanti même si on lâche la souris hors fenêtre
         this.classList.remove('dragging');
-        document.querySelectorAll('.building-item').forEach(item => item.classList.remove('over'));
+        document.querySelectorAll('.item').forEach(item => item.classList.remove('over'));
     }
 
     function swapItems(from, to) {
-        const itemToMove = items[from];
-        
-        // Logique de permutation robuste
-        items.splice(from, 1);
-        items.splice(to, 0, itemToMove);
-        
+        const currentArr = getCurrentArray();
+        const itemToMove = currentArr[from];
+        currentArr.splice(from, 1);
+        currentArr.splice(to, 0, itemToMove);
         saveData();
         render();
     }
 
-    // Animation du message de statut
-    function showStatus(msg) {
-        statusMsg.innerText = msg;
-        statusMsg.classList.add('visible');
-        setTimeout(() => statusMsg.classList.remove('visible'), 2000);
-    }
 </script>
-
 </body>
 </html>
