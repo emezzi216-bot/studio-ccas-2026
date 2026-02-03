@@ -2,332 +2,324 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v16 Finale</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Bâtiments</title>
     <style>
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; --panel: #ffffff; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
+        :root {
+            --primary: #2c3e50; /* Bleu nuit pro pour Bâtiment */
+            --accent: #e67e22;  /* Orange chantier/action */
+            --danger: #e74c3c;
+            --bg: #f4f7f6;
+            --text: #333;
+        }
 
-        /* GENERAL UI */
-        button { cursor: pointer; transition: 0.1s; }
-        button:active { transform: scale(0.98); }
-        
-        /* DASHBOARD */
-        #view-dashboard { flex: 1; padding: 30px; display: flex; flex-direction: column; }
-        .header { background: var(--panel); padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 3px solid var(--gold); }
-        .btn-big { padding: 12px 25px; border: none; border-radius: 6px; font-weight: bold; background: #eef2ff; color: var(--blue); border: 1px solid var(--blue); display:flex; align-items:center; gap:10px; }
-        .btn-big:hover { background: var(--blue); color: white; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; overflow-y: auto; padding: 5px; }
-        .card { background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; transition: 0.2s; }
-        .card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .del-btn { position: absolute; top: 8px; right: 8px; color: #ff4d4d; font-weight: bold; width: 28px; height: 28px; background:#fff0f0; border-radius:50%; display: flex; align-items: center; justify-content: center; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            margin: 0;
+            user-select: none; /* Améliore l'expérience tactile/souris */
+        }
 
-        /* STUDIO */
-        #view-studio { display: none; height: 100vh; flex-direction: row; }
-        #sidebar { width: 280px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 10px rgba(0,0,0,0.2); }
-        .back-home { padding: 18px; background: rgba(255,255,255,0.05); color: var(--gold); font-weight: bold; cursor: pointer; border: none; text-align: left; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .back-home:hover { background: rgba(255,255,255,0.1); }
-        
-        #editor-main { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
-        .top-bar { background: white; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; height: 65px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        
-        .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; overflow: hidden; }
-        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
-        
-        .gen-btn { background: linear-gradient(135deg, var(--blue), #1a2b50); color: white; padding: 10px 30px; border-radius: 30px; border: none; font-weight: bold; box-shadow: 0 4px 10px rgba(10, 26, 60, 0.3); }
-        .gen-btn:hover { transform: scale(1.05); }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
 
-        .content-area { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
+        h2 { 
+            text-align: center; 
+            margin-top: 0; 
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Zone de saisie */
+        .input-group { display: flex; gap: 10px; margin-bottom: 25px; }
         
-        /* EDITOR CARDS & DRAG DROP */
-        .photo-block { background: white; padding: 20px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 20px; border: 1px solid #ddd; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: 0.2s; }
-        
-        /* Style quand on glisse */
-        .photo-block.dragging { opacity: 0.5; border: 2px dashed var(--blue); transform: scale(0.98); }
-        .photo-block.drag-over { border-top: 4px solid var(--gold); }
+        input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: var(--accent); }
 
-        .drag-handle { cursor: grab; font-size: 24px; color: #ccc; display: flex; align-items: center; justify-content: center; padding-right: 10px; }
-        .drag-handle:hover { color: var(--blue); }
+        button.add-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.3s, transform 0.1s;
+        }
+        button.add-btn:hover { background: #34495e; }
+        button.add-btn:active { transform: scale(0.98); }
 
-        .photo-col { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 240px; flex-shrink: 0; }
-        .photo-img { width: 100%; height: 160px; object-fit: contain; border: 1px solid #eee; background: #fafafa; border-radius: 4px; cursor: pointer; }
-        .btn-edit-photo { background: #333; color: white; border: none; padding: 8px 0; border-radius: 4px; width: 100%; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-edit-photo:hover { background: var(--gold); color: black; }
-        
-        .del-p-btn { position: absolute; top: -12px; right: -12px; background: #ff4d4d; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; border:3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 5; }
-        
-        /* TEXT TOOLBAR */
-        .toolbar { display: flex; gap: 4px; margin-bottom: 8px; background: #f8f9fa; padding: 6px; border-radius: 6px; border: 1px solid #e9ecef; flex-wrap: wrap; }
-        .toolbar button { width: 30px; height: 30px; border: 1px solid transparent; background: white; border-radius: 4px; font-weight: bold; font-size: 13px; color: #444; border-color: #ddd; }
-        .toolbar button:hover { background: #e2e6ea; border-color: #adb5bd; }
-        .rich-text { min-height: 130px; border: 1px solid #ccc; padding: 12px; border-radius: 6px; font-size: 14px; overflow-y: auto; background: #fff; line-height: 1.5; color: #333; cursor: text; }
-        .rich-text:focus { border-color: var(--blue); outline: none; background: #fdfdff; }
+        /* Liste des bâtiments */
+        ul { list-style: none; padding: 0; margin: 0; }
 
-        .bat-item { padding: 12px; margin-bottom: 6px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; justify-content: space-between; border-radius: 6px; color: #ccc; }
-        .bat-item:hover { background: rgba(255,255,255,0.1); color: white; }
-        .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; border-left: 4px solid #fff; }
+        .building-item {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 12px;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: grab; /* Main ouverte */
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+            position: relative;
+        }
 
-        /* PAINT MODAL */
-        #paint-modal { position: fixed; inset: 0; background: rgba(20, 20, 25, 0.95); z-index: 20000; display: none; flex-direction: column; }
-        .paint-header { height: 60px; background: #333; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #555; }
-        .paint-toolbar { height: 70px; background: #444; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 0 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .tool-group { display: flex; gap: 5px; background: #333; padding: 5px; border-radius: 8px; align-items: center; }
-        .p-btn { width: 40px; height: 40px; border: 1px solid #555; background: #444; border-radius: 5px; color: white; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .p-btn.active { background: var(--gold); color: black; border-color: var(--gold); }
-        .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
-        .color-swatch:hover { transform: scale(1.1); }
-        .color-swatch.active { border-color: white; box-shadow: 0 0 0 2px var(--blue); }
-        #paint-canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #222; }
-        #paint-canvas { box-shadow: 0 0 30px rgba(0,0,0,0.5); background: transparent; cursor: crosshair; }
+        .building-item:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            z-index: 2;
+        }
 
-        /* OVERLAYS */
-        #overlay, #success-modal { position: fixed; inset: 0; background: rgba(10, 26, 60, 0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .success-box { background: white; width: 600px; padding: 40px; border-radius: 15px; text-align: left; color: #333; border-top: 6px solid var(--success); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        #photo-courage { width: 300px; height: 300px; border-radius: 50%; border: 8px solid var(--gold); object-fit: cover; cursor: pointer; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.02);} 100% {transform: scale(1);} }
+        .building-item:active {
+            cursor: grabbing; /* Main fermée */
+        }
+
+        /* Styles pendant le déplacement */
+        .building-item.dragging {
+            opacity: 0.5;
+            background: #fcf3cf; /* Légère teinte jaune */
+            border: 2px dashed var(--accent);
+            transform: scale(0.98);
+        }
+
+        .building-item.over {
+            border-top: 3px solid var(--accent);
+            transform: translateY(2px);
+        }
+
+        /* Contenu du bâtiment */
+        .item-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            pointer-events: none; /* CRUCIAL : empêche les bugs de drag sur le texte */
+            flex-grow: 1;
+        }
+
+        .icon { font-size: 1.6rem; }
+        .name { font-size: 1.1rem; font-weight: 600; color: #2c3e50; }
+
+        /* Bouton supprimer */
+        .delete-btn {
+            background: #fff;
+            border: 1px solid #eee;
+            color: #bdc3c7;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        /* Message de statut */
+        .status {
+            text-align: center;
+            color: #27ae60;
+            font-weight: bold;
+            height: 20px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .status.visible { opacity: 1; }
     </style>
 </head>
 <body>
 
-<input type="file" id="import-input" style="display:none" onchange="loadFile(this)">
-<input type="file" id="photo-input" style="display:none" multiple onchange="processPhotos(this)">
-<input type="file" id="courage-input" style="display:none" onchange="updateCourage(this)">
-<input type="file" id="logo-input" style="display:none" onchange="updateLogo(this)">
+<div class="container">
+    <h2>🏗️ Mes Bâtiments</h2>
+    
+    <div class="input-group">
+        <input type="text" id="inputField" placeholder="Nom du bâtiment (ex: Tour A)..." autocomplete="off">
+        <button class="add-btn" onclick="addItem()">Ajouter</button>
+    </div>
 
-<div id="view-dashboard">
-    <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:14px; opacity:0.6;">v16 Finale</span></h1><p style="margin:0;color:#666">Direction des Finances</p></div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-big" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
-            <button class="btn-big" onclick="document.getElementById('import-input').click()">📂 OUVRIR USB</button>
-        </div>
-    </div>
-    <div id="grid-projects" class="grid"></div>
-</div>
+    <ul id="itemList"></ul>
 
-<div id="view-studio">
-    <div id="sidebar">
-        <button class="back-home" onclick="goDashboard()">🏠 REVENIR AUX DOSSIERS</button>
-        <div style="padding:20px; text-align:center; color:var(--gold); font-weight:bold; font-size:1.1rem;" id="lbl-proj">Projet</div>
-        <div id="list-bat" style="flex:1; overflow-y:auto; padding:10px;"></div>
-        <div style="padding:20px;"><button onclick="newBat()" style="width:100%; padding:12px; background:transparent; border:2px dashed var(--gold); color:white; font-weight:bold; cursor:pointer; border-radius:6px;">+ AJOUTER BÂTIMENT</button></div>
-    </div>
-    <div id="editor-main">
-        <div class="top-bar">
-            <div class="logo-box" onclick="document.getElementById('logo-input').click()" title="Changer le logo"><img id="logo-preview" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'"></div>
-            <div id="lbl-bat" style="font-weight:bold; color:var(--blue); font-size:1.3rem;">Accueil</div>
-            <button class="gen-btn" onclick="generateZip()">📦 GÉNÉRER ZIP (MAIL)</button>
-        </div>
-        <div id="area-photos" class="content-area"></div>
-    </div>
-</div>
-
-<div id="paint-modal">
-    <div class="paint-header">
-        <div style="color:white; font-weight:bold;">🎨 RETOUCHE PHOTO</div>
-        <div style="display:flex; gap:10px;">
-            <button onclick="savePaint()" style="background:var(--gold); border:none; padding:8px 20px; border-radius:4px; font-weight:bold;">💾 ENREGISTRER</button>
-            <button onclick="closePaint()" style="background:#555; color:white; border:none; padding:8px 20px; border-radius:4px;">Annuler</button>
-        </div>
-    </div>
-    <div class="paint-toolbar">
-        <div class="tool-group">
-            <button class="p-btn active" onclick="setTool('rect')">⬜</button>
-            <button class="p-btn" onclick="setTool('circle')">⭕</button>
-            <button class="p-btn" onclick="setTool('arrow')">↗️</button>
-            <button class="p-btn" onclick="undoPaint()">↩️</button>
-        </div>
-        <div class="tool-group">
-            <div class="color-swatch active" style="background:#ff0000;" onclick="setColor('#ff0000', this)"></div>
-            <div class="color-swatch" style="background:#ffff00;" onclick="setColor('#ffff00', this)"></div>
-            <div class="color-swatch" style="background:#00ff00;" onclick="setColor('#00ff00', this)"></div>
-            <div class="color-swatch" style="background:#0000ff;" onclick="setColor('#0000ff', this)"></div>
-            <div class="color-swatch" style="background:#ffffff;" onclick="setColor('#ffffff', this)"></div>
-            <input type="color" onchange="setColor(this.value, null)" style="width:30px; height:30px; border:none; padding:0; background:none;">
-        </div>
-        <div class="tool-group" style="color:white; font-size:12px; padding:0 15px;">
-            Épaisseur<br><input type="range" min="2" max="20" value="5" oninput="setLineWidth(this.value)" style="width:100px;">
-        </div>
-    </div>
-    <div id="paint-canvas-container"><canvas id="paint-canvas"></canvas></div>
-</div>
-
-<div id="overlay">
-    <img src="courage.jpg.JPG" id="photo-courage" onclick="document.getElementById('courage-input').click()" onerror="this.src='https://via.placeholder.com/300?text=PHOTO+MANQUANTE'">
-    <h2 style="color:var(--gold); margin-top:20px;">COURAGE MAMIE ! ❤️</h2>
-    <p>Création du dossier ZIP en cours...</p>
-</div>
-
-<div id="success-modal">
-    <div class="success-box">
-        <h2 style="color:var(--blue); margin:0 0 15px 0;">📦 Dossier ZIP prêt !</h2>
-        <p style="font-size:1.1rem; line-height:1.6; color:#555;">Le fichier <strong>Dossier_Final.zip</strong> est dans <strong>Téléchargements</strong>.</p>
-        <button style="background:var(--blue); color:white; border:none; padding:12px 20px; font-weight:bold; cursor:pointer; width:100%; border-radius:6px; margin-top:25px;" onclick="document.getElementById('success-modal').style.display='none'">OK, C'EST NOTÉ</button>
-    </div>
+    <div class="status" id="statusMsg">Sauvegarde effectuée</div>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v16')) || {};
-    let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
-    let curP = null, curB = null;
-    let canvas, ctx, paintImg, isDrawing = false, startX, startY;
-    let currentTool = 'rect', currentColor = '#ff0000', currentWidth = 5;
-    let paintHistory = [], currentPhotoIndex = null;
-    let dragSrcEl = null;
+    // --- DONNÉES & SAUVEGARDE ---
+    // Clé unique pour les bâtiments pour ne pas mélanger avec les dossiers précédents
+    const STORAGE_KEY = 'myBuildingsData';
 
-    window.onload = () => {
-        refreshGrid();
-        if(appConfig.logo) document.getElementById('logo-preview').src = appConfig.logo;
-        if(appConfig.courage) document.getElementById('photo-courage').src = appConfig.courage;
-        if(!appConfig.logo) { const img = document.getElementById('logo-preview'); if(img.complete && img.naturalWidth > 0) imgTo64(img, r => { appConfig.logo = r; saveConfig(); }); }
-        canvas = document.getElementById('paint-canvas'); ctx = canvas.getContext('2d');
-        canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); window.addEventListener('mouseup', stopDraw);
-    };
+    let items = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+        { id: 1, name: 'Résidence Les Lilas' },
+        { id: 2, name: 'Tour Centrale' },
+        { id: 3, name: 'Entrepôt Nord' }
+    ];
 
-    function save() { localStorage.setItem('ccas_db_v16', JSON.stringify(db)); }
-    function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
-    function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
-    function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
-    function updateCourage(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('photo-courage').src=e.target.result; appConfig.courage=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
+    const listElement = document.getElementById('itemList');
+    const statusMsg = document.getElementById('statusMsg');
+    const inputField = document.getElementById('inputField');
 
-    function refreshGrid() {
-        const g = document.getElementById('grid-projects');
-        g.innerHTML = `<div class="card" onclick="createProj()" style="border:2px dashed #ccc; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#888;"><h1>+</h1><div>NOUVEAU</div></div>`;
-        Object.keys(db).sort((a,b) => db[b].date - db[a].date).forEach(id => {
-            const p = db[id];
-            const div = document.createElement('div'); div.className = 'card';
-            div.innerHTML = `<div class="del-btn" onclick="delProj('${id}', event)">×</div><div style="font-size:2rem;">📁</div><div style="font-weight:bold; color:#0A1A3C;">${p.name}</div><div style="color:#888; font-size:0.8rem;">${new Date(p.date).toLocaleDateString()}</div>`;
-            div.onclick = () => openProj(id); g.appendChild(div);
-        });
+    // Premier affichage
+    render();
+
+    // Fonction de sauvegarde automatique
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        showStatus("✅ Sauvegardé !");
     }
-    function createProj() { const n = prompt("Nom du dossier :"); if(n) { const id = Date.now().toString(); db[id] = { name:n, date:Date.now(), data:{} }; save(); openProj(id); } }
-    function delProj(id, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete db[id]; save(); refreshGrid(); } }
-    function saveToUSB() { const d = { db: db, config: appConfig }; const b = new Blob([JSON.stringify(d)], {type: "application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `CCAS_SAUVEGARDE_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); }
-    function loadFile(i) { const f = i.files[0]; if(!f) return; const r = new FileReader(); r.onload = e => { try { const j = JSON.parse(e.target.result); if(j.config) { appConfig = j.config; db = { ...db, ...j.db }; saveConfig(); } else { db = { ...db, ...j }; } save(); refreshGrid(); alert("OK"); } catch(err) { alert("Erreur"); } }; r.readAsText(f); }
 
-    function openProj(id) { curP = id; curB = null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex'; document.getElementById('lbl-proj').innerText = db[id].name; refreshSide(); refreshMain(); }
-    function goDashboard() { curP = null; document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; refreshGrid(); }
-    function newBat() { const n = prompt("Nom du bâtiment :"); if(n) { if(!db[curP].data[n]) { db[curP].data[n] = []; save(); openBat(n); refreshSide(); } else alert("Existe déjà"); } }
-    function refreshSide() { const l = document.getElementById('list-bat'); l.innerHTML = ''; Object.keys(db[curP].data).forEach(b => { const d = document.createElement('div'); d.className = `bat-item ${curB === b ? 'active' : ''}`; d.innerHTML = `<span>${b}</span><span onclick="delBat('${b}', event)" style="color:#ff6b6b; font-weight:bold; padding:0 5px;">×</span>`; d.onclick = () => openBat(b); l.appendChild(d); }); }
-    function delBat(b, e) { e.stopPropagation(); if(confirm("Supprimer "+b+" ?")) { delete db[curP].data[b]; if(curB === b) curB = null; save(); refreshSide(); refreshMain(); } }
-    function openBat(b) { curB = b; document.getElementById('lbl-bat').innerText = b; refreshSide(); refreshMain(); }
+    // --- FONCTIONS PRINCIPALES ---
 
-    function refreshMain() {
-        const area = document.getElementById('area-photos');
-        if(!curB) { area.innerHTML = '<div style="text-align:center; color:#999; margin-top:50px;">Sélectionnez un bâtiment.</div>'; return; }
-        area.innerHTML = `<div onclick="document.getElementById('photo-input').click()" style="padding:30px; border:3px dashed #ddd; text-align:center; background:white; cursor:pointer; margin-bottom:30px; font-weight:bold; color:#888; border-radius:10px;">📸 AJOUTER DES PHOTOS ICI</div>`;
-        db[curP].data[curB].forEach((p, idx) => {
-            const div = document.createElement('div');
-            div.className = 'photo-block';
-            div.draggable = true;
-            div.dataset.index = idx;
-            // EVENTS DRAG DROP
-            div.ondragstart = handleDragStart;
-            div.ondragover = handleDragOver;
-            div.ondragleave = handleDragLeave;
-            div.ondrop = handleDrop;
-
-            div.innerHTML = `
-                <div class="del-p-btn" onclick="delPhoto(${idx})">×</div>
-                <div class="drag-handle" title="Glisser pour déplacer">⠿</div>
-                <div class="photo-col">
-                    <img src="${p.img}" class="photo-img" onclick="openPaint(${idx})">
-                    <button class="btn-edit-photo" onclick="openPaint(${idx})">🎨 RETOUCHER</button>
+    function render() {
+        listElement.innerHTML = '';
+        
+        items.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.className = 'building-item';
+            li.draggable = true;
+            li.dataset.index = index;
+            
+            // Structure HTML interne
+            li.innerHTML = `
+                <div class="item-content">
+                    <span class="icon">🏢</span>
+                    <span class="name">${item.name}</span>
                 </div>
-                <div style="flex:1">
-                    <div class="toolbar">
-                        <button onclick="cmd('bold')"><b>B</b></button><button onclick="cmd('italic')"><i>I</i></button><button onclick="cmd('underline')"><u>U</u></button>
-                        <div style="width:1px; background:#ccc; margin:0 5px;"></div>
-                        <input type="color" onchange="cmd('foreColor', this.value)" style="height:28px; width:30px;">
-                        <button onclick="cmd('hiliteColor', 'yellow')" style="background:yellow;">🖍️</button>
-                        <div style="width:1px; background:#ccc; margin:0 5px;"></div>
-                        <button onclick="cmd('insertUnorderedList')">• Liste</button>
-                    </div>
-                    <div class="rich-text" contenteditable="true" oninput="updateTxt(${idx}, this.innerHTML)">${p.desc}</div>
-                </div>`;
-            area.appendChild(div);
+                <button class="delete-btn" onclick="deleteItem(${index})" title="Supprimer">✖</button>
+            `;
+
+            addDragEvents(li);
+            listElement.appendChild(li);
         });
     }
 
-    // DRAG AND DROP LOGIC
-    function handleDragStart(e) { dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
-    function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); this.classList.add('drag-over'); return false; }
-    function handleDragLeave(e) { this.classList.remove('drag-over'); }
-    function handleDrop(e) {
-        if (e.stopPropagation) e.stopPropagation();
-        this.classList.remove('drag-over');
-        if (dragSrcEl !== this) {
-            const oldIdx = parseInt(dragSrcEl.dataset.index);
-            const newIdx = parseInt(this.dataset.index);
-            const arr = db[curP].data[curB];
-            const item = arr.splice(oldIdx, 1)[0];
-            arr.splice(newIdx, 0, item);
-            save(); refreshMain();
+    function addItem() {
+        const name = inputField.value.trim();
+        
+        if (name) {
+            items.push({ id: Date.now(), name: name });
+            inputField.value = '';
+            saveData();
+            render();
+            inputField.focus(); // Remet le curseur dans la case
         }
+    }
+
+    // Touche Entrée pour valider
+    inputField.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addItem();
+    });
+
+    function deleteItem(index) {
+        if(confirm('Supprimer ce bâtiment ?')) {
+            items.splice(index, 1);
+            saveData();
+            render();
+        }
+    }
+
+    // --- MOTEUR DRAG & DROP (VERIFIÉ & OPTIMISÉ) ---
+    
+    let dragStartIndex;
+
+    function addDragEvents(li) {
+        li.addEventListener('dragstart', dragStart);
+        li.addEventListener('dragover', dragOver);
+        li.addEventListener('drop', drop);
+        li.addEventListener('dragenter', dragEnter);
+        li.addEventListener('dragleave', dragLeave);
+        li.addEventListener('dragend', dragEnd);
+    }
+
+    function dragStart(e) {
+        dragStartIndex = +this.dataset.index;
+        this.classList.add('dragging');
+        
+        // Optimisation du rendu visuel lors du drag
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', this.innerHTML);
+    }
+
+    function dragOver(e) {
+        e.preventDefault(); // Indispensable pour autoriser le drop
         return false;
     }
 
-    function cmd(c, v=null) { document.execCommand(c, false, v); }
-    function processPhotos(i) { Array.from(i.files).forEach(f => { const r = new FileReader(); r.onload = e => { db[curP].data[curB].push({img: e.target.result, desc: ""}); save(); refreshMain(); }; r.readAsDataURL(f); }); }
-    function delPhoto(idx) { if(confirm("Supprimer ?")) { db[curP].data[curB].splice(idx, 1); save(); refreshMain(); } }
-    function updateTxt(idx, h) { db[curP].data[curB][idx].desc = h; save(); }
-
-    function openPaint(idx) {
-        currentPhotoIndex = idx; const src = db[curP].data[curB][idx].img; paintImg = new Image();
-        paintImg.onload = () => {
-            const maxW = window.innerWidth * 0.8, maxH = window.innerHeight * 0.7;
-            let w = paintImg.width, h = paintImg.height, r = Math.min(maxW/w, maxH/h);
-            w *= r; h *= r; canvas.width = w; canvas.height = h;
-            ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.drawImage(paintImg, 0, 0, w, h);
-            saveHistory(); document.getElementById('paint-modal').style.display = 'flex';
-        }; paintImg.src = src;
+    function dragEnter() {
+        this.classList.add('over');
     }
-    function setTool(t) { currentTool = t; document.querySelectorAll('.p-btn').forEach(b=>b.classList.remove('active')); event.currentTarget.classList.add('active'); }
-    function setColor(c, el) { currentColor = c; if(el){ document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active')); el.classList.add('active'); } }
-    function setLineWidth(w) { currentWidth = w; }
-    function saveHistory() { paintHistory.push(canvas.toDataURL()); if(paintHistory.length>8) paintHistory.shift(); }
-    function undoPaint() { if(paintHistory.length>1) { paintHistory.pop(); let i = new Image(); i.onload=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(i,0,0);}; i.src = paintHistory[paintHistory.length-1]; } }
-    function startDraw(e) { isDrawing=true; const r=canvas.getBoundingClientRect(); startX=e.clientX-r.left; startY=e.clientY-r.top; saveHistory(); }
-    function draw(e) {
-        if(!isDrawing) return; const r=canvas.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
-        let i=new Image(); i.src=paintHistory[paintHistory.length-1]; ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(i,0,0);
-        ctx.strokeStyle=currentColor; ctx.lineWidth=currentWidth; ctx.beginPath();
-        if(currentTool==='circle'){ let rad=Math.sqrt(Math.pow(x-startX,2)+Math.pow(y-startY,2)); ctx.arc(startX,startY,rad,0,2*Math.PI); ctx.stroke(); }
-        else if(currentTool==='rect'){ ctx.strokeRect(startX,startY,x-startX,y-startY); }
-        else if(currentTool==='arrow'){ const h=15+currentWidth*0.5, a=Math.atan2(y-startY,x-startX); ctx.moveTo(startX,startY); ctx.lineTo(x,y); ctx.lineTo(x-h*Math.cos(a-Math.PI/6),y-h*Math.sin(a-Math.PI/6)); ctx.moveTo(x,y); ctx.lineTo(x-h*Math.cos(a+Math.PI/6),y-h*Math.sin(a+Math.PI/6)); ctx.stroke(); }
-    }
-    function stopDraw() { isDrawing=false; }
-    function savePaint() { db[curP].data[curB][currentPhotoIndex].img=canvas.toDataURL('image/jpeg',0.9); save(); closePaint(); refreshMain(); }
-    function closePaint() { document.getElementById('paint-modal').style.display='none'; paintHistory=[]; }
 
-    function generateZip() {
-        if(!window.JSZip) { alert("Erreur moteur ZIP"); return; }
-        const proj = db[curP]; document.getElementById('overlay').style.display='flex';
-        const finalLogo = appConfig.logo || "";
-        setTimeout(() => {
-            const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
-            const h = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
-            body{font-family:'Segoe UI',sans-serif;margin:0;display:flex;height:100vh;background:#000;color:#F4F7FD;overflow:hidden}
-            #side{width:280px;background:#050E24;border-right:3px solid #CCA43B;display:flex;flex-direction:column;z-index:10;box-shadow:5px 0 15px rgba(0,0,0,0.5)}
-            .head{padding:25px;color:#CCA43B;font-weight:800;border-bottom:1px solid #1f2d40;text-transform:uppercase;text-align:center}
-            .btn{width:100%;padding:20px;text-align:left;border:none;background:none;color:#8E8E93;cursor:pointer;border-bottom:1px solid #111;transition:0.2s}
-            .btn.active{color:#CCA43B;background:rgba(204,164,59,0.1);border-left:5px solid #CCA43B;font-weight:bold}.btn:hover{color:white}
-            #main{flex:1;display:flex;flex-direction:column;position:relative;background:radial-gradient(circle at center,#142850,#0A1A3C)}
-            .top-zone{position:absolute;top:15px;right:15px;display:flex;align-items:center;gap:10px;background:rgba(10,26,60,0.9);padding:5px 10px;border:1px solid #CCA43B;border-radius:4px;z-index:100}
-            .logo{width:50px !important;height:auto;display:block}.txt{margin:0;font-size:9px !important;color:#CCA43B;font-weight:700;text-transform:uppercase;line-height:1.1;text-align:left}
-            .view{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
-            .frame{width:100%;max-width:1400px;aspect-ratio:16/9;border:4px solid #CCA43B;background:#000;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 80px rgba(0,0,0,0.8)}
-            .frame img{width:100%;height:100%;object-fit:contain}
-            .bot{padding:30px 50px;background:rgba(5,14,36,0.95);border-top:4px solid #CCA43B;min-height:150px;z-index:50}
-            .arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,26,60,0.8);color:#CCA43B;border:2px solid #CCA43B;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:24px;z-index:60}.al{left:-25px}.ar{right:-25px}
-            </style></head><body><div id="side"><div class="head">${proj.name}</div><div id="nav" style="flex:1;overflow-y:auto"></div></div><div id="main"><div class="view"><div class="frame" id="fr"><div class="top-zone"><img src="${finalLogo}" class="logo"><div class="txt">DIRECTION GÉNÉRALE<br>DES FINANCES ET DES<br>MOYENS GÉNÉRAUX</div></div><div id="sc" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div></div></div><div class="bot"><h2 id="tit" style="color:#CCA43B;margin:0 0 10px 0;text-transform:uppercase"></h2><div id="desc" style="font-size:1.3rem;line-height:1.5"></div></div></div><script>
-            const d=${json};let cB=Object.keys(d)[0],cI=0;function rn(){const n=document.getElementById('nav');n.innerHTML='';Object.keys(d).forEach(k=>{const b=document.createElement('button');b.className='btn'+(cB===k?' active':'');b.innerText=k;b.onclick=()=>{cB=k;cI=0;sh();rn()};n.appendChild(b)})}function sh(){const s=document.getElementById('sc'),f=document.getElementById('fr'),i=d[cB];if(!i||!i.length){s.innerHTML='';document.getElementById('desc').innerHTML='';f.querySelectorAll('.arr').forEach(a=>a.remove());return}s.innerHTML='<img src="'+i[cI].img+'">';document.getElementById('tit').innerText=cB;document.getElementById('desc').innerHTML=i[cI].desc||"";f.querySelectorAll('.arr').forEach(a=>a.remove());if(i.length>1){const l=document.createElement('div');l.className='arr al';l.innerHTML='❮';l.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()};const r=document.createElement('div');r.className='arr ar';r.innerHTML='❯';r.onclick=()=>{cI=(cI+1)%i.length;sh()};f.appendChild(l);f.appendChild(r)}}window.onload=()=>{if(cB){rn();sh()}};<\/script></body></html>`;
-            const zip = new JSZip(); const sn = proj.name.replace(/[^a-z0-9]/gi, '_'); zip.file(sn + ".html", h);
-            zip.generateAsync({type:"blob"}).then(function(c) { const a = document.createElement('a'); a.href = URL.createObjectURL(c); a.download = sn + ".zip"; a.click(); document.getElementById('overlay').style.display='none'; document.getElementById('success-modal').style.display='flex'; });
-        }, 1500);
+    function dragLeave() {
+        this.classList.remove('over');
+    }
+
+    function drop(e) {
+        e.stopPropagation(); // Arrête les conflits d'événements
+        
+        const dragEndIndex = +this.dataset.index;
+        
+        // Si la position a changé, on met à jour le tableau
+        if (dragStartIndex !== dragEndIndex) {
+            swapItems(dragStartIndex, dragEndIndex);
+        }
+        
+        this.classList.remove('over');
+        return false;
+    }
+
+    function dragEnd() {
+        // Nettoyage visuel garanti même si on lâche la souris hors fenêtre
+        this.classList.remove('dragging');
+        document.querySelectorAll('.building-item').forEach(item => item.classList.remove('over'));
+    }
+
+    function swapItems(from, to) {
+        const itemToMove = items[from];
+        
+        // Logique de permutation robuste
+        items.splice(from, 1);
+        items.splice(to, 0, itemToMove);
+        
+        saveData();
+        render();
+    }
+
+    // Animation du message de statut
+    function showStatus(msg) {
+        statusMsg.innerText = msg;
+        statusMsg.classList.add('visible');
+        setTimeout(() => statusMsg.classList.remove('visible'), 2000);
     }
 </script>
+
 </body>
 </html>
