@@ -2,182 +2,256 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v48 COMPLETE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio CCAS | v50 ULTIME</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f6f8; --white: #ffffff; --green: #27ae60; --red: #c0392b; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
-        * { box-sizing: border-box; outline: none; }
-        button { cursor: pointer; font-family: inherit; transition: 0.1s; } button:active { transform: scale(0.98); }
-
-        /* HEADER */
-        .app-header { background: var(--white); padding: 0 30px; height: 70px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--gold); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .app-title h1 { color: var(--blue); margin: 0; font-size: 1.4rem; display:flex; align-items:center; gap:10px; }
-        .badge { background: var(--green); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; }
-        .btn-main { background: var(--blue); color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold; border: none; display: flex; align-items: center; gap: 8px; }
-        
-        /* VIEWS */
-        #view-dashboard { flex: 1; padding: 40px; overflow-y: auto; }
-        #view-studio { display: none; height: 100%; flex-direction: row; }
-
-        /* GRID */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-        .card { background: white; padding: 30px; border-radius: 12px; text-align: center; border: 2px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; cursor: pointer; transition: 0.2s; }
-        .card:hover { transform: translateY(-5px); border-color: var(--gold); }
-        .card-del { position: absolute; top: 10px; right: 10px; background: #fee2e2; color: var(--red); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
-        /* SIDEBAR (BATIMENTS) */
-        .sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 20px rgba(0,0,0,0.15); }
-        .back-btn { padding: 20px; background: rgba(0,0,0,0.2); color: var(--gold); font-weight: bold; border: none; text-align: left; width: 100%; }
-        .bat-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .bat-item { 
-            padding: 12px; background: rgba(255,255,255,0.05); margin-bottom: 8px; border-radius: 6px; 
-            cursor: pointer; display: flex; align-items: center; justify-content: space-between; 
-            border: 1px solid transparent; transition: 0.2s;
+        :root {
+            --primary: #0A1A3C; /* Bleu Nuit */
+            --accent: #CCA43B;  /* Or */
+            --bg: #f4f6f8;
+            --white: #ffffff;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --gray: #ecf0f1;
         }
-        .bat-item:hover { background: rgba(255,255,255,0.1); }
-        .bat-item.active { background: white; color: var(--blue); font-weight: bold; border-left: 5px solid var(--gold); }
-        /* DRAG STATE */
-        .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
-        
-        .bat-handle { cursor: grab; padding-right: 10px; opacity: 0.5; font-size: 1.2rem; }
-        .add-bat-btn { padding: 20px; }
-        .add-bat-btn button { width: 100%; padding: 15px; background: transparent; border: 2px dashed rgba(255,255,255,0.3); color: white; font-weight: bold; border-radius: 8px; }
 
-        /* EDITOR (PHOTOS) */
-        .editor { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
-        .toolbar-top { height: 70px; background: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; }
-        .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; cursor: pointer; display:flex; align-items:center; justify-content:center; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; color: #333; }
+        * { box-sizing: border-box; outline: none; }
+        
+        /* UTILITAIRES */
+        button { cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+        button:active { transform: scale(0.96); }
+        .hidden { display: none !important; }
+
+        /* --- HEADER --- */
+        .app-header {
+            height: 70px; background: var(--white); padding: 0 30px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 3px solid var(--accent); box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 50;
+        }
+        .app-title h1 { margin: 0; color: var(--primary); font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        .badge { background: var(--accent); color: black; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        
+        .header-actions { display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border-radius: 6px; font-weight: bold; border: none; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .btn-outline { background: white; border: 2px solid #ccc; color: #555; }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; box-shadow: 0 4px 6px rgba(39, 174, 96, 0.3); }
+        .btn-success:hover { background: #219150; }
+
+        /* --- VUES --- */
+        #view-dashboard { flex: 1; padding: 40px; overflow-y: auto; }
+        #view-studio { display: none; height: calc(100vh - 70px); flex-direction: row; }
+
+        /* DASHBOARD GRID */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; padding-bottom: 50px; }
+        .card { 
+            background: white; padding: 30px; border-radius: 12px; text-align: center; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; cursor: pointer; 
+            border: 2px solid transparent; transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .card-del { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; background: #fee2e2; color: var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.2s; }
+        .card-del:hover { background: var(--danger); color: white; }
+
+        /* STUDIO: SIDEBAR (Gauche) */
+        .sidebar { width: 300px; background: var(--primary); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 20px rgba(0,0,0,0.2); }
+        .sidebar-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
+        .back-btn { background: none; border: none; color: var(--accent); font-weight: bold; width: 100%; text-align: left; display: flex; align-items: center; gap: 5px; }
+        
+        .bat-list { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .bat-item { 
+            padding: 12px 15px; background: rgba(255,255,255,0.08); border-radius: 6px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: space-between; border-left: 4px solid transparent; 
+            transition: 0.2s; 
+        }
+        .bat-item:hover { background: rgba(255,255,255,0.15); }
+        .bat-item.active { background: white; color: var(--primary); border-left-color: var(--accent); font-weight: bold; }
+        .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
+        .bat-handle { cursor: grab; margin-right: 10px; opacity: 0.6; font-size: 1.2rem; }
+
+        /* STUDIO: EDITOR (Droite) */
+        .editor { flex: 1; display: flex; flex-direction: column; background: #eef2f6; position: relative; }
+        
+        .editor-toolbar { 
+            height: 70px; background: white; border-bottom: 1px solid #ddd; display: flex; 
+            justify-content: space-between; align-items: center; padding: 0 25px; 
+        }
+        .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; border-radius: 6px; cursor: pointer; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
         
-        .photos-area { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
+        .content-area { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
         
         /* BLOC PHOTO */
         .block { 
-            background: white; border-radius: 12px; margin-bottom: 30px; display: flex; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #ddd; height: 350px; 
-            animation: fadeIn 0.3s; position: relative;
+            background: white; border-radius: 10px; margin-bottom: 30px; display: flex; height: 380px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #ddd; animation: fadeIn 0.4s;
+            position: relative; overflow: hidden;
         }
-        .block.dragging { opacity: 0.4; border: 2px dashed var(--blue); }
+        .block.dragging { opacity: 0.4; border: 2px dashed var(--primary); }
         
-        .drag-photo-handle { width: 40px; background: #f8fafc; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #eee; color: #aaa; font-size: 24px; }
-        .drag-photo-handle:hover { color: var(--blue); background: #edf2f7; }
-
-        .block-img { width: 300px; background: #f9fafb; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid #eee; position: relative; }
-        .img-wrap { width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; }
+        .drag-handle { width: 40px; background: #f8f9fa; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #eee; color: #aaa; font-size: 24px; transition: 0.2s; }
+        .drag-handle:hover { background: #e2e8f0; color: var(--primary); }
+        
+        .block-img { width: 340px; background: #f8fafc; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid #eee; position: relative; }
+        .img-wrap { width: 100%; height: 220px; border: 1px solid #ccc; background: white; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .btn-edit { margin-top: 10px; width: 100%; padding: 8px; background: #333; color: white; border: none; border-radius: 4px; font-weight: bold; }
-        .del-block { position: absolute; top: 10px; left: 10px; background: var(--red); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; z-index: 5; }
+        
+        .btn-action-small { width: 100%; margin-top: 10px; padding: 8px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-edit { background: #333; color: white; }
+        .btn-del { position: absolute; top: 10px; left: 10px; width: 30px; height: 30px; border-radius: 50%; background: white; color: var(--danger); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
         .block-txt { flex: 1; padding: 20px; display: flex; flex-direction: column; }
-        .txt-tools { display: flex; gap: 5px; margin-bottom: 10px; background: #f1f5f9; padding: 5px; border-radius: 6px; border: 1px solid #ddd; }
-        .txt-tools button { width: 30px; height: 30px; border: 1px solid #ccc; background: white; border-radius: 4px; }
-        .editable { flex: 1; border: 1px solid #ccc; border-radius: 6px; padding: 15px; overflow-y: auto; background: white; font-size: 16px; line-height: 1.5; }
+        .txt-tools { display: flex; gap: 8px; margin-bottom: 10px; background: #f9f9f9; padding: 6px; border-radius: 6px; border: 1px solid #eee; }
+        .tool-btn { width: 30px; height: 30px; border: 1px solid #ccc; background: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .editable { flex: 1; border: 1px solid #ccc; border-radius: 6px; padding: 15px; overflow-y: auto; font-size: 16px; line-height: 1.5; background: white; }
+        .editable:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(10,26,60,0.1); }
 
-        /* NOTIFICATIONS */
-        #save-status { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 10px 25px; border-radius: 30px; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 9999; }
-        #save-status.show { opacity: 1; }
+        /* NOTIFICATION FLOTTANTE */
+        #toast { position: fixed; bottom: 30px; right: 30px; background: #333; color: white; padding: 15px 35px; border-radius: 50px; font-weight: bold; opacity: 0; transition: 0.3s; transform: translateY(20px); z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        #toast.show { opacity: 1; transform: translateY(0); }
+        #toast.success { background: var(--success); }
+        #toast.error { background: var(--danger); }
 
-        /* LOADING */
-        #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .spinner { width: 50px; height: 50px; border: 5px solid #eee; border-top-color: var(--gold); border-radius: 50%; animation: spin 1s infinite linear; }
+        /* LOADING OVERLAY */
+        #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .loader { width: 50px; height: 50px; border: 5px solid #eee; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s infinite linear; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* PAINT */
-        #paint-modal { position: fixed; inset: 0; background: #222; z-index: 20000; display: none; flex-direction: column; }
-        .paint-bar { height: 60px; background: #333; display: flex; justify-content: center; align-items: center; gap: 20px; }
+        /* PAINT MODAL */
+        #paint-modal { position: fixed; inset: 0; background: #1e1e1e; z-index: 20000; display: none; flex-direction: column; }
+        .paint-bar { height: 60px; background: #333; display: flex; justify-content: center; align-items: center; gap: 15px; }
         #canvas-box { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .p-btn { width: 40px; height: 40px; background: #555; color: white; border: 1px solid #777; font-size: 18px; }
-        .p-btn.active { background: var(--gold); color: black; }
+        .p-btn { width: 40px; height: 40px; border-radius: 4px; border: 1px solid #555; background: #444; color: white; font-size: 18px; }
+        .p-btn.active { background: var(--accent); color: black; }
     </style>
 </head>
 <body>
 
-<div id="save-status">💾 Sauvegarde auto...</div>
-<div id="loading"><div class="spinner"></div><h3 style="color:var(--blue);margin-top:20px;">Chargement...</h3></div>
+<div id="toast">Message</div>
 
-<input type="file" id="i-load" class="hidden" onchange="importData(this)" style="display:none">
-<input type="file" id="i-photo" class="hidden" multiple accept="image/*" onchange="addPhotos(this)" style="display:none">
-<input type="file" id="i-logo" class="hidden" accept="image/*" onchange="setLogo(this)" style="display:none">
+<div id="loading"><div class="loader"></div><h3 style="color:var(--primary);margin-top:20px;">Traitement en cours...</h3></div>
+
+<input type="file" id="i-import" class="hidden" onchange="importBackup(this)">
+<input type="file" id="i-photo" class="hidden" multiple accept="image/*" onchange="processPhotos(this)">
+<input type="file" id="i-logo" class="hidden" accept="image/*" onchange="processLogo(this)">
 
 <div id="view-dashboard">
     <div class="app-header">
-        <div class="app-title"><h1>STUDIO CCAS <span class="badge">v48 FINAL</span></h1></div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-main" onclick="exportData()">📥 SAUVEGARDE PC</button>
-            <button class="btn-main" style="background:white; color:#333; border:2px solid #ccc;" onclick="document.getElementById('i-load').click()">📂 OUVRIR</button>
+        <div class="app-title"><h1>📁 STUDIO CCAS <span class="badge">v50</span></h1></div>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="exportBackup()">📥 SAUVEGARDE PC</button>
+            <button class="btn btn-outline" onclick="document.getElementById('i-import').click()">📂 OUVRIR SAUVEGARDE</button>
         </div>
     </div>
-    <div id="grid" class="grid"></div>
-    <div style="text-align:center; margin-top:40px;"><button class="btn-main" style="margin:0 auto; padding:15px 40px;" onclick="addProject()">+ NOUVEAU DOSSIER</button></div>
+    
+    <div id="grid" class="grid" style="margin-top:40px;"></div>
+    
+    <div style="text-align:center; margin-top:40px;">
+        <button class="btn btn-primary" style="margin:0 auto; padding:15px 40px; font-size:1.1rem;" onclick="addProject()">+ CRÉER UN NOUVEAU DOSSIER</button>
+    </div>
 </div>
 
 <div id="view-studio">
     <div class="sidebar">
-        <button class="back-btn" onclick="goHome()">⬅️ MES DOSSIERS</button>
-        <div style="text-align:center; padding:15px; font-weight:bold; border-bottom:1px solid rgba(255,255,255,0.1);" id="proj-title">Projet</div>
-        <div id="bat-list" class="bat-list"></div>
-        <div class="add-bat-btn"><button onclick="addBat()">+ RUBRIQUE</button></div>
-    </div>
-    <div class="editor">
-        <div class="toolbar-top">
-            <div class="logo-box" onclick="document.getElementById('i-logo').click()" title="Logo"><img id="img-logo" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'"></div>
-            <div id="bat-title" style="font-weight:bold; color:var(--blue); font-size:1.2rem;">Accueil</div>
-            <button class="btn-main" onclick="genZip()">📦 GÉNÉRER LE DOSSIER</button>
+        <div class="sidebar-header">
+            <button class="back-btn" onclick="goHome()">⬅️ RETOUR ACCUEIL</button>
+            <div style="text-align:center; font-weight:bold; margin-top:15px; color:white; font-size:1.1rem;" id="proj-title">...</div>
         </div>
-        <div id="content" class="photos-area"></div>
+        
+        <div id="bat-list" class="bat-list"></div>
+        
+        <div style="padding:20px;">
+            <button class="btn btn-outline" style="width:100%; border-style:dashed; border-color:rgba(255,255,255,0.3); color:white; justify-content:center;" onclick="addBat()">+ RUBRIQUE</button>
+        </div>
+    </div>
+    
+    <div class="editor">
+        <div class="editor-toolbar">
+            <div class="logo-box" onclick="document.getElementById('i-logo').click()" title="Changer Logo">
+                <img id="img-logo" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
+            </div>
+            <div id="bat-title" style="font-weight:bold; color:var(--primary); font-size:1.2rem;">Accueil</div>
+            <div class="header-actions">
+                <button class="btn btn-success" onclick="manualSave()">💾 ENREGISTRER</button>
+                <button class="btn btn-primary" onclick="generateZip()">📦 GÉNÉRER LE DOSSIER</button>
+            </div>
+        </div>
+        
+        <div id="content" class="content-area"></div>
     </div>
 </div>
 
 <div id="paint-modal">
-    <div style="background:#444; padding:10px; display:flex; justify-content:space-between; color:white;"><b>RETOUCHE</b><div><button onclick="savePaint()" style="background:var(--gold); border:none; padding:5px 15px; font-weight:bold;">OK</button> <button onclick="closePaint()">Annuler</button></div></div>
+    <div style="background:#444; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; color:white;">
+        <b>RETOUCHE</b>
+        <div><button class="btn btn-success" style="padding:5px 15px;" onclick="savePaint()">OK</button> <button class="btn btn-outline" style="padding:5px 15px; border-color:#666; color:#ccc;" onclick="closePaint()">Annuler</button></div>
+    </div>
     <div id="canvas-box"><canvas id="canvas"></canvas></div>
     <div class="paint-bar">
-        <button class="p-btn" onclick="tool='rect'">⬜</button><button class="p-btn" onclick="tool='circle'">⭕</button><button class="p-btn" onclick="tool='arrow'">↗️</button><button class="p-btn" onclick="tool='free'">✏️</button>
-        <input type="color" onchange="color=this.value" value="#ff0000"><input type="range" min="2" max="20" value="5" onchange="width=this.value">
+        <button class="p-btn" onclick="tool='rect'">⬜</button>
+        <button class="p-btn" onclick="tool='circle'">⭕</button>
+        <button class="p-btn" onclick="tool='arrow'">↗️</button>
+        <button class="p-btn" onclick="tool='free'">✏️</button>
+        <input type="color" onchange="color=this.value" value="#ff0000">
+        <input type="range" min="2" max="20" value="5" onchange="width=this.value">
     </div>
 </div>
 
 <script>
-/** * MOTEUR V48 : DRAG & DROP + INDEXEDDB + ANIMATIONS 
+/**
+ * ARCHITECTURE V50 : INDEXEDDB + DRAG&DROP + FAILSAFE
  */
-const DB_N='CCAS_V48', STORE='data';
+const DB_NAME='CCAS_V50', STORE='data';
 let db, app={ projects:{}, config:{logo:""} }, curP=null, curB=null;
-let dragSrc=null; // Pour le drag & drop
+let dragSrc=null; // Variable globale pour le Drag & Drop
 
-// --- DB INIT ---
-function init(){
-    const r=indexedDB.open(DB_N,1);
+// --- 1. BASE DE DONNÉES (SECURITÉ) ---
+function initDB(){
+    const r=indexedDB.open(DB_NAME,1);
     r.onupgradeneeded=e=>{e.target.result.createObjectStore(STORE)};
-    r.onsuccess=e=>{ db=e.target.result; load(); };
+    r.onsuccess=e=>{ db=e.target.result; loadApp(); };
+    r.onerror=()=>alert("Erreur critique DB");
     
     // Setup Paint
     const c=document.getElementById('canvas');
     c.addEventListener('mousedown', startD); c.addEventListener('mousemove', drawD); window.addEventListener('mouseup', stopD);
 }
-function save(){
-    const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(app,'root');
-    const s=document.getElementById('save-status'); s.classList.add('show'); setTimeout(()=>s.classList.remove('show'),1000);
-}
-function load(){
-    const tx=db.transaction(STORE,'readonly'); const r=tx.objectStore(STORE).get('root');
-    r.onsuccess=()=>{ if(r.result) app=r.result; renderGrid(); if(app.config.logo) document.getElementById('img-logo').src=app.config.logo; };
+
+function saveApp(silent=true){
+    const tx=db.transaction(STORE,'readwrite'); 
+    tx.objectStore(STORE).put(app,'root');
+    if(!silent) showToast("✅ Sauvegarde effectuée", "success");
 }
 
-// --- PROJETS ---
+function loadApp(){
+    const tx=db.transaction(STORE,'readonly'); 
+    const r=tx.objectStore(STORE).get('root');
+    r.onsuccess=()=>{ 
+        if(r.result) app=r.result; 
+        renderGrid(); 
+        if(app.config.logo) document.getElementById('img-logo').src=app.config.logo; 
+    };
+}
+
+function manualSave() { saveApp(false); }
+function showToast(msg, type){ const t=document.getElementById('toast'); t.innerText=msg; t.className=type; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+
+// --- 2. GESTION PROJETS ---
 function renderGrid(){
     const g=document.getElementById('grid'); g.innerHTML='';
     Object.keys(app.projects).sort((a,b)=>app.projects[b].date-app.projects[a].date).forEach(id=>{
         const p=app.projects[id];
         const d=document.createElement('div'); d.className='card animate__animated animate__fadeInUp';
-        d.innerHTML=`<div class="card-del" onclick="delProj('${id}',event)">×</div><div style="font-size:3rem;">📁</div><b>${p.name}</b>`;
+        d.innerHTML=`<div class="card-del" onclick="delProj('${id}',event)">×</div><div style="font-size:3rem;margin-bottom:15px;">📁</div><div style="font-weight:bold;color:#0A1A3C;font-size:1.1rem;">${p.name}</div><div style="color:#888;font-size:0.8rem;margin-top:5px;">${new Date(p.date).toLocaleDateString()}</div>`;
         d.onclick=()=>{ openProj(id); }; g.appendChild(d);
     });
 }
-function addProject(){ const n=prompt("Nom :"); if(n){ const id=Date.now(); app.projects[id]={name:n,date:Date.now(),data:{}}; save(); renderGrid(); openProj(id); } }
-function delProj(id,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[id]; save(); renderGrid(); } }
+function addProject(){ const n=prompt("Nom du dossier :"); if(n){ const id=Date.now(); app.projects[id]={name:n,date:Date.now(),data:{}}; saveApp(); renderGrid(); openProj(id); } }
+function delProj(id,e){ e.stopPropagation(); if(confirm("Supprimer ce dossier ?")){ delete app.projects[id]; saveApp(); renderGrid(); } }
 function goHome(){ document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; curP=null; }
 
 function openProj(id){ 
@@ -186,60 +260,59 @@ function openProj(id){
     renderBats(); renderContent();
 }
 
-// --- BATIMENTS (AVEC DRAG & DROP) ---
-function addBat(){ const n=prompt("Nom Rubrique :"); if(n){ if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; save(); openBat(n); } }
+// --- 3. BATIMENTS (AVEC DRAG & DROP) ---
+function addBat(){ const n=prompt("Nom de la rubrique :"); if(n){ if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; saveApp(); openBat(n); } }
+
 function renderBats(){
     const l=document.getElementById('bat-list'); l.innerHTML='';
-    const bats = Object.keys(app.projects[curP].data); // L'ordre dépend des clés, on va gérer le reorder
+    const bats = Object.keys(app.projects[curP].data); 
     
     bats.forEach(b=>{
         const d=document.createElement('div'); d.className=`bat-item ${curB===b?'active':''}`;
-        d.draggable=true; // ACTIVER DRAG
-        d.dataset.bat=b;
-        d.innerHTML=`<div style="display:flex;align-items:center"><span class="bat-handle">☰</span><span>${b}</span></div><span onclick="delBat('${b}',event)" style="color:red;font-weight:bold;padding:5px;">×</span>`;
+        d.draggable=true; d.dataset.bat=b;
+        d.innerHTML=`<div style="display:flex;align-items:center"><span class="bat-handle">☰</span><span>${b}</span></div><span onclick="delBat('${b}',event)" style="color:#e74c3c;font-weight:bold;padding:5px;">×</span>`;
         d.onclick=()=>{ openBat(b); };
         
-        // DRAG EVENTS BATIMENT
+        // Drag Events
         d.ondragstart=e=>{ dragSrc=d; e.dataTransfer.effectAllowed='move'; d.classList.add('dragging'); };
         d.ondragend=()=>{ d.classList.remove('dragging'); };
         d.ondragover=e=>{ e.preventDefault(); };
         d.ondrop=function(e){
             e.stopPropagation();
             if(dragSrc!==this && dragSrc.classList.contains('bat-item')){
-                // REORDER KEYS
                 const srcKey=dragSrc.dataset.bat; const tgtKey=this.dataset.bat;
                 const oldData=app.projects[curP].data;
                 const keys=Object.keys(oldData);
                 const srcI=keys.indexOf(srcKey); const tgtI=keys.indexOf(tgtKey);
                 keys.splice(srcI,1); keys.splice(tgtI,0,srcKey);
-                
                 const newData={}; keys.forEach(k=>newData[k]=oldData[k]);
-                app.projects[curP].data=newData; // Save new order
-                save(); renderBats();
+                app.projects[curP].data=newData; saveApp(); renderBats();
             }
         };
         l.appendChild(d);
     });
 }
-function delBat(b,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[curP].data[b]; if(curB===b) curB=null; save(); renderBats(); renderContent(); } }
+function delBat(b,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[curP].data[b]; if(curB===b) curB=null; saveApp(); renderBats(); renderContent(); } }
 function openBat(b){ curB=b; document.getElementById('bat-title').innerText=b; renderBats(); renderContent(); }
 
-// --- CONTENU PHOTOS (AVEC DRAG & DROP) ---
+// --- 4. PHOTOS (AVEC DRAG & DROP & COMPRESSION) ---
 function addPhotos(input){
-    if(!curB) return alert("Sélectionnez une rubrique");
+    if(!curB) return alert("Sélectionnez une rubrique à gauche.");
     if(!input.files.length) return;
     document.getElementById('loading').style.display='flex';
-    let loaded=0;
+    let count=0;
     Array.from(input.files).forEach(f=>{
         const r=new FileReader();
         r.onload=e=>{
             const img=new Image();
             img.onload=()=>{
+                // Compression intelligente
                 const cvs=document.createElement('canvas'); const ctx=cvs.getContext('2d');
                 const max=1000; let w=img.width, h=img.height;
                 if(w>max){h*=max/w;w=max;} cvs.width=w; cvs.height=h; ctx.drawImage(img,0,0,w,h);
+                
                 app.projects[curP].data[curB].push({src:cvs.toDataURL('image/jpeg',0.7), text:"Cliquez ici..."});
-                loaded++; if(loaded===input.files.length){ save(); renderContent(); document.getElementById('loading').style.display='none'; }
+                count++; if(count===input.files.length){ saveApp(); renderContent(); document.getElementById('loading').style.display='none'; }
             }; img.src=e.target.result;
         }; r.readAsDataURL(f);
     });
@@ -250,30 +323,33 @@ function renderContent(){
     const c=document.getElementById('content'); c.innerHTML='';
     if(!curB){ c.innerHTML='<div style="text-align:center;margin-top:50px;color:#aaa;">Sélectionnez une rubrique</div>'; return; }
     
-    // Bouton Add
-    const btn=document.createElement('div'); btn.style="border:2px dashed #ccc;padding:20px;text-align:center;border-radius:10px;cursor:pointer;color:#666;font-weight:bold;margin-bottom:20px;";
-    btn.innerText="📸 AJOUTER PHOTOS"; btn.onclick=()=>document.getElementById('i-photo').click();
+    // Bouton Ajout
+    const btn=document.createElement('div'); btn.style="border:2px dashed #ccc;padding:30px;text-align:center;border-radius:10px;cursor:pointer;color:#666;font-weight:bold;margin-bottom:30px;transition:0.2s;";
+    btn.innerHTML="📸 AJOUTER PHOTOS"; 
+    btn.onmouseover=()=>btn.style.borderColor="var(--primary)"; btn.onmouseout=()=>btn.style.borderColor="#ccc";
+    btn.onclick=()=>document.getElementById('i-photo').click();
     c.appendChild(btn);
 
     app.projects[curP].data[curB].forEach((item,idx)=>{
         const b=document.createElement('div'); b.className='block animate__animated animate__fadeIn';
         b.draggable=true; b.dataset.idx=idx;
-        
         b.innerHTML=`
-            <div class="drag-photo-handle">⠿</div>
+            <div class="drag-handle">⠿</div>
             <div class="block-img">
-                <div class="del-block" onclick="delItem(${idx})">×</div>
+                <div class="btn-del" onclick="delItem(${idx})">×</div>
                 <div class="img-wrap" onclick="editP(${idx})"><img src="${item.src}"></div>
-                <button class="btn-edit" onclick="editP(${idx})">🎨 RETOUCHER</button>
+                <button class="btn-action-small btn-edit" onclick="editP(${idx})">🎨 RETOUCHER</button>
             </div>
             <div class="block-txt">
                 <div class="txt-tools">
-                    <button onclick="document.execCommand('bold')">B</button><button onclick="document.execCommand('italic')">I</button><button onclick="document.execCommand('underline')">U</button>
+                    <button class="tool-btn" onclick="document.execCommand('bold')">B</button>
+                    <button class="tool-btn" onclick="document.execCommand('italic')">I</button>
+                    <button class="tool-btn" onclick="document.execCommand('underline')">U</button>
                 </div>
                 <div class="editable" contenteditable="true" oninput="updTxt(${idx},this.innerHTML)">${item.text}</div>
             </div>`;
-            
-        // DRAG EVENTS PHOTO
+        
+        // Drag Events Photos
         b.ondragstart=e=>{ dragSrc=b; e.dataTransfer.effectAllowed='move'; b.classList.add('dragging'); };
         b.ondragend=()=>{ b.classList.remove('dragging'); };
         b.ondragover=e=>{ e.preventDefault(); };
@@ -282,33 +358,31 @@ function renderContent(){
             if(dragSrc!==this && dragSrc.classList.contains('block')){
                 const oldIdx=parseInt(dragSrc.dataset.idx); const newIdx=parseInt(this.dataset.idx);
                 const arr=app.projects[curP].data[curB];
-                const movedItem=arr.splice(oldIdx,1)[0];
-                arr.splice(newIdx,0,movedItem);
-                save(); renderContent();
+                const movedItem=arr.splice(oldIdx,1)[0]; arr.splice(newIdx,0,movedItem);
+                saveApp(); renderContent();
             }
         };
-        
         c.appendChild(b);
     });
 }
-function updTxt(i,t){ app.projects[curP].data[curB][i].text=t; clearTimeout(window.t); window.t=setTimeout(save,1000); }
-function delItem(i){ if(confirm("Supprimer ?")){ app.projects[curP].data[curB].splice(i,1); save(); renderContent(); } }
+function updTxt(i,t){ app.projects[curP].data[curB][i].text=t; clearTimeout(window.t); window.t=setTimeout(saveApp,1000); }
+function delItem(i){ if(confirm("Supprimer ?")){ app.projects[curP].data[curB].splice(i,1); saveApp(); renderContent(); } }
 
-// --- PAINT ---
+// --- 5. PAINT (Retouche) ---
 let pIdx, pImg, tool='rect', color='#ff0000', width=5, drawing=false, sx, sy;
 function editP(i){ pIdx=i; const src=app.projects[curP].data[curB][i].src; pImg=new Image(); pImg.onload=()=>{ const cvs=document.getElementById('canvas'); cvs.width=pImg.width; cvs.height=pImg.height; cvs.getContext('2d').drawImage(pImg,0,0); document.getElementById('paint-modal').style.display='flex'; }; pImg.src=src; }
 function startD(e){ drawing=true; const r=e.target.getBoundingClientRect(); const s=e.target.width/r.width; sx=(e.clientX-r.left)*s; sy=(e.clientY-r.top)*s; ctx.beginPath(); }
 function drawD(e){ if(!drawing)return; const r=e.target.getBoundingClientRect(); const s=e.target.width/r.width; const x=(e.clientX-r.left)*s, y=(e.clientY-r.top)*s; ctx.strokeStyle=color; ctx.lineWidth=width; if(tool==='free'){ ctx.lineTo(x,y); ctx.stroke(); } }
-function stopD(){ drawing=false; if(tool!=='free'){ /* Simplified for reliability */ } } // Ajouter formes si besoin
-function savePaint(){ app.projects[curP].data[curB][pIdx].src=document.getElementById('canvas').toDataURL('image/jpeg',0.7); save(); document.getElementById('paint-modal').style.display='none'; renderContent(); }
+function stopD(){ drawing=false; if(tool!=='free'){ ctx.beginPath(); if(tool==='rect') ctx.strokeRect(sx,sy,event.offsetX-sx,event.offsetY-sy); } }
+function savePaint(){ app.projects[curP].data[curB][pIdx].src=document.getElementById('canvas').toDataURL('image/jpeg',0.7); saveApp(); document.getElementById('paint-modal').style.display='none'; renderContent(); }
 function closePaint(){ document.getElementById('paint-modal').style.display='none'; }
 
-// --- EXPORT ---
-function exportData(){ const b=new Blob([JSON.stringify(app)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`CCAS_BACKUP.json`; a.click(); }
-function importData(i){ const r=new FileReader(); r.onload=e=>{ try{ app=JSON.parse(e.target.result); save(); renderGrid(); alert("OK"); }catch(e){alert("Erreur");} }; if(i.files[0])r.readAsText(i.files[0]); }
-function setLogo(i){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; save(); }; if(i.files[0])r.readAsDataURL(i.files[0]); }
+// --- 6. EXPORT / IMPORT (Backup) ---
+function exportBackup(){ const b=new Blob([JSON.stringify(app)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`CCAS_BACKUP.json`; a.click(); }
+function importBackup(i){ const r=new FileReader(); r.onload=e=>{ try{ app=JSON.parse(e.target.result); saveApp(); renderGrid(); alert("Restauration réussie !"); }catch(e){alert("Fichier invalide");} }; if(i.files[0])r.readAsText(i.files[0]); }
+function processLogo(i){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; saveApp(); }; if(i.files[0])r.readAsDataURL(i.files[0]); }
 
-// --- ZIP ---
+// --- 7. GENERATION ZIP (TEMPLATE FIGÉ) ---
 function genZip(){
     if(!window.JSZip){alert("Erreur ZIP");return;}
     document.getElementById('loading').style.display='flex';
@@ -318,21 +392,21 @@ function genZip(){
         const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
         body{margin:0;background:#000;font-family:'Segoe UI',sans-serif;height:100vh;display:flex;overflow:hidden;color:white;}
         #side{width:280px;background:#050E24;border-right:3px solid #CCA43B;display:flex;flex-direction:column;z-index:10;}
-        .head{padding:20px;color:#CCA43B;font-weight:800;border-bottom:1px solid #333;text-transform:uppercase;text-align:center;}
+        .head{padding:20px;color:#CCA43B;font-weight:800;border-bottom:1px solid #333;text-transform:uppercase;text-align:center;font-size:1.2rem;}
         .btn{width:100%;padding:15px;color:#888;background:none;border:none;text-align:left;cursor:pointer;border-bottom:1px solid #222;}
         .btn.active{color:#CCA43B;border-left:5px solid #CCA43B;background:rgba(204,164,59,0.1);font-weight:bold;}
         #main{flex:1;display:flex;flex-direction:column;}
         .view{height:75vh;width:100%;display:flex;align-items:center;justify-content:center;background:#000;border-bottom:3px solid #CCA43B;position:relative;}
         .frame img{max-width:100%;max-height:100%;}
-        .bot{height:25vh;background:#111;padding:20px 40px;overflow-y:auto;}
-        #desc, #desc *{color:white !important;}
-        #tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:10px;margin-top:0;}
+        .bot{height:25vh;background:#111;padding:20px 40px;overflow-y:auto;box-sizing:border-box;}
+        #desc{color:white !important;font-size:1.3rem;line-height:1.5;} #desc *{color:white !important;background:transparent !important;}
+        #tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:10px;margin-top:0;font-size:1.4rem;}
         .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(204,164,59,0.5);color:white;border:none;font-size:30px;padding:10px;cursor:pointer;border-radius:50%;}
-        .p{left:10px;} .n{right:10px;}
+        .p{left:20px;} .n{right:20px;}
         .pdf{position:absolute;top:10px;left:290px;background:#c0392b;color:white;border:none;padding:5px 10px;border-radius:4px;font-weight:bold;cursor:pointer;opacity:0.6;z-index:99;}
         .pdf:hover{opacity:1;}
         .top{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.8);padding:5px 10px;border:1px solid #CCA43B;display:flex;align-items:center;gap:10px;}
-        @media print{ #side,.nav,.pdf{display:none;} .view{height:70vh;} .bot{height:25vh;} }
+        @media print{ #side,.nav,.pdf{display:none;} .view{height:70vh;page-break-inside:avoid;} .bot{height:25vh;page-break-after:always;} }
         </style></head><body><button class="pdf" onclick="window.print()">🖨️ PDF</button><div id="side"><div class="head">${proj.name}</div><div id="nav"></div></div><div id="main"><div class="view"><div class="top"><img src="${logo}" height="40"><div style="color:#CCA43B;font-weight:bold;font-size:10px;">DIRECTION<br>FINANCES</div></div><div id="sc"></div></div><div class="bot"><h2 id="tit"></h2><div id="desc"></div></div></div>
         <script>
         const d=${json}; let keys=Object.keys(d), cB=keys[0], cI=0;
@@ -347,6 +421,7 @@ function genZip(){
     },1000);
 }
 
+// Lancement
 init();
 </script>
 </body>
