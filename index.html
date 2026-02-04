@@ -3,327 +3,369 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio CCAS | v58 COLOR</title>
+    <title>Studio CCAS | v55 FINAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; --white: #ffffff; --green: #27ae60; --red: #c0392b; --dark: #1e1e1e; }
+        /* --- STYLE ROBUSTE --- */
+        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f6f8; --white: #fff; --green: #27ae60; --red: #c0392b; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
         * { box-sizing: border-box; outline: none; }
-        button { cursor: pointer; transition: 0.1s; font-family: inherit; } button:active { transform: scale(0.98); }
-        .hidden { display: none !important; }
-
-        /* HEADER */
-        .header { height: 70px; background: var(--white); padding: 0 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .title h1 { margin: 0; color: var(--blue); font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
-        .badge { background: var(--gold); color: black; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
         
-        .btn { padding: 10px 20px; border-radius: 6px; font-weight: bold; border: none; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-        .btn-outline { background: white; border: 2px solid #ccc; color: #333; }
-        .btn-primary { background: var(--blue); color: white; }
-        .btn-success { background: var(--green); color: white; border: 2px solid var(--green); }
+        /* HEADER FIXE */
+        .app-header { height: 60px; background: var(--white); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { color: var(--blue); font-size: 1.4rem; font-weight: 900; letter-spacing: 1px; }
+        .actions { display: flex; gap: 10px; }
+        
+        button { cursor: pointer; border: none; border-radius: 4px; padding: 8px 15px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; }
+        button:active { transform: scale(0.98); }
+        .btn-green { background: var(--green); color: white; border: 1px solid var(--green); }
+        .btn-blue { background: var(--blue); color: white; }
+        .btn-outline { background: white; border: 1px solid #ccc; color: #333; }
+        
+        /* GESTION DES VUES (IMPORTANT) */
+        .view-container { flex: 1; position: relative; overflow: hidden; }
+        .view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; background: var(--bg); }
+        .view.active { display: flex; }
 
-        /* VUES */
-        #view-dashboard { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; }
-        #view-studio { display: none; height: calc(100vh - 70px); flex-direction: row; }
+        /* VUE 1 : DASHBOARD */
+        #dashboard { align-items: center; padding-top: 50px; overflow-y: auto; }
+        .big-card { background: white; padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 2px solid transparent; width: 100%; max-width: 500px; }
+        .big-btn { background: var(--blue); color: white; font-size: 1.2rem; padding: 15px 40px; border-radius: 8px; margin-bottom: 20px; width: 100%; justify-content: center; }
+        .load-zone { border: 2px dashed #ccc; padding: 20px; border-radius: 8px; cursor: pointer; color: #666; margin-top: 20px; }
+        .load-zone:hover { border-color: var(--blue); color: var(--blue); }
 
-        /* DASHBOARD */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-top: 30px; }
-        .card { background: white; padding: 30px; border-radius: 12px; text-align: center; border: 2px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; cursor: pointer; transition: 0.2s; }
-        .card:hover { transform: translateY(-5px); border-color: var(--gold); }
-        .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); background: #fee2e2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; }
-
-        /* STUDIO: SIDEBAR */
-        .sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 20px rgba(0,0,0,0.1); }
-        .side-head { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
-        .back-btn { background: none; border: none; color: var(--gold); font-weight: bold; width: 100%; text-align: left; cursor: pointer; font-size: 0.9rem; }
+        /* VUE 2 : STUDIO */
+        #studio { flex-direction: row; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 280px; background: var(--blue); color: white; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 10; }
+        .side-head { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.2); }
+        .proj-name { text-align: center; font-weight: bold; font-size: 1.1rem; margin-top: 5px; color: var(--gold); }
+        
         .bat-list { flex: 1; overflow-y: auto; padding: 10px; }
-        
-        .bat-item { padding: 12px; background: rgba(255,255,255,0.08); margin-bottom: 5px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
-        .bat-item:hover { background: rgba(255,255,255,0.15); }
+        .bat-item { padding: 12px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; border-left: 4px solid transparent; }
+        .bat-item:hover { background: rgba(255,255,255,0.1); }
         .bat-item.active { background: white; color: var(--blue); border-left-color: var(--gold); font-weight: bold; }
-        .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
-        .handle { cursor: grab; padding-right: 10px; opacity: 0.5; font-size: 1.2rem; }
+        
+        .add-zone { padding: 15px; border-top: 1px solid rgba(255,255,255,0.15); }
+        .btn-add { width: 100%; background: transparent; border: 1px dashed rgba(255,255,255,0.5); color: white; justify-content: center; }
 
-        /* STUDIO: EDITOR */
-        .editor { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
-        .editor-tools { height: 70px; background: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
+        /* MAIN EDITOR */
+        .main-area { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
+        .toolbar { height: 50px; background: white; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .logo-btn { width: 40px; height: 40px; border: 1px dashed #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; }
+        .logo-btn img { width: 100%; height: 100%; object-fit: contain; }
         
-        .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; }
-        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
-        
-        .content { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
+        .content { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
 
         /* PHOTO BLOCK */
-        .block { background: white; border-radius: 10px; margin-bottom: 30px; display: flex; border: 1px solid #ddd; height: 400px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .block.dragging { opacity: 0.4; border: 2px dashed var(--blue); }
+        .block { background: white; border-radius: 8px; margin-bottom: 20px; display: flex; height: 300px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #ddd; }
         
-        .drag-handle { width: 40px; background: #f8f9fa; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #eee; color: #aaa; font-size: 24px; }
-        .drag-handle:hover { background: #e2e8f0; color: var(--blue); }
-        
-        .block-img { width: 350px; background: #f8fafc; padding: 15px; border-right: 1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .img-wrap { width: 100%; height: 250px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; }
-        .img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        .btn-del { position: absolute; top: 10px; left: 10px; width: 30px; height: 30px; background: var(--red); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; z-index: 5; }
-        
-        .block-txt { flex: 1; padding: 20px; display: flex; flex-direction: column; background: #fdfdfd; }
-        
-        /* BARRE D'OUTILS TEXTE */
-        .txt-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: #eee; padding: 5px; border-radius: 6px; align-items: center; }
-        .t-btn { width: 30px; height: 30px; border: 1px solid #ccc; background: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
-        .t-color { width: 30px; height: 30px; border: none; background: none; cursor: pointer; padding: 0; }
-        
-        /* EDITEUR WYSIWYG (Fond Sombre pour simuler le rendu) */
-        .editable { 
-            flex: 1; border: 1px solid #333; border-radius: 6px; padding: 15px; overflow-y: auto; 
-            background: #222; color: white; font-size: 16px; line-height: 1.5; 
-        }
-        .editable:focus { border-color: var(--gold); outline: none; }
+        .block-img { width: 300px; background: #f8f8f8; padding: 10px; border-right: 1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .img-view { width: 100%; height: 200px; object-fit: contain; background: white; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
+        .handle { position: absolute; top: 5px; left: 5px; cursor: grab; font-size: 20px; color: #999; background: white; padding: 0 5px; border-radius: 4px; }
+        .btn-del { margin-top: 10px; background: #fee2e2; color: var(--red); width: 100%; justify-content: center; }
 
-        /* LOADING */
-        #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .bar-bg { width: 300px; height: 10px; background: #ddd; border-radius: 5px; margin-top: 20px; overflow: hidden; }
-        .bar-fill { height: 100%; background: var(--green); width: 0%; transition: width 0.2s; }
+        .block-txt { flex: 1; padding: 15px; display: flex; flex-direction: column; }
+        .txt-tools { display: flex; gap: 5px; margin-bottom: 5px; background: #f0f0f0; padding: 5px; border-radius: 4px; }
+        .txt-btn { width: 25px; height: 25px; padding: 0; justify-content: center; background: white; border: 1px solid #ccc; color: black; }
+        .editable { flex: 1; border: 1px solid #ccc; padding: 10px; overflow-y: auto; background: white; font-size: 15px; line-height: 1.4; border-radius: 4px; }
         
-        /* NOTIFICATION */
-        #toast { position: fixed; bottom: 30px; right: 30px; background: #333; color: white; padding: 15px 30px; border-radius: 50px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 9999; font-weight: bold; }
-        #toast.show { opacity: 1; }
+        /* LOADING */
+        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .bar { width: 200px; height: 8px; background: #ddd; border-radius: 4px; margin-top: 15px; overflow: hidden; }
+        .fill { height: 100%; width: 0%; background: var(--blue); transition: width 0.2s; }
+        
+        /* PAINT */
+        #paint { position: fixed; inset: 0; background: #222; z-index: 3000; display: none; flex-direction: column; }
+        .paint-tools { height: 50px; background: #333; display: flex; justify-content: center; gap: 10px; align-items: center; }
+        #canvas-wrap { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        canvas { box-shadow: 0 0 20px black; }
     </style>
 </head>
 <body>
 
-<div id="toast">Message</div>
-<div id="loading">
-    <h2 style="color:var(--blue);">Traitement...</h2>
-    <div class="bar-bg"><div class="bar-fill" id="progress"></div></div>
-</div>
+<div id="loader"><h2 style="color:var(--blue)">Traitement...</h2><div class="bar"><div class="fill" id="progress"></div></div></div>
 
-<input type="file" id="f-import" class="hidden" onchange="importData(this)">
-<input type="file" id="f-photo" class="hidden" multiple accept="image/*" onchange="addPhotos(this)">
-<input type="file" id="f-logo" class="hidden" accept="image/*" onchange="setLogo(this)">
-
-<div id="view-dashboard">
-    <div class="header">
-        <div class="title"><h1>STUDIO CCAS <span class="badge">v58 COLOR</span></h1></div>
-        <div class="actions">
-            <button class="btn btn-success" onclick="exportData()">📥 SAUVEGARDE PC</button>
-            <button class="btn btn-outline" onclick="document.getElementById('f-import').click()">📂 CHARGER PROJET</button>
-        </div>
-    </div>
-    <div id="grid" class="grid"></div>
-    <div style="text-align:center; margin-top:40px;">
-        <button class="btn btn-primary" style="margin:0 auto; padding:15px 40px; font-size:1.1rem;" onclick="addProj()">+ NOUVEAU DOSSIER</button>
+<div class="app-header">
+    <div class="logo">STUDIO CCAS v55</div>
+    <div class="actions">
+        <button class="btn-green" onclick="saveToPC()">💾 SAUVEGARDE PC</button>
     </div>
 </div>
 
-<div id="view-studio">
-    <div class="sidebar">
-        <div class="side-head">
-            <button class="back-btn" onclick="goHome()">⬅️ MES DOSSIERS</button>
-            <div id="proj-title" style="text-align:center; color:white; font-weight:bold; margin-top:10px;">...</div>
-        </div>
-        <div id="bat-list" class="bat-list"></div>
-        <div style="padding:20px;"><button class="btn btn-outline" style="width:100%; border-style:dashed; color:white; background:transparent; border-color:rgba(255,255,255,0.5);" onclick="addBat()">+ RUBRIQUE</button></div>
-    </div>
-    <div class="editor">
-        <div class="editor-tools">
-            <div class="logo-box" onclick="document.getElementById('f-logo').click()" title="Changer Logo">
-                <img id="img-logo" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
-            </div>
-            <div id="bat-title" style="font-weight:bold; color:var(--blue); font-size:1.2rem;">Accueil</div>
-            <div class="actions">
-                <button class="btn btn-success" onclick="exportData()">💾 SAUVEGARDER</button>
-                <button class="btn btn-primary" onclick="genZip()">📦 GÉNÉRER (PDF/Site)</button>
+<div class="view-container">
+    
+    <div id="dashboard" class="view active">
+        <div class="big-card">
+            <h2 style="color:var(--blue); margin-bottom:30px;">Bienvenue</h2>
+            <button class="big-btn" onclick="createProject()">+ NOUVEAU DOSSIER</button>
+            <div class="load-zone" onclick="document.getElementById('f-load').click()">
+                📂 Cliquez ici pour ouvrir une sauvegarde (.json)
             </div>
         </div>
-        <div id="content" class="content"></div>
+    </div>
+
+    <div id="studio" class="view">
+        <div class="sidebar">
+            <div class="side-head">
+                <button onclick="goDashboard()" style="background:none; border:none; color:white; padding:0;">⬅️ Fermer</button>
+                <div class="proj-name" id="lbl-proj">Projet</div>
+            </div>
+            <div id="bat-list" class="bat-list"></div>
+            <div class="add-zone">
+                <button class="btn-add" onclick="addBat()">+ RUBRIQUE</button>
+            </div>
+        </div>
+        
+        <div class="main-area">
+            <div class="toolbar">
+                <div class="logo-btn" onclick="document.getElementById('f-logo').click()">
+                    <img id="img-logo" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
+                </div>
+                <h3 id="lbl-bat" style="margin:0; color:var(--blue);">Accueil</h3>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-blue" onclick="document.getElementById('f-photo').click()">📸 AJOUTER PHOTOS</button>
+                    <button class="btn-outline" onclick="generateZip()">📦 GÉNÉRER</button>
+                </div>
+            </div>
+            <div id="content" class="content"></div>
+        </div>
+    </div>
+
+</div>
+
+<div id="paint">
+    <div style="background:#444; padding:10px; display:flex; justify-content:space-between; color:white;">
+        <b>RETOUCHE</b>
+        <div><button class="btn-green" onclick="savePaint()">OK</button> <button class="btn-outline" style="background:transparent; color:#ccc; border:none;" onclick="closePaint()">Annuler</button></div>
+    </div>
+    <div id="canvas-wrap"><canvas id="canvas"></canvas></div>
+    <div class="paint-tools">
+        <button onclick="tool='rect'">⬜</button><button onclick="tool='circle'">⭕</button><button onclick="tool='arrow'">↗️</button><button onclick="tool='free'">✏️</button>
+        <input type="color" onchange="color=this.value" value="#ff0000">
+        <input type="range" min="2" max="20" value="5" onchange="width=this.value">
     </div>
 </div>
+
+<input type="file" id="f-load" style="display:none" onchange="loadFile(this)">
+<input type="file" id="f-photo" style="display:none" multiple accept="image/png, image/jpeg, image/jpg" onchange="addPhotos(this)">
+<input type="file" id="f-logo" style="display:none" accept="image/*" onchange="setLogo(this)">
 
 <script>
-/** MOTEUR V58 - COLOR & STABILITY */
-let app = { projects: {}, config: { logo: "" } };
-let curP = null, curB = null, dragSrc = null;
+// --- DONNEES (RAM) ---
+let app = { name: "Projet", data: {} };
+let curBat = null;
+let pIdx = null; // Index photo pour paint
 
-// --- UTILS ---
-function toast(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
-
-// --- DASHBOARD ---
-function renderGrid(){
-    const g=document.getElementById('grid'); g.innerHTML='';
-    if(Object.keys(app.projects).length===0) { g.innerHTML='<div style="grid-column:1/-1; text-align:center; color:#999; margin-top:50px;">Aucun dossier ouvert.<br>Créez-en un ou chargez une sauvegarde.</div>'; return; }
-    Object.keys(app.projects).forEach(id=>{
-        const p=app.projects[id];
-        const d=document.createElement('div'); d.className='card';
-        d.innerHTML=`<div class="card-del" onclick="delProj('${id}',event)">×</div><div style="font-size:3rem;margin-bottom:10px;">📁</div><b>${p.name}</b>`;
-        d.onclick=()=>{ openProj(id); }; g.appendChild(d);
-    });
+// --- NAVIGATION ---
+function showView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
 }
-function addProj(){ const n=prompt("Nom du dossier :"); if(n){ const id='p'+Date.now(); app.projects[id]={name:n,date:Date.now(),data:{}}; renderGrid(); openProj(id); } }
-function delProj(id,e){ e.stopPropagation(); if(confirm("Supprimer ce dossier ?")){ delete app.projects[id]; renderGrid(); } }
-function goHome(){ 
-    if(confirm("ATTENTION : Avez-vous fait une SAUVEGARDE PC ? Sinon vos modifications seront perdues.")) {
-        document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; curP=null; 
+
+function createProject() {
+    let n = prompt("Nom du dossier :");
+    if(!n) return;
+    app = { name: n, data: { "Zone 1": [] } }; // Création auto Zone 1
+    document.getElementById('lbl-proj').innerText = n;
+    showView('studio');
+    selectBat("Zone 1");
+}
+
+function goDashboard() {
+    if(confirm("ATTENTION : Avez-vous sauvegardé sur PC ? Sinon tout sera perdu.")) {
+        showView('dashboard');
     }
 }
-function openProj(id){ 
-    curP=id; curB=null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex';
-    document.getElementById('proj-title').innerText=app.projects[id].name;
-    // Auto-fix si vide
-    if(Object.keys(app.projects[id].data).length===0) app.projects[id].data["Zone 1"]=[];
-    renderBats();
-    // Select premier
-    const first=Object.keys(app.projects[id].data)[0];
-    if(first) openBat(first);
+
+// --- BATIMENTS ---
+function addBat() {
+    let n = prompt("Nom :");
+    if(n) { if(!app.data[n]) app.data[n]=[]; selectBat(n); }
 }
 
-// --- BATIMENTS (DRAG & DROP) ---
-function addBat(){ const n=prompt("Nom :"); if(n){ if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; openBat(n); } }
-function renderBats(){
-    const l=document.getElementById('bat-list'); l.innerHTML='';
-    const bats=Object.keys(app.projects[curP].data);
-    bats.forEach(b=>{
-        const d=document.createElement('div'); d.className=`bat-item ${curB===b?'active':''}`;
-        d.draggable=true; d.dataset.bat=b;
-        d.innerHTML=`<div style="display:flex;align-items:center"><span class="handle">☰</span><span>${b}</span></div><span onclick="delBat('${b}',event)" style="color:#e74c3c;font-weight:bold;padding:5px;">×</span>`;
-        d.onclick=()=>{ openBat(b); };
-        // Drag
-        d.ondragstart=e=>{ dragSrc=d; e.dataTransfer.effectAllowed='move'; d.classList.add('dragging'); };
-        d.ondragend=()=>{ d.classList.remove('dragging'); };
-        d.ondragover=e=>{ e.preventDefault(); };
-        d.ondrop=function(e){
-            e.stopPropagation();
-            if(dragSrc!==this && dragSrc.classList.contains('bat-item')){
-                const src=dragSrc.dataset.bat, tgt=this.dataset.bat, data=app.projects[curP].data;
-                const keys=Object.keys(data), sI=keys.indexOf(src), tI=keys.indexOf(tgt);
-                keys.splice(sI,1); keys.splice(tI,0,src);
-                const newData={}; keys.forEach(k=>newData[k]=data[k]);
-                app.projects[curP].data=newData; renderBats();
-            }
-        };
+function selectBat(name) {
+    curBat = name;
+    document.getElementById('lbl-bat').innerText = name;
+    renderSide();
+    renderContent();
+}
+
+function delBat(name, e) {
+    e.stopPropagation();
+    if(confirm("Supprimer "+name+" ?")) {
+        delete app.data[name];
+        let keys = Object.keys(app.data);
+        if(keys.length > 0) selectBat(keys[0]); else { curBat=null; renderSide(); renderContent(); }
+    }
+}
+
+function renderSide() {
+    let l = document.getElementById('bat-list'); l.innerHTML = "";
+    Object.keys(app.data).forEach(k => {
+        let d = document.createElement('div');
+        d.className = "bat-item " + (curBat === k ? "active" : "");
+        d.innerHTML = `<span>${k}</span> <span onclick="delBat('${k}',event)" style="color:#e74c3c;font-weight:bold;">×</span>`;
+        d.onclick = () => selectBat(k);
         l.appendChild(d);
     });
 }
-function delBat(b,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[curP].data[b]; if(curB===b) curB=null; renderBats(); renderContent(); } }
-function openBat(b){ curB=b; document.getElementById('bat-title').innerText=b; renderBats(); renderContent(); }
 
-// --- PHOTOS (COMPRESSION & DRAG) ---
-function addPhotos(input){
-    if(!curB) { app.projects[curP].data["Zone Photos"]=[]; openBat("Zone Photos"); alert("Rubrique 'Zone Photos' créée automatiquement."); }
-    if(!input.files.length) return;
-    document.getElementById('loading').style.display='flex';
-    let c=0; const total=input.files.length;
+// --- PHOTOS ---
+function addPhotos(input) {
+    if(!curBat) { // Auto-correction si clic sans sélection
+        if(Object.keys(app.data).length === 0) app.data["Zone 1"] = [];
+        curBat = Object.keys(app.data)[0];
+        selectBat(curBat);
+    }
     
-    Array.from(input.files).forEach(f=>{
-        if(f.type==="image/heic"){ c++; if(c===total) document.getElementById('loading').style.display='none'; return alert("Utilisez JPG ou PNG (pas HEIC)"); }
-        const r=new FileReader();
-        r.onload=e=>{
-            const img=new Image();
-            img.onload=()=>{
-                const cvs=document.createElement('canvas'), ctx=cvs.getContext('2d');
-                const max=1000; let w=img.width, h=img.height;
-                if(w>max){h*=max/w; w=max;} cvs.width=w; cvs.height=h; ctx.drawImage(img,0,0,w,h);
-                app.projects[curP].data[curB].push({src:cvs.toDataURL('image/jpeg',0.7), text:"Description..."});
-                c++; 
-                document.getElementById('progress').style.width=(c/total*100)+'%';
-                if(c===total){ renderContent(); setTimeout(()=>document.getElementById('loading').style.display='none',500); }
-            }; img.src=e.target.result;
-        }; r.readAsDataURL(f);
+    if(!input.files.length) return;
+    
+    let loader = document.getElementById('loader');
+    let bar = document.getElementById('progress');
+    loader.style.display = 'flex';
+    
+    let c = 0;
+    Array.from(input.files).forEach(f => {
+        let r = new FileReader();
+        r.onload = e => {
+            let img = new Image();
+            img.onload = () => {
+                let cvs = document.createElement('canvas');
+                let ctx = cvs.getContext('2d');
+                let max = 1000;
+                let w = img.width, h = img.height;
+                if(w > max) { h *= max/w; w = max; }
+                cvs.width = w; cvs.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+                
+                app.data[curBat].push({ img: cvs.toDataURL('image/jpeg', 0.7), text: "Description..." });
+                c++;
+                bar.style.width = (c/input.files.length*100) + "%";
+                if(c === input.files.length) {
+                    renderContent();
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }
+            };
+            img.src = e.target.result;
+        };
+        r.readAsDataURL(f);
     });
-    input.value='';
+    input.value = "";
 }
 
-function renderContent(){
-    const c=document.getElementById('content'); c.innerHTML='';
-    if(!curB){ c.innerHTML='<div style="text-align:center;margin-top:50px;color:#aaa;">Sélectionnez une rubrique à gauche</div>'; return; }
+function renderContent() {
+    let c = document.getElementById('content'); c.innerHTML = "";
+    if(!curBat) return;
     
-    const btn=document.createElement('div'); btn.style="border:2px dashed #ccc;padding:25px;text-align:center;border-radius:10px;cursor:pointer;color:#666;font-weight:bold;margin-bottom:25px;";
-    btn.innerText="📸 AJOUTER DES PHOTOS"; btn.onclick=()=>document.getElementById('f-photo').click();
-    c.appendChild(btn);
-
-    app.projects[curP].data[curB].forEach((item,idx)=>{
-        const b=document.createElement('div'); b.className='block';
-        b.draggable=true; b.dataset.idx=idx;
-        b.innerHTML=`
-            <div class="drag-handle">⠿</div>
+    app.data[curBat].forEach((item, idx) => {
+        let b = document.createElement('div'); b.className = "block";
+        b.innerHTML = `
             <div class="block-img">
-                <div class="btn-del" onclick="delItem(${idx})">×</div>
-                <div class="img-wrap"><img src="${item.src}"></div>
+                <span class="handle">☰</span>
+                <img src="${item.img}" class="img-view" onclick="editP(${idx})">
+                <button class="btn-del" onclick="delPhoto(${idx})">Supprimer</button>
             </div>
             <div class="block-txt">
-                <div class="txt-toolbar">
-                    <button class="t-btn" onclick="document.execCommand('bold')">B</button>
-                    <button class="t-btn" onclick="document.execCommand('italic')">I</button>
-                    <button class="t-btn" onclick="document.execCommand('underline')">U</button>
-                    <div style="width:1px;height:20px;background:#ccc;margin:0 5px;"></div>
-                    <label style="font-size:12px;display:flex;align-items:center;gap:5px;">Couleur: <input type="color" class="t-color" onchange="document.execCommand('foreColor', false, this.value)"></label>
+                <div class="txt-tools">
+                    <button class="txt-btn" onclick="document.execCommand('bold')">B</button>
+                    <button class="txt-btn" onclick="document.execCommand('italic')">I</button>
+                    <button class="txt-btn" onclick="document.execCommand('underline')">U</button>
+                    <input type="color" onchange="document.execCommand('foreColor',false,this.value)" style="width:25px;height:25px;border:none;">
                 </div>
                 <div class="editable" contenteditable="true" oninput="updTxt(${idx},this.innerHTML)">${item.text}</div>
-            </div>`;
-        
-        b.ondragstart=e=>{ dragSrc=b; e.dataTransfer.effectAllowed='move'; b.classList.add('dragging'); };
-        b.ondragend=()=>{ b.classList.remove('dragging'); };
-        b.ondragover=e=>{ e.preventDefault(); };
-        b.ondrop=function(e){
-            e.stopPropagation();
-            if(dragSrc!==this && dragSrc.classList.contains('block')){
-                const old=parseInt(dragSrc.dataset.idx), cur=parseInt(this.dataset.idx);
-                const arr=app.projects[curP].data[curB];
-                const mv=arr.splice(old,1)[0]; arr.splice(cur,0,mv);
-                renderContent();
-            }
-        };
+            </div>
+        `;
         c.appendChild(b);
     });
 }
-function updTxt(i,t){ app.projects[curP].data[curB][i].text=t; }
-function delItem(i){ if(confirm("Supprimer ?")){ app.projects[curP].data[curB].splice(i,1); renderContent(); } }
 
-/* --- FILE --- */
-function exportData(){ const b=new Blob([JSON.stringify(app)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`CCAS_SAVE_${Date.now()}.json`; a.click(); toast("✅ Sauvegarde téléchargée !"); }
-function importData(i){ if(!i.files[0])return; const r=new FileReader(); r.onload=e=>{ try{ app=JSON.parse(e.target.result); renderGrid(); toast("✅ Projet chargé !"); }catch(x){alert("Fichier invalide");} }; r.readAsText(i.files[0]); }
-function setLogo(i){ if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; }; r.readAsDataURL(i.files[0]); } }
+function updTxt(i, t) { app.data[curBat][i].text = t; }
+function delPhoto(i) { if(confirm("Supprimer ?")) { app.data[curBat].splice(i, 1); renderContent(); } }
 
-/* --- ZIP (TEMPLATE FIGÉ) --- */
-function genZip(){
-    if(!window.JSZip){alert("Erreur ZIP");return;}
-    document.getElementById('loading').style.display='flex';
-    setTimeout(()=>{
-        const proj=app.projects[curP]; const json=JSON.stringify(proj.data).replace(/</g,'\\u003c'); const logo=app.config.logo||"";
+// --- PAINT ---
+let paintCvs = document.getElementById('canvas');
+let paintCtx = paintCvs.getContext('2d');
+let paintImg = new Image();
+let tool='rect', color='#ff0000', width=5, drawing=false, sx, sy;
+
+function editP(i) {
+    pIdx = i;
+    paintImg.src = app.data[curBat][i].img;
+    paintImg.onload = () => {
+        paintCvs.width = paintImg.width;
+        paintCvs.height = paintImg.height;
+        paintCtx.drawImage(paintImg, 0, 0);
+        document.getElementById('paint').style.display = 'flex';
+    };
+}
+function savePaint() {
+    app.data[curBat][pIdx].img = paintCvs.toDataURL('image/jpeg', 0.8);
+    closePaint();
+    renderContent();
+}
+function closePaint() { document.getElementById('paint').style.display = 'none'; }
+
+paintCvs.addEventListener('mousedown', e => { drawing=true; let r=paintCvs.getBoundingClientRect(); let s=paintCvs.width/r.width; sx=(e.clientX-r.left)*s; sy=(e.clientY-r.top)*s; paintCtx.beginPath(); });
+paintCvs.addEventListener('mousemove', e => { if(!drawing) return; let r=paintCvs.getBoundingClientRect(); let s=paintCvs.width/r.width; let x=(e.clientX-r.left)*s; let y=(e.clientY-r.top)*s; paintCtx.strokeStyle=color; paintCtx.lineWidth=width; if(tool==='free'){ paintCtx.lineTo(x,y); paintCtx.stroke(); } });
+paintCvs.addEventListener('mouseup', e => { drawing=false; if(tool!=='free'){ let r=paintCvs.getBoundingClientRect(); let s=paintCvs.width/r.width; let x=(e.clientX-r.left)*s; let y=(e.clientY-r.top)*s; paintCtx.beginPath(); paintCtx.strokeStyle=color; paintCtx.lineWidth=width; if(tool==='rect') paintCtx.strokeRect(sx,sy,x-sx,y-sy); if(tool==='circle'){ let rad=Math.sqrt(Math.pow(x-sx,2)+Math.pow(y-sy,2)); paintCtx.arc(sx,sy,rad,0,2*Math.PI); paintCtx.stroke(); } if(tool==='arrow'){ paintCtx.moveTo(sx,sy); paintCtx.lineTo(x,y); paintCtx.stroke(); } } });
+
+// --- FICHIERS ---
+function saveToPC() {
+    let b = new Blob([JSON.stringify(app)], {type:"application/json"});
+    let a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "CCAS_PROJET.json"; a.click();
+    alert("Sauvegarde téléchargée !");
+}
+function loadFile(i) {
+    if(!i.files[0]) return;
+    let r = new FileReader();
+    r.onload = e => {
+        try { app = JSON.parse(e.target.result); document.getElementById('lbl-proj').innerText = app.name; showView('studio'); selectBat(Object.keys(app.data)[0] || ""); }
+        catch(x) { alert("Fichier invalide"); }
+    };
+    r.readAsText(i.files[0]);
+}
+function setLogo(i) { if(i.files[0]) { let r=new FileReader(); r.onload=e=>{ document.getElementById('img-logo').src=e.target.result; }; r.readAsDataURL(i.files[0]); } }
+
+// --- GENERATION ZIP ---
+function generateZip() {
+    if(typeof JSZip === 'undefined') { alert("Erreur ZIP. Vérifiez connexion."); return; }
+    document.getElementById('loader').style.display='flex';
+    setTimeout(() => {
+        let zip = new JSZip();
+        let json = JSON.stringify(app.data).replace(/</g,'\\u003c');
+        let logo = document.getElementById('img-logo').src;
         
-        const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
-        body{margin:0;background:#000;font-family:'Segoe UI',sans-serif;height:100vh;display:flex;overflow:hidden;color:white;}
-        #side{width:280px;background:#050E24;border-right:3px solid #CCA43B;display:flex;flex-direction:column;}
-        .head{padding:20px;color:#CCA43B;font-weight:800;border-bottom:1px solid #333;text-align:center;font-size:1.2rem;text-transform:uppercase;}
-        .btn{width:100%;padding:15px;color:#888;background:none;border:none;text-align:left;cursor:pointer;border-bottom:1px solid #222;font-size:1rem;}
-        .btn.active{color:#CCA43B;border-left:5px solid #CCA43B;background:rgba(204,164,59,0.1);font-weight:bold;}
-        #main{flex:1;display:flex;flex-direction:column;position:relative;}
-        .view{height:75vh;width:100%;display:flex;align-items:center;justify-content:center;background:#000;border-bottom:3px solid #CCA43B;position:relative;}
-        .frame img{max-width:100%;max-height:100%;object-fit:contain;}
-        .bot{height:25vh;background:#111;padding:20px 40px;overflow-y:auto;box-sizing:border-box;}
-        #desc{color:white!important;font-size:1.3rem;line-height:1.5;} 
-        /* GESTION COULEURS */
-        #desc font[color] { color: inherit !important; } /* Permet de garder les couleurs du user */
-        #desc * { background:transparent !important; }
-        #tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:10px;margin-top:0;font-size:1.4rem;}
-        .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(204,164,59,0.5);color:white;border:none;font-size:40px;padding:10px;cursor:pointer;border-radius:50%;}
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${app.name}</title><style>
+        body{margin:0;background:#000;font-family:sans-serif;height:100vh;display:flex;overflow:hidden;color:white;}
+        #side{width:250px;background:#0A1A3C;border-right:3px solid #CCA43B;display:flex;flex-direction:column;}
+        .btn{padding:15px;color:#888;background:none;border:none;text-align:left;cursor:pointer;border-bottom:1px solid #222;width:100%;font-size:16px;}
+        .btn.active{color:#CCA43B;font-weight:bold;background:rgba(255,255,255,0.1);border-left:5px solid #CCA43B;}
+        #main{flex:1;display:flex;flex-direction:column;}
+        #top{height:75vh;display:flex;align-items:center;justify-content:center;border-bottom:3px solid #CCA43B;position:relative;}
+        #bot{height:25vh;background:#111;padding:20px;overflow-y:auto;}
+        img{max-width:100%;max-height:100%;}
+        #desc{font-size:1.2rem;line-height:1.5;} #desc * {color:white!important;}
+        .nav{position:absolute;top:50%;transform:translateY(-50%);font-size:40px;color:white;background:rgba(204,164,59,0.5);padding:10px;cursor:pointer;border-radius:50%;}
         .p{left:20px;} .n{right:20px;}
-        .pdf{position:absolute;top:10px;left:10px;background:#c0392b;color:white;border:none;padding:5px 15px;border-radius:4px;font-weight:bold;cursor:pointer;opacity:0.6;z-index:99;}
-        .pdf:hover{opacity:1;}
-        .top{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.8);padding:5px 10px;border:1px solid #CCA43B;display:flex;align-items:center;gap:10px;border-radius:4px;}
-        @media print{ #side,.nav,.pdf{display:none;} .view{height:70vh;page-break-inside:avoid;} .bot{height:30vh;page-break-after:always;} }
-        </style></head><body><button class="pdf" onclick="window.print()">🖨️ PDF</button><div id="side"><div class="head">${proj.name}</div><div id="nav"></div></div><div id="main"><div class="view"><div class="top"><img src="${logo}" height="40"><div style="color:#CCA43B;font-weight:bold;font-size:10px;">DIRECTION<br>FINANCES</div></div><div id="sc"></div></div><div class="bot"><h2 id="tit"></h2><div id="desc"></div></div></div>
+        .pdf{position:absolute;top:10px;left:10px;background:#c0392b;color:white;padding:5px 15px;border-radius:4px;border:none;font-weight:bold;cursor:pointer;z-index:99;}
+        @media print{ #side,.nav,.pdf{display:none;} #top{height:70vh;page-break-inside:avoid;} #bot{height:30vh;page-break-after:always;} }
+        </style></head><body>
+        <button class="pdf" onclick="window.print()">🖨️ PDF</button>
+        <div id="side"><h3 style="text-align:center;color:#CCA43B">${app.name}</h3><div id="nav"></div></div>
+        <div id="main"><div id="top"><img id="img"><div class="nav p" onclick="mv(-1)">❮</div><div class="nav n" onclick="mv(1)">❯</div></div><div id="bot"><h2 id="tit" style="color:#CCA43B;margin-top:0;"></h2><div id="desc"></div></div></div>
         <script>
-        const d=${json}; let keys=Object.keys(d), cB=keys[0], cI=0;
-        function rn(){ const n=document.getElementById('nav'); n.innerHTML=''; keys.forEach(k=>{ const b=document.createElement('button'); b.className='btn'+(cB===k?' active':''); b.innerText=k; b.onclick=()=>{cB=k;cI=0;sh();rn()}; n.appendChild(b); }); }
-        function sh(){ const s=document.getElementById('sc'), i=d[cB]; if(!i||!i.length){ s.innerHTML=''; document.getElementById('desc').innerHTML='Aucune photo'; return; } s.innerHTML='<img src="'+i[cI].src+'">'; document.getElementById('tit').innerText=cB+" ("+(cI+1)+"/"+i.length+")"; document.getElementById('desc').innerHTML=i[cI].text.replace("Description...","");
-        document.querySelectorAll('.nav').forEach(e=>e.remove()); if(i.length>1){ const p=document.createElement('button'); p.className='nav p'; p.innerText='❮'; p.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()}; document.querySelector('.view').appendChild(p); const n=document.createElement('button'); n.className='nav n'; n.innerText='❯'; n.onclick=()=>{cI=(cI+1)%i.length;sh()}; document.querySelector('.view').appendChild(n); } }
-        window.onload=()=>{ if(keys.length){rn();sh();} };
+        var d=${json}, keys=Object.keys(d), cb=keys[0], ci=0;
+        function rn(){ var n=document.getElementById('nav'); n.innerHTML=''; keys.forEach(k=>{ var b=document.createElement('button'); b.className='btn '+(cb===k?'active':''); b.innerText=k; b.onclick=()=>{cb=k;ci=0;sh();rn();}; n.appendChild(b); }); }
+        function sh(){ var i=d[cb]; if(!i||!i.length){ document.getElementById('img').style.display='none'; return; } document.getElementById('img').style.display='block'; document.getElementById('img').src=i[ci].img; document.getElementById('desc').innerHTML=i[ci].text; document.getElementById('tit').innerText=cb+" ("+(ci+1)+"/"+i.length+")"; }
+        function mv(x){ var l=d[cb].length; ci+=x; if(ci<0)ci=l-1; if(ci>=l)ci=0; sh(); }
+        if(keys.length){ rn(); sh(); }
         <\/script></body></html>`;
         
-        const z=new JSZip(); z.file("Dossier_INTERACTIF.html",html);
-        z.generateAsync({type:"blob"}).then(b=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="Dossier_"+proj.name+".zip"; a.click(); document.getElementById('loading').style.display='none'; });
-    },1000);
+        zip.file("Dossier_INTERACTIF.html", html);
+        zip.generateAsync({type:"blob"}).then(c=>{ let a=document.createElement('a'); a.href=URL.createObjectURL(c); a.download="Dossier.zip"; a.click(); document.getElementById('loader').style.display='none'; });
+    }, 1000);
 }
 </script>
 </body>
