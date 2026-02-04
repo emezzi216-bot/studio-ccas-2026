@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Studio CCAS | v39 FINAL</title>
+    <title>Studio CCAS | v40 REPARATION</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <style>
@@ -80,13 +80,13 @@
 <div id="save-toast">✅ ENREGISTRÉ !</div>
 
 <input type="file" id="import-input" style="display:none" onchange="loadFile(this)">
-<input type="file" id="photo-input" style="display:none" multiple onchange="processPhotos(this)">
+<input type="file" id="photo-input" style="display:none" multiple accept="image/*" onchange="processPhotos(this)">
 <input type="file" id="courage-input" style="display:none" onchange="updateCourage(this)">
 <input type="file" id="logo-input" style="display:none" onchange="updateLogo(this)">
 
 <div id="view-dashboard">
     <div class="header">
-        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v39</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
+        <div><h1 style="color:var(--blue); margin:0;">STUDIO CCAS <span style="font-size:12px; background:var(--gold); color:black; padding:2px 6px; border-radius:4px;">v40</span></h1><p style="margin:0;color:#666;">Direction des Finances</p></div>
         <button class="btn-save-main" onclick="manualSave()">💾 ENREGISTRER TOUT</button>
         <div style="display:flex; gap:10px;">
             <button class="btn-usb" onclick="saveToUSB()">💾 SAUVEGARDE USB</button>
@@ -153,8 +153,7 @@
         <div style="background:#f0f9ff; padding:15px; border-radius:8px; margin:15px 0; border:1px solid #bae6fd;">
             <strong>Contenu :</strong>
             <ul style="margin:10px 0 0 20px;">
-                <li>📂 <strong>_INTERACTIF.html</strong> : Le rapport final.</li>
-                <li>Tout est verrouillé (Image 70%, Texte 25%).</li>
+                <li>📂 <strong>_INTERACTIF.html</strong> : Le rapport final avec texte blanc forcé.</li>
             </ul>
         </div>
         <button style="background:var(--blue); color:white; border:none; padding:15px 30px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('success-modal').style.display='none'">FERMER</button>
@@ -162,7 +161,7 @@
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ccas_db_v39')) || {};
+    let db = JSON.parse(localStorage.getItem('ccas_db_v40')) || {};
     let appConfig = JSON.parse(localStorage.getItem('ccas_config')) || { logo: "", courage: "" };
     let curP = null, curB = null;
     let canvas, ctx, paintImg, isDrawing=false, startX, startY, currentTool='rect', currentColor='#ff0000', currentWidth=5, paintHistory=[], currentPhotoIndex=null, dragSrcEl = null;
@@ -177,8 +176,15 @@
     };
 
     function notifySave() { const t = document.getElementById('save-toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
-    function manualSave() { save(); notifySave(); }
-    function save() { localStorage.setItem('ccas_db_v39', JSON.stringify(db)); }
+    function manualSave() { 
+        try {
+            localStorage.setItem('ccas_db_v40', JSON.stringify(db)); 
+            notifySave(); 
+        } catch(e) {
+            alert("⚠️ MÉMOIRE PLEINE ! Impossible de sauvegarder. Supprimez des photos ou des anciens dossiers.");
+        }
+    }
+    function save() { try { localStorage.setItem('ccas_db_v40', JSON.stringify(db)); } catch(e){ console.log("Auto-save failed: full"); } }
     function saveConfig() { localStorage.setItem('ccas_config', JSON.stringify(appConfig)); }
     function imgTo64(img, cb) { try { const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);cb(c.toDataURL('image/png')); } catch(e){} }
     function updateLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; appConfig.logo=e.target.result; saveConfig(); }; r.readAsDataURL(i.files[0]); } }
@@ -288,28 +294,48 @@
     }
 
     function cmd(c, v=null) { document.execCommand(c, false, v); }
-    function processPhotos(i) { 
-        Array.from(i.files).forEach(f => { 
+    
+    // --- CORRECTION UPLOAD PHOTOS ---
+    function processPhotos(input) { 
+        if(!input.files || input.files.length === 0) return;
+        
+        Array.from(input.files).forEach(f => { 
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200;
+                    // REDUCTION AGRESSIVE POUR EVITER LE BLOCAGE MEMOIRE
+                    const MAX_WIDTH = 800; // 800px suffisent pour un rapport standard et économisent la mémoire
                     let width = img.width; let height = img.height;
-                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    
+                    if (width > MAX_WIDTH) { 
+                        height *= MAX_WIDTH / width; 
+                        width = MAX_WIDTH; 
+                    }
+                    
                     canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext("2d");
                     ctx.drawImage(img, 0, 0, width, height);
-                    db[curP].data[curB].push({img: canvas.toDataURL("image/jpeg", 0.7), desc: "Cliquez ici pour écrire..."}); 
-                    save(); refreshMain();
+                    
+                    // COMPRESSION JPEG 0.6 (Qualité moyenne mais fichier léger)
+                    try {
+                        const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
+                        db[curP].data[curB].push({img: dataUrl, desc: "Cliquez ici pour écrire..."}); 
+                        save(); 
+                        refreshMain();
+                    } catch(e) {
+                        alert("ERREUR MEMOIRE: Photo trop lourde ou mémoire pleine.");
+                    }
                 }
                 img.src = event.target.result;
             }
             reader.readAsDataURL(f);
         }); 
-        i.value = ''; // Reset pour permettre de réimporter le même fichier si besoin
+        // IMPORTANT: Reset l'input pour pouvoir réimporter la même photo si on s'est trompé
+        input.value = '';
     }
+
     function delPhoto(idx) { if(confirm("Supprimer ?")) { db[curP].data[curB].splice(idx, 1); save(); refreshMain(); } }
     function updateTxt(idx, h) { db[curP].data[curB][idx].desc = h; save(); }
 
