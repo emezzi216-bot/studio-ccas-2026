@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio CCAS | v85 FINAL DB</title>
+    <title>Studio CCAS | v88 GITHUB EDITION</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* --- CHARTE CRÉTEIL : BLEU NUIT (#0A1A3C) & OR (#CCA43B) --- */
+        /* --- CHARTE : BLEU NUIT (#0A1A3C) & OR (#CCA43B) --- */
         :root { 
             --blue: #0A1A3C; 
             --gold: #CCA43B; 
@@ -33,6 +33,8 @@
             padding: 0 20px; background: rgba(0,0,0,0.3); 
         }
         .logo-fixed { display: flex; align-items: center; gap: 15px; font-weight: 900; color: var(--gold); font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* APPEL DU FICHIER LOCAL GITHUB */
         .logo-fixed img { height: 60px; background: white; padding: 5px; border-radius: 4px; border: 1px solid var(--gold); }
         
         .db-status { font-size: 0.8rem; padding: 2px 8px; border-radius: 4px; margin-left: 10px; background: #333; color: #aaa; }
@@ -62,6 +64,7 @@
         .bat-list { flex: 1; overflow-y: auto; padding: 15px; }
         .bat-item { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1rem; }
         .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; border-left: 5px solid white; }
+        .bat-item.drag-over { background: rgba(46, 204, 113, 0.2); border: 1px dashed #2ecc71; }
         
         .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
         .editor-bar { height: 80px; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: rgba(0,0,0,0.2); }
@@ -81,7 +84,6 @@
         .block-img { width: 60%; position: relative; background: black; border-right: 1px solid var(--gold); overflow: hidden; }
         .block-img img { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
         
-        /* TOOLS IMAGE + SWAP BUTTONS */
         .tools-overlay { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; z-index: 10; }
         .mini-btn { background: rgba(0,0,0,0.7); border: 1px solid white; color: white; padding: 5px 10px; cursor: pointer; border-radius: 3px; font-weight: bold; }
         .mini-btn:hover { background: var(--gold); color: black; }
@@ -113,7 +115,7 @@
 </head>
 <body>
 
-<div id="toast">✅ Action effectuée</div>
+<div id="toast">✅ Sauvegardé !</div>
 
 <input type="file" id="f-imp" onchange="importData(this)">
 <input type="file" id="f-photo" multiple accept="image/*" onchange="addPhotos(this)">
@@ -121,8 +123,8 @@
 <div id="view-dash">
     <div class="header" style="width: 100%;">
         <div class="logo-fixed">
-            <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/8/8f/Logo_Cr%C3%A9teil.svg/1200px-Logo_Cr%C3%A9teil.svg.png" alt="Logo Créteil">
-            STUDIO CCAS <span id="db-state" class="db-status">DB Init...</span>
+            <img src="Logo_Créteil_Val_Marne.svg.png" alt="Logo Créteil" onerror="this.style.display='none'">
+            STUDIO CCAS <span id="db-state" class="db-status">Chargement...</span>
         </div>
         <div style="display:flex; gap:15px;">
             <button class="btn btn-green" onclick="exportPC()">📥 SAUVEGARDE PC</button>
@@ -150,7 +152,7 @@
     <div class="editor">
         <div class="editor-bar">
             <div class="logo-sealed">
-                <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/8/8f/Logo_Cr%C3%A9teil.svg/1200px-Logo_Cr%C3%A9teil.svg.png">
+                <img src="Logo_Créteil_Val_Marne.svg.png" alt="Logo Créteil" onerror="this.style.display='none'">
             </div>
             
             <div id="bat-title" style="font-weight:bold; color:var(--gold); font-size:1.5rem; text-transform: uppercase;">Accueil</div>
@@ -186,14 +188,14 @@
 </div>
 
 <script>
-/* --- MOTEUR v85 - INDEXED DB (STOCKAGE MASSIF) --- */
-const DB_NAME = "CCAS_DB_V85";
+/* --- MOTEUR v88 - GITHUB LOCAL LOGO + INDEXED DB --- */
+const DB_NAME = "CCAS_DB_V88";
 const DB_VER = 1;
 let db = null;
 let app = { projects: {} };
 let curP = null, curB = null;
 
-// 1. INIT BASE DE DONNÉES
+// INIT DB (Indispensable pour la sauvegarde Auto sans crash)
 const request = indexedDB.open(DB_NAME, DB_VER);
 request.onupgradeneeded = e => {
     db = e.target.result;
@@ -207,22 +209,14 @@ request.onsuccess = e => {
     document.getElementById('db-state').classList.add('ok');
     loadData();
 };
-request.onerror = e => {
-    alert("Erreur critique : Impossible d'ouvrir la base de données locale.");
-};
+request.onerror = e => { console.error("Erreur DB", e); };
 
-// 2. FONCTIONS LOAD / SAVE (ASYNC)
 function loadData() {
     const tx = db.transaction(['data'], 'readonly');
     const store = tx.objectStore('data');
     const req = store.get('main');
     req.onsuccess = () => {
-        if (req.result) {
-            app = req.result.val;
-            renderDash();
-        } else {
-            console.log("Nouvelle base créée");
-        }
+        if (req.result) { app = req.result.val; renderDash(); }
     };
 }
 
@@ -231,7 +225,6 @@ function saveData() {
     const tx = db.transaction(['data'], 'readwrite');
     const store = tx.objectStore('data');
     store.put({ id: 'main', val: app });
-    // Pas d'alerte, sauvegarde silencieuse
 }
 
 /* NAVIGATION */
@@ -267,20 +260,44 @@ function renderDash() {
 }
 function delProj(id, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete app.projects[id]; saveData(); renderDash(); } }
 
-/* RUBRIQUES */
+/* RUBRIQUES (DRAG) */
 function addBat() { const n = prompt("Nom :"); if(n) { if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; saveData(); openBat(n); } }
+
 function renderBats() {
     const l = document.getElementById('bat-list'); l.innerHTML = '';
     Object.keys(app.projects[curP].data).forEach(b => {
-        const d = document.createElement('div'); d.className = `bat-item ${curB===b?'active':''}`;
-        d.innerHTML = `<span onclick="openBat('${b}')" style="flex:1">${b}</span> <span onclick="delBat('${b}',event)" style="color:var(--red); font-weight:bold; cursor:pointer;">×</span>`;
+        const d = document.createElement('div'); 
+        d.className = `bat-item ${curB===b?'active':''}`;
+        d.draggable = true;
+        d.innerHTML = `
+            <span class="drag-handle" style="margin-right:10px; cursor:grab; font-size:1.2rem;">☰</span>
+            <span onclick="openBat('${b}')" style="flex:1">${b}</span> 
+            <span onclick="delBat('${b}',event)" style="color:var(--red); font-weight:bold; cursor:pointer;">×</span>
+        `;
+        
+        d.ondragstart = e => { e.dataTransfer.setData('src', b); e.dataTransfer.setData('type', 'bat'); };
+        d.ondragover = e => { e.preventDefault(); d.classList.add('drag-over'); };
+        d.ondragleave = e => { d.classList.remove('drag-over'); };
+        d.ondrop = e => {
+            e.stopPropagation(); d.classList.remove('drag-over');
+            const src = e.dataTransfer.getData('src');
+            if(e.dataTransfer.getData('type') === 'bat' && src !== b) {
+                const data = app.projects[curP].data;
+                const keys = Object.keys(data);
+                const nObj = {};
+                keys.splice(keys.indexOf(b), 0, keys.splice(keys.indexOf(src), 1)[0]);
+                keys.forEach(k => nObj[k] = data[k]);
+                app.projects[curP].data = nObj;
+                saveData(); renderBats();
+            }
+        };
         l.appendChild(d);
     });
 }
 function openBat(b) { curB=b; document.getElementById('bat-title').innerText=b; renderBats(); renderContent(); }
 function delBat(b, e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete app.projects[curP].data[b]; if(curB===b) curB=null; saveData(); renderBats(); renderContent(); } }
 
-/* PHOTOS & GESTION CONTENU */
+/* PHOTOS & DRAG */
 function addPhotos(input) {
     if(!curB) return alert("Sélectionnez une rubrique !");
     Array.from(input.files).forEach(f => {
@@ -289,7 +306,7 @@ function addPhotos(input) {
             const img = new Image();
             img.onload = () => {
                 const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d');
-                let w = img.width, h = img.height; const max = 1200; // Meilleure qualité possible avec IndexedDB
+                let w = img.width, h = img.height; const max = 1200; 
                 if(w > max) { h *= max/w; w = max; }
                 cvs.width = w; cvs.height = h; ctx.drawImage(img, 0, 0, w, h);
                 app.projects[curP].data[curB].push({ src: cvs.toDataURL('image/jpeg', 0.8), text: "Description..." });
@@ -306,7 +323,7 @@ function renderContent() {
 
     app.projects[curP].data[curB].forEach((item, idx) => {
         const b = document.createElement('div'); b.className = 'block';
-        b.draggable = true; // Activer le drag
+        b.draggable = true; 
         
         b.innerHTML = `
             <div class="drag-handle">☰</div>
@@ -329,7 +346,6 @@ function renderContent() {
                 <div class="editable" contenteditable="true" oninput="updT(${idx},this.innerHTML)">${item.text}</div>
             </div>`;
         
-        // DRAG & DROP EVENTS
         b.ondragstart = e => { e.dataTransfer.setData('idx', idx); b.classList.add('dragging'); };
         b.ondragend = e => { b.classList.remove('dragging'); };
         b.ondragover = e => { e.preventDefault(); b.classList.add('drag-over'); };
@@ -343,19 +359,15 @@ function renderContent() {
                 saveData(); renderContent();
             }
         };
-        
         c.appendChild(b);
     });
 }
 
-// UPDATE TEXTE & MOUVEMENT MANUEL
 function updT(i, t) { app.projects[curP].data[curB][i].text = t; clearTimeout(window.st); window.st = setTimeout(saveData, 1000); }
 function moveItem(i, dir) {
     const arr = app.projects[curP].data[curB];
     if(i+dir >= 0 && i+dir < arr.length) {
-        const temp = arr[i];
-        arr[i] = arr[i+dir];
-        arr[i+dir] = temp;
+        const temp = arr[i]; arr[i] = arr[i+dir]; arr[i+dir] = temp;
         saveData(); renderContent();
     }
 }
@@ -387,16 +399,16 @@ function importData(i) {
 }
 function showToast() { const t = document.getElementById('toast'); t.style.display = 'block'; setTimeout(()=>t.style.display='none', 2000); }
 
-/* EXPORT SITE HTML */
+/* EXPORT HTML */
 function genExportHTML() {
     if(!window.JSZip) return alert("Erreur ZIP");
     const proj = app.projects[curP]; 
     const jsonData = JSON.stringify(proj.data).replace(/</g, '\\u003c');
     
-    // HTML COMPLET - CHARTE CRÉTEIL SCELLÉE
+    // HTML COMPLET - AVEC LOGO LOCAL (pour que le site généré fonctionne aussi s'il est dans le même dossier)
     const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;background:#0A1A3C;color:white;font-family:'Segoe UI',sans-serif;height:100vh;display:flex;overflow:hidden}#side{width:300px;background:rgba(0,0,0,0.3);border-right:3px solid #CCA43B;display:flex;flex-direction:column}.head{padding:20px;color:#CCA43B;font-weight:800;border-bottom:1px solid #555;text-align:center;font-size:1.4rem;text-transform:uppercase}.btn{width:100%;padding:15px;color:#ccc;background:none;border:none;text-align:left;cursor:pointer;border-bottom:1px solid #444;font-size:1.1rem;transition:0.2s}.btn:hover{background:rgba(255,255,255,0.05)}.btn.active{color:#CCA43B;border-left:6px solid #CCA43B;background:rgba(204,164,59,0.1);font-weight:bold}#main{flex:1;display:flex;flex-direction:column;position:relative}.view{height:75vh;width:100%;display:flex;align-items:center;justify-content:center;background:black;border-bottom:3px solid #CCA43B;position:relative}.frame img{max-width:100%;max-height:100%;object-fit:contain}.bot{height:25vh;background:#0A1A3C;padding:30px;overflow-y:auto;box-sizing:border-box}#desc{color:white;font-size:1.4rem;line-height:1.6}#desc *{background:transparent!important}#desc font{color:inherit}#tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #555;padding-bottom:10px;margin-top:0;font-size:1.6rem}.nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(204,164,59,0.5);color:white;border:none;font-size:50px;padding:10px;cursor:pointer;border-radius:50%}.p{left:20px}.n{right:20px}.top-logo{position:absolute;top:10px;right:10px;background:white;padding:5px;border:1px solid #CCA43B;border-radius:4px;height:70px;display:flex;align-items:center}.top-logo img{height:100%;}@media print{#side,.nav{display:none}.view{height:60vh;page-break-inside:avoid}.bot{height:40vh;page-break-after:always}}</style></head><body>
     <div id="side"><div class="head">${proj.name}</div><div id="nav"></div></div>
-    <div id="main"><div class="view"><div class="top-logo"><img src="https://upload.wikimedia.org/wikipedia/fr/thumb/8/8f/Logo_Cr%C3%A9teil.svg/1200px-Logo_Cr%C3%A9teil.svg.png"></div><div id="sc"></div></div><div class="bot"><h2 id="tit"></h2><div id="desc"></div></div></div>
+    <div id="main"><div class="view"><div class="top-logo"><img src="Logo_Créteil_Val_Marne.svg.png"></div><div id="sc"></div></div><div class="bot"><h2 id="tit"></h2><div id="desc"></div></div></div>
     <script>const data=${jsonData};const keys=Object.keys(data);let cBat=keys[0];let cIdx=0;function renderNav(){const n=document.getElementById('nav');n.innerHTML='';keys.forEach(k=>{const b=document.createElement('button');b.className='btn'+(cBat===k?' active':'');b.innerText=k;b.onclick=()=>{cBat=k;cIdx=0;show();renderNav()};n.appendChild(b)})}function show(){const s=document.getElementById('sc');const arr=data[cBat];document.querySelectorAll('.nav').forEach(e=>e.remove());if(!arr||!arr.length){s.innerHTML='';document.getElementById('tit').innerText=cBat;document.getElementById('desc').innerHTML="Aucune photo.";return}const item=arr[cIdx];s.innerHTML='<img src="'+item.src+'">';document.getElementById('tit').innerText=cBat+" ("+(cIdx+1)+"/"+arr.length+")";document.getElementById('desc').innerHTML=item.text;if(arr.length>1){const prev=document.createElement('button');prev.className='nav p';prev.innerText='❮';prev.onclick=()=>{cIdx=(cIdx-1+arr.length)%arr.length;show()};document.querySelector('.view').appendChild(prev);const next=document.createElement('button');next.className='nav n';next.innerText='❯';next.onclick=()=>{cIdx=(cIdx+1)%arr.length;show()};document.querySelector('.view').appendChild(next)}}if(keys.length){renderNav();show()}<\/script></body></html>`;
 
     const z = new JSZip(); 
