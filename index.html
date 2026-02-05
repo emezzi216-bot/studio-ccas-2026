@@ -3,48 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio CCAS | v64 AUTO-SAVE</title>
+    <title>Studio CCAS | v65 FINAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* --- DESIGN --- */
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; --white: #fff; --green: #27ae60; --red: #c0392b; }
+        /* --- DESIGN BLEU NUIT & OR --- */
+        :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f4f6f8; --white: #fff; --green: #27ae60; --red: #c0392b; }
+        
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
         * { box-sizing: border-box; outline: none; }
-        button { cursor: pointer; transition: 0.1s; } button:active { transform: scale(0.98); }
+        button { cursor: pointer; transition: 0.1s; font-family: inherit; } button:active { transform: scale(0.98); }
         .hidden { display: none !important; }
 
         /* HEADER */
-        .header { height: 60px; background: var(--white); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
-        .title h1 { margin: 0; color: var(--blue); font-size: 1.4rem; display: flex; align-items: center; gap: 15px; }
+        .header { height: 65px; background: var(--white); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { color: var(--blue); font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .status-badge { font-size: 0.75rem; background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; border: 1px solid #bae6fd; }
         
-        /* STATUS SAUVEGARDE */
-        .save-status { font-size: 0.8rem; padding: 5px 10px; border-radius: 4px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        .status-ok { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .status-warn { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
-
-        .btn { padding: 8px 20px; border-radius: 6px; font-weight: bold; border: none; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-        .btn-green { background: var(--green); color: white; border: 1px solid var(--green); }
+        .actions { display: flex; gap: 10px; }
+        .btn { padding: 8px 18px; border-radius: 6px; font-weight: bold; border: none; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .btn-green { background: var(--green); color: white; border: 1px solid var(--green); box-shadow: 0 2px 5px rgba(39, 174, 96, 0.3); }
         .btn-blue { background: var(--blue); color: white; }
         .btn-outline { background: white; border: 2px solid #ccc; color: #333; }
 
         /* VUES */
-        #view-dashboard { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; }
-        #view-studio { display: none; height: calc(100vh - 60px); flex-direction: row; }
-
+        #view-dash, #view-studio { flex: 1; overflow: hidden; display: flex; }
+        #view-dash { flex-direction: column; padding: 40px; overflow-y: auto; }
+        
         /* DASHBOARD */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-top: 30px; }
-        .card { background: white; padding: 30px; border-radius: 12px; text-align: center; border: 2px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; cursor: pointer; transition: 0.2s; }
-        .card:hover { transform: translateY(-5px); border-color: var(--gold); }
-        .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); background: #fee2e2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
+        .card { background: white; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid transparent; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; cursor: pointer; transition: 0.2s; }
+        .card:hover { transform: translateY(-5px); border-color: var(--gold); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); background: #fee2e2; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
 
         /* STUDIO: SIDEBAR */
-        .sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; border-right: 2px solid var(--gold); }
+        .sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 15px rgba(0,0,0,0.1); border-right: 2px solid var(--gold); }
         .side-head { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
-        .back-btn { background: none; border: none; color: var(--gold); font-weight: bold; width: 100%; text-align: left; cursor: pointer; }
+        .back-btn { background: none; border: none; color: var(--gold); font-weight: bold; width: 100%; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         
-        #proj-title { cursor: pointer; border-bottom: 1px dashed rgba(255,255,255,0.3); padding-bottom: 2px; display: inline-block; }
-        
+        #proj-title-display { cursor: pointer; border-bottom: 1px dashed rgba(255,255,255,0.4); padding-bottom: 2px; display: inline-block; margin-top: 5px; font-size: 1.1rem; }
+        #proj-title-display:hover { color: var(--gold); border-color: var(--gold); }
+
         .bat-list { flex: 1; overflow-y: auto; padding: 10px; }
+        
         .bat-item { padding: 10px; background: rgba(255,255,255,0.08); margin-bottom: 5px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
         .bat-item:hover { background: rgba(255,255,255,0.15); }
         .bat-item.active { background: white; color: var(--blue); border-left-color: var(--gold); font-weight: bold; }
@@ -54,36 +54,40 @@
         .icon-btn { width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; }
         .icon-edit { background: #3498db; }
         .icon-del { background: #e74c3c; }
-        .handle { cursor: grab; padding-right: 10px; opacity: 0.5; font-size: 1.2rem; }
+        .handle { cursor: grab; padding-right: 8px; opacity: 0.6; font-size: 1.2rem; }
 
         /* STUDIO: EDITOR */
         .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
         .editor-tools { height: 60px; background: white; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        
         .logo-box { width: 45px; height: 45px; border: 1px dashed #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: white; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+        
         .content { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
 
         /* PHOTO BLOCK */
         .block { background: white; border-radius: 8px; margin-bottom: 25px; display: flex; border: 2px solid var(--gold); height: 350px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .block.dragging { opacity: 0.4; border: 2px dashed white; }
+        
         .drag-handle { width: 40px; background: #f8f9fa; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #eee; color: #aaa; font-size: 24px; }
         .block-img { width: 320px; background: #f8fafc; padding: 15px; border-right: 1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         .img-wrap { width: 100%; height: 220px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; }
         .img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
         .btn-del { position: absolute; top: 10px; left: 10px; width: 30px; height: 30px; background: var(--red); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; z-index: 5; }
         .btn-retouch { margin-top: 10px; width: 100%; background: var(--blue); color: white; border: none; padding: 8px; border-radius: 4px; font-weight: bold; }
 
         .block-txt { flex: 1; padding: 15px; display: flex; flex-direction: column; background: #fdfdfd; }
         .txt-toolbar { display: flex; gap: 5px; margin-bottom: 5px; background: #eee; padding: 5px; border-radius: 6px; align-items: center; }
         .t-btn { width: 28px; height: 28px; border: 1px solid #ccc; background: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        
         .editable { flex: 1; border: 1px solid #333; border-radius: 6px; padding: 10px; overflow-y: auto; background: #222; color: white; font-size: 15px; line-height: 1.5; }
         .editable:focus { border-color: var(--gold); outline: none; }
 
-        /* LOADING */
-        #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .bar-bg { width: 300px; height: 10px; background: #ddd; border-radius: 5px; margin-top: 20px; overflow: hidden; }
-        .bar-fill { height: 100%; width: 0%; background: var(--green); transition: width 0.2s; }
-
+        /* LOADING & TOAST */
+        #toast { position: fixed; bottom: 30px; right: 30px; background: #333; color: white; padding: 15px 30px; border-radius: 50px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 9999; font-weight: bold; }
+        #toast.show { opacity: 1; }
+        
         /* PAINT */
         #paint-modal { position: fixed; inset: 0; background: #222; z-index: 20000; display: none; flex-direction: column; }
         .paint-top { height: 50px; background: #333; padding: 0 20px; display:flex; justify-content:space-between; align-items:center; color:white; }
@@ -95,11 +99,7 @@
 </head>
 <body>
 
-<div id="loading">
-    <h2 style="color:var(--blue);">Démarrage sécurisé...</h2>
-    <div class="bar-bg"><div class="bar-fill" id="progress"></div></div>
-    <p id="load-msg" style="margin-top:10px; color:#666;">Récupération de vos données...</p>
-</div>
+<div id="toast">Message</div>
 
 <input type="file" id="f-import" class="hidden" onchange="importData(this)">
 <input type="file" id="f-photo" class="hidden" multiple accept="image/*" onchange="addPhotos(this)">
@@ -107,13 +107,12 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div class="title">
-            <h1>STUDIO CCAS</h1>
-            <div id="db-status" class="save-status status-warn">⏳ Connexion...</div>
+        <div class="logo">
+            STUDIO CCAS <span id="save-indicator" class="status-badge">Prêt</span>
         </div>
         <div class="actions">
             <button class="btn btn-green" onclick="exportData()">📥 SAUVEGARDE PC</button>
-            <button class="btn btn-outline" onclick="document.getElementById('f-import').click()">📂 IMPORTER</button>
+            <button class="btn btn-outline" onclick="document.getElementById('f-import').click()">📂 CHARGER</button>
         </div>
     </div>
     <div id="grid" class="grid"></div>
@@ -127,7 +126,7 @@
         <div class="side-head">
             <button class="back-btn" onclick="goHome()">⬅️ RETOUR ACCUEIL</button>
             <div style="text-align:center; margin-top:10px;">
-                <span id="proj-title" onclick="renameProj()" title="Renommer" style="color:white; font-weight:bold; cursor:pointer; border-bottom:1px dashed white;">Projet</span>
+                <span id="proj-title-display" onclick="renameProj()" title="Renommer">Projet</span>
             </div>
         </div>
         <div id="bat-list" class="bat-list"></div>
@@ -140,7 +139,7 @@
             </div>
             <div id="bat-title" style="font-weight:bold; color:var(--blue); font-size:1.2rem;">Accueil</div>
             <div class="actions">
-                <button class="btn btn-outline" onclick="exportData()">💾 SAUVER SUR PC</button>
+                <button class="btn btn-green" onclick="exportData()">💾 SAUVEGARDE PC</button>
                 <button class="btn btn-blue" onclick="genZip()">📦 GÉNÉRER PDF</button>
             </div>
         </div>
@@ -167,64 +166,41 @@
 </div>
 
 <script>
-/* --- MOTEUR SAUVEGARDE HYBRIDE (V64) --- */
-const DB_NAME='CCAS_DB_FINAL', STORE='data';
-let db=null, app={ projects:{}, config:{logo:""} };
-let curP=null, curB=null, dragSrc=null;
-let dbReady = false;
+/** MOTEUR V65 - SAUVEGARDE LOCALE AUTO + FICHIER */
+const STORE_KEY = 'CCAS_AUTO_SAVE_V65';
+let app = { projects: {}, config: { logo: "" } };
+let curP = null, curB = null, dragSrc = null;
 
-// 1. DÉMARRAGE SECURISE (Anti-blocage)
-window.onload = function() {
-    let forced = false;
-    const timer = setTimeout(() => {
-        forced = true;
-        console.warn("DB lente -> Mode RAM");
-        updateStatus(false);
-        document.getElementById('loading').style.display='none';
-        renderGrid();
-    }, 3000); // 3sec max pour charger la DB
-
-    const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = e => e.target.result.createObjectStore(STORE);
-    req.onsuccess = e => {
-        if(forced) return;
-        clearTimeout(timer);
-        db = e.target.result;
-        dbReady = true;
-        updateStatus(true);
-        loadDB();
-    };
-    req.onerror = e => {
-        if(forced) return;
-        clearTimeout(timer);
-        updateStatus(false);
-        document.getElementById('loading').style.display='none';
-    };
-};
-
-function updateStatus(ok){
-    const s = document.getElementById('db-status');
-    if(ok) { s.className="save-status status-ok"; s.innerHTML="☁️ SAUVEGARDE AUTO ACTIVE"; }
-    else { s.className="save-status status-warn"; s.innerHTML="⚠️ MODE SANS ÉCHEC (RAM)"; }
+/* --- AUTO SAVE SYSTEM --- */
+// Chargement immédiat au lancement (pas de base de données bloquante)
+try {
+    const saved = localStorage.getItem(STORE_KEY);
+    if(saved) {
+        app = JSON.parse(saved);
+        console.log("Données récupérées de la sauvegarde auto.");
+    }
+} catch(e) {
+    console.error("Erreur lecture sauvegarde auto", e);
 }
 
-function saveDB(){
-    if(dbReady && db){
-        const tx = db.transaction(STORE,'readwrite');
-        tx.objectStore(STORE).put(app, 'root');
+// Fonction de sauvegarde qui s'exécute à chaque changement
+function autoSave() {
+    try {
+        localStorage.setItem(STORE_KEY, JSON.stringify(app));
+        document.getElementById('save-indicator').innerText = "Sauvegardé";
+        setTimeout(() => document.getElementById('save-indicator').innerText = "Prêt", 1000);
+    } catch(e) {
+        document.getElementById('save-indicator').innerText = "⚠️ Mémoire pleine ! Faites une sauvegarde PC";
+        document.getElementById('save-indicator').style.color = "red";
     }
 }
 
-function loadDB(){
-    const tx = db.transaction(STORE,'readonly');
-    const r = tx.objectStore(STORE).get('root');
-    r.onsuccess = () => {
-        if(r.result) app = r.result;
-        document.getElementById('loading').style.display='none';
-        renderGrid();
-        if(app.config.logo) document.getElementById('img-logo').src=app.config.logo;
-    };
-}
+// Init Dashboard
+renderGrid();
+if(app.config.logo) document.getElementById('img-logo').src = app.config.logo;
+
+/* --- UTILS --- */
+function toast(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
 
 /* --- DASHBOARD --- */
 function renderGrid(){
@@ -237,23 +213,23 @@ function renderGrid(){
         d.onclick=()=>{ openProj(id); }; g.appendChild(d);
     });
 }
-function addProj(){ const n=prompt("Nom :"); if(n){ const id='p'+Date.now(); app.projects[id]={name:n,date:Date.now(),data:{}}; saveDB(); renderGrid(); openProj(id); } }
-function delProj(id,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[id]; saveDB(); renderGrid(); } }
+function addProj(){ const n=prompt("Nom :"); if(n){ const id='p'+Date.now(); app.projects[id]={name:n,date:Date.now(),data:{}}; autoSave(); renderGrid(); openProj(id); } }
+function delProj(id,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[id]; autoSave(); renderGrid(); } }
 function goHome(){ document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; curP=null; }
 function openProj(id){ 
     curP=id; curB=null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex';
-    document.getElementById('proj-title').innerText=app.projects[id].name;
+    document.getElementById('proj-title-display').innerText=app.projects[id].name;
     if(Object.keys(app.projects[id].data).length===0) app.projects[id].data["Zone 1"]=[];
     renderBats();
     const first=Object.keys(app.projects[id].data)[0]; if(first) openBat(first);
 }
 function renameProj(){
     const n = prompt("Renommer le projet :", app.projects[curP].name);
-    if(n){ app.projects[curP].name=n; document.getElementById('proj-title').innerText=n; saveDB(); }
+    if(n){ app.projects[curP].name=n; document.getElementById('proj-title-display').innerText=n; autoSave(); }
 }
 
-/* --- BATIMENTS --- */
-function addBat(){ const n=prompt("Nom :"); if(n){ if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; saveDB(); openBat(n); } }
+/* --- BATIMENTS (RENOMMAGE + DRAG) --- */
+function addBat(){ const n=prompt("Nom :"); if(n){ if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; autoSave(); openBat(n); } }
 function renameBat(oldName,e){
     e.stopPropagation();
     const n = prompt("Renommer :", oldName);
@@ -263,7 +239,7 @@ function renameBat(oldName,e){
         const newData = {};
         keys.forEach(k => { if(k===oldName) newData[n]=data[k]; else newData[k]=data[k]; });
         app.projects[curP].data = newData;
-        saveDB(); if(curB===oldName) openBat(n); else renderBats();
+        autoSave(); if(curB===oldName) openBat(n); else renderBats();
     }
 }
 function renderBats(){
@@ -284,20 +260,19 @@ function renderBats(){
                 const keys=Object.keys(data), sI=keys.indexOf(src), tI=keys.indexOf(tgt);
                 keys.splice(sI,1); keys.splice(tI,0,src);
                 const newData={}; keys.forEach(k=>newData[k]=data[k]);
-                app.projects[curP].data=newData; saveDB(); renderBats();
+                app.projects[curP].data=newData; autoSave(); renderBats();
             }
         };
         l.appendChild(d);
     });
 }
-function delBat(b,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[curP].data[b]; if(curB===b) curB=null; saveDB(); renderBats(); renderContent(); } }
+function delBat(b,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[curP].data[b]; if(curB===b) curB=null; autoSave(); renderBats(); renderContent(); } }
 function openBat(b){ curB=b; document.getElementById('bat-title').innerText=b; renderBats(); renderContent(); }
 
-/* --- PHOTOS --- */
+/* --- PHOTOS (COMPRESSION FORTE POUR AUTO-SAVE) --- */
 function addPhotos(input){
     if(!curB) { app.projects[curP].data["Zone 1"]=[]; openBat("Zone 1"); }
     if(!input.files.length) return;
-    document.getElementById('loading').style.display='flex';
     let c=0; const total=input.files.length;
     Array.from(input.files).forEach(f=>{
         if(f.type==="image/heic") return c++;
@@ -306,12 +281,11 @@ function addPhotos(input){
             const img=new Image();
             img.onload=()=>{
                 const cvs=document.createElement('canvas'), ctx=cvs.getContext('2d');
-                const max=1000; let w=img.width, h=img.height;
+                // COMPRESSION PLUS FORTE pour tenir dans le LocalStorage
+                const max=800; let w=img.width, h=img.height;
                 if(w>max){h*=max/w; w=max;} cvs.width=w; cvs.height=h; ctx.drawImage(img,0,0,w,h);
-                app.projects[curP].data[curB].push({src:cvs.toDataURL('image/jpeg',0.7), text:"Description..."});
-                c++; 
-                document.getElementById('progress').style.width=(c/total*100)+'%';
-                if(c===total){ saveDB(); renderContent(); setTimeout(()=>document.getElementById('loading').style.display='none',500); }
+                app.projects[curP].data[curB].push({src:cvs.toDataURL('image/jpeg',0.6), text:"Description..."});
+                c++; if(c===total){ autoSave(); renderContent(); }
             }; img.src=e.target.result;
         }; r.readAsDataURL(f);
     });
@@ -347,19 +321,19 @@ function renderContent(){
                 const old=parseInt(dragSrc.dataset.idx), cur=parseInt(this.dataset.idx);
                 const arr=app.projects[curP].data[curB];
                 const mv=arr.splice(old,1)[0]; arr.splice(cur,0,mv);
-                saveDB(); renderContent();
+                autoSave(); renderContent();
             }
         };
         c.appendChild(b);
     });
 }
-function updTxt(i,t){ app.projects[curP].data[curB][i].text=t; clearTimeout(window.t); window.t=setTimeout(saveDB,1000); }
-function delItem(i){ if(confirm("Supprimer ?")){ app.projects[curP].data[curB].splice(i,1); saveDB(); renderContent(); } }
+function updTxt(i,t){ app.projects[curP].data[curB][i].text=t; clearTimeout(window.t); window.t=setTimeout(autoSave,1000); }
+function delItem(i){ if(confirm("Supprimer ?")){ app.projects[curP].data[curB].splice(i,1); autoSave(); renderContent(); } }
 
 /* --- PAINT --- */
 let pIdx, pImg, tool='rect', color='#ff0000', brushSize=5, draw=false, sx, sy;
 function editP(i){ pIdx=i; const s=app.projects[curP].data[curB][i].src; pImg=new Image(); pImg.onload=()=>{ const cvs=document.getElementById('canvas'); cvs.width=pImg.width; cvs.height=pImg.height; cvs.getContext('2d').drawImage(pImg,0,0); document.getElementById('paint-modal').style.display='flex'; }; pImg.src=s; }
-function savePaint(){ app.projects[curP].data[curB][pIdx].src=document.getElementById('canvas').toDataURL('image/jpeg',0.8); saveDB(); closePaint(); renderContent(); }
+function savePaint(){ app.projects[curP].data[curB][pIdx].src=document.getElementById('canvas').toDataURL('image/jpeg',0.8); autoSave(); closePaint(); renderContent(); }
 function closePaint(){ document.getElementById('paint-modal').style.display='none'; }
 function setTool(t){ tool=t; }
 const cvs=document.getElementById('canvas');
@@ -382,48 +356,42 @@ cvs.addEventListener('mouseup',e=>{
 });
 
 /* --- FILES --- */
-function exportData(){ const b=new Blob([JSON.stringify(app)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`CCAS_FULL_BACKUP.json`; a.click(); }
-function importData(i){ if(!i.files[0])return; const r=new FileReader(); r.onload=e=>{ try{ app=JSON.parse(e.target.result); saveDB(); renderGrid(); }catch(x){alert("Erreur fichier");} }; r.readAsText(i.files[0]); }
-function setLogo(i){ if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; saveDB(); }; r.readAsDataURL(i.files[0]); } }
+function exportData(){ const b=new Blob([JSON.stringify(app)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`CCAS_BACKUP.json`; a.click(); toast("Sauvegarde téléchargée"); }
+function importData(i){ if(!i.files[0])return; const r=new FileReader(); r.onload=e=>{ try{ app=JSON.parse(e.target.result); autoSave(); renderGrid(); toast("Chargé"); }catch(x){alert("Erreur fichier");} }; r.readAsText(i.files[0]); }
+function setLogo(i){ if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; autoSave(); }; r.readAsDataURL(i.files[0]); } }
 
 /* --- ZIP --- */
 function genZip(){
     if(!window.JSZip){alert("Erreur ZIP");return;}
-    document.getElementById('loading').style.display='flex';
-    const currentLogo = document.getElementById('img-logo').src;
-    setTimeout(()=>{
-        const proj=app.projects[curP]; const json=JSON.stringify(proj.data).replace(/</g,'\\u003c');
-        const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
-        body{margin:0;background:#000;font-family:sans-serif;height:100vh;display:flex;overflow:hidden;color:white;}
-        #side{width:280px;background:#0A1A3C;border-right:3px solid #CCA43B;display:flex;flex-direction:column;}
-        .head{padding:20px;color:#CCA43B;font-weight:800;border-bottom:1px solid #333;text-align:center;font-size:1.2rem;text-transform:uppercase;}
-        .btn{width:100%;padding:15px;color:#888;background:none;border:none;text-align:left;cursor:pointer;border-bottom:1px solid #222;font-size:16px;}
-        .btn.active{color:#CCA43B;border-left:5px solid #CCA43B;background:rgba(204,164,59,0.1);font-weight:bold;}
-        #main{flex:1;display:flex;flex-direction:column;position:relative;}
-        .view{height:75vh;width:100%;display:flex;align-items:center;justify-content:center;background:#000;border-bottom:3px solid #CCA43B;position:relative;}
-        .frame img{max-width:100%;max-height:100%;object-fit:contain;}
-        .bot{height:25vh;background:#111;padding:20px 40px;overflow-y:auto;box-sizing:border-box;}
-        #desc{color:white!important;font-size:1.3rem;line-height:1.5;} 
-        #desc * {background:transparent!important;} 
-        #desc font { color: inherit !important; }
-        #tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:10px;margin-top:0;font-size:1.4rem;}
-        .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(204,164,59,0.5);color:white;border:none;font-size:40px;padding:10px;cursor:pointer;border-radius:50%;}
-        .p{left:20px;} .n{right:20px;}
-        .pdf{position:absolute;top:10px;left:10px;background:#c0392b;color:white;border:none;padding:5px 15px;border-radius:4px;font-weight:bold;cursor:pointer;opacity:0.6;z-index:99;}
-        .top{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.8);padding:5px 10px;border:1px solid #CCA43B;display:flex;align-items:center;gap:10px;border-radius:4px;}
-        @media print{ #side,.nav,.pdf{display:none;} .view{height:70vh;page-break-inside:avoid;} .bot{height:30vh;page-break-after:always;} }
-        </style></head><body><button class="pdf" onclick="window.print()">🖨️ PDF</button><div id="side"><div class="head">${proj.name}</div><div id="nav"></div></div><div id="main"><div class="view"><div class="top"><img src="${currentLogo}" height="40"><div style="color:#CCA43B;font-weight:bold;font-size:10px;">DIRECTION<br>FINANCES</div></div><div id="sc"></div></div><div class="bot"><h2 id="tit"></h2><div id="desc"></div></div></div>
-        <script>
-        const d=${json}; let keys=Object.keys(d), cB=keys[0], cI=0;
-        function rn(){ const n=document.getElementById('nav'); n.innerHTML=''; keys.forEach(k=>{ const b=document.createElement('button'); b.className='btn '+(cB===k?'active':''); b.innerText=k; b.onclick=()=>{cB=k;cI=0;sh();rn()}; n.appendChild(b); }); }
-        function sh(){ const s=document.getElementById('sc'), i=d[cB]; if(!i||!i.length){ s.innerHTML=''; document.getElementById('desc').innerHTML='Aucune photo'; return; } s.innerHTML='<img src="'+i[cI].src+'">'; document.getElementById('tit').innerText=cB+" ("+(cI+1)+"/"+i.length+")"; document.getElementById('desc').innerHTML=i[cI].text.replace("Description...","");
-        document.querySelectorAll('.nav').forEach(e=>e.remove()); if(i.length>1){ const p=document.createElement('button'); p.className='nav p'; p.innerText='❮'; p.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()}; document.querySelector('.view').appendChild(p); const n=document.createElement('button'); n.className='nav n'; n.innerText='❯'; n.onclick=()=>{cI=(cI+1)%i.length;sh()}; document.querySelector('.view').appendChild(n); } }
-        window.onload=()=>{ if(keys.length){rn();sh();} };
-        <\/script></body></html>`;
-        
-        const z=new JSZip(); z.file("Dossier_INTERACTIF.html",html);
-        z.generateAsync({type:"blob"}).then(b=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="Dossier_"+proj.name+".zip"; a.click(); document.getElementById('loading').style.display='none'; });
-    },1000);
+    const logo=document.getElementById('img-logo').src;
+    const proj=app.projects[curP]; const json=JSON.stringify(proj.data).replace(/</g,'\\u003c');
+    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
+    body{margin:0;background:#000;font-family:sans-serif;height:100vh;display:flex;overflow:hidden;color:white;}
+    #side{width:280px;background:#0A1A3C;border-right:3px solid #CCA43B;display:flex;flex-direction:column;}
+    .head{padding:20px;color:#CCA43B;font-weight:800;border-bottom:1px solid #333;text-align:center;font-size:1.2rem;text-transform:uppercase;}
+    .btn{width:100%;padding:15px;color:#888;background:none;border:none;text-align:left;cursor:pointer;border-bottom:1px solid #222;font-size:16px;}
+    .btn.active{color:#CCA43B;border-left:5px solid #CCA43B;background:rgba(204,164,59,0.1);font-weight:bold;}
+    #main{flex:1;display:flex;flex-direction:column;position:relative;}
+    .view{height:75vh;width:100%;display:flex;align-items:center;justify-content:center;background:#000;border-bottom:3px solid #CCA43B;position:relative;}
+    .frame img{max-width:100%;max-height:100%;object-fit:contain;}
+    .bot{height:25vh;background:#111;padding:20px 40px;overflow-y:auto;box-sizing:border-box;}
+    #desc{color:white!important;font-size:1.3rem;line-height:1.5;} #desc *{background:transparent!important;} #desc font[color]{color:inherit!important;}
+    #tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:10px;margin-top:0;font-size:1.4rem;}
+    .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(204,164,59,0.5);color:white;border:none;font-size:40px;padding:10px;cursor:pointer;border-radius:50%;}
+    .p{left:20px;} .n{right:20px;}
+    .pdf{position:absolute;top:10px;left:10px;background:#c0392b;color:white;border:none;padding:5px 15px;border-radius:4px;font-weight:bold;cursor:pointer;opacity:0.6;z-index:99;}
+    .top{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.8);padding:5px 10px;border:1px solid #CCA43B;display:flex;align-items:center;gap:10px;border-radius:4px;}
+    @media print{ #side,.nav,.pdf{display:none;} .view{height:70vh;page-break-inside:avoid;} .bot{height:30vh;page-break-after:always;} }
+    </style></head><body><button class="pdf" onclick="window.print()">🖨️ PDF</button><div id="side"><div class="head">${proj.name}</div><div id="nav"></div></div><div id="main"><div class="view"><div class="top"><img src="${logo}" height="40"><div style="color:#CCA43B;font-weight:bold;font-size:10px;">DIRECTION<br>FINANCES</div></div><div id="sc"></div></div><div class="bot"><h2 id="tit"></h2><div id="desc"></div></div></div>
+    <script>
+    const d=${json}; let keys=Object.keys(d), cB=keys[0], cI=0;
+    function rn(){ const n=document.getElementById('nav'); n.innerHTML=''; keys.forEach(k=>{ const b=document.createElement('button'); b.className='btn '+(cB===k?'active':''); b.innerText=k; b.onclick=()=>{cB=k;cI=0;sh();rn()}; n.appendChild(b); }); }
+    function sh(){ const s=document.getElementById('sc'), i=d[cB]; if(!i||!i.length){ s.innerHTML=''; document.getElementById('desc').innerHTML='Aucune photo'; return; } s.innerHTML='<img src="'+i[cI].src+'">'; document.getElementById('tit').innerText=cB+" ("+(cI+1)+"/"+i.length+")"; document.getElementById('desc').innerHTML=i[cI].text.replace("Description...","");
+    document.querySelectorAll('.nav').forEach(e=>e.remove()); if(i.length>1){ const p=document.createElement('button'); p.className='nav p'; p.innerText='❮'; p.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()}; document.querySelector('.view').appendChild(p); const n=document.createElement('button'); n.className='nav n'; n.innerText='❯'; n.onclick=()=>{cI=(cI+1)%i.length;sh()}; document.querySelector('.view').appendChild(n); } }
+    window.onload=()=>{ if(keys.length){rn();sh();} };
+    <\/script></body></html>`;
+    const z=new JSZip(); z.file("Dossier_INTERACTIF.html",html);
+    z.generateAsync({type:"blob"}).then(b=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="Dossier_"+proj.name+".zip"; a.click(); });
 }
 </script>
 </body>
