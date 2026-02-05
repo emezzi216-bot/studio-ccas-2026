@@ -3,67 +3,725 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sauvegarde et Style</title>
+    <title>Studio CCAS | v68 FINAL DESIGN</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* CSS Optimisé */
-        body {
-            background-color: #0000FF; /* Fond Bleu */
-            color: #FFFFFF; /* Écriture blanche pour contraste */
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+        /* --- CHARTE GRAPHIQUE STRICTE : BLEU NUIT / OR / BLANC --- */
+        :root { 
+            --blue: #0A1A3C; 
+            --gold: #CCA43B; 
+            --white: #ffffff; 
+            --green: #27ae60; 
+            --red: #c0392b; 
         }
         
-        .content-area {
-            border: 2px solid #FFD700; /* Bordure dorée */
-            padding: 15px;
-            margin-bottom: 20px;
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            background-color: var(--blue); /* FOND GLOBAL BLEU */
+            color: var(--white); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            user-select: none; 
         }
+        
+        * { box-sizing: border-box; outline: none; }
+        
+        /* HEADER */
+        .header { 
+            height: 60px; 
+            border-bottom: 2px solid var(--gold); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 20px;
+            background: rgba(0,0,0,0.3);
+        }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; }
+        
+        .btn { padding: 8px 20px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; color: white; display:flex; align-items:center; gap:8px;}
+        /* BOUTON VERT = SAUVEGARDE SITE */
+        .btn-green { background: var(--green); border: 1px solid #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.2); }
+        .btn-green:active { transform: scale(0.98); }
+        .btn-blue { background: var(--blue); border: 1px solid var(--gold); color: var(--gold); }
+        .btn-blue:hover { background: var(--gold); color: var(--blue); }
 
-        button {
-            background-color: #FF0000;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
+        /* VUES */
+        #view-dash, #view-studio { flex: 1; overflow: hidden; display: flex; }
+        #view-dash { flex-direction: column; padding: 40px; align-items: center; }
+        
+        /* DASHBOARD - CARTES */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; width: 100%; max-width: 1000px; margin-top: 40px; }
+        .card { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid var(--gold); 
+            padding: 30px; 
+            text-align: center; 
+            cursor: pointer; 
+            position: relative;
+            transition: 0.2s;
         }
+        .card:hover { background: rgba(204, 164, 59, 0.1); box-shadow: 0 0 20px rgba(204, 164, 59, 0.2); }
+        .card-title { color: var(--gold); font-weight: bold; font-size: 1.1rem; margin-top: 10px; }
+        .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); font-weight: bold; cursor: pointer; }
 
-        button:hover {
-            opacity: 0.8;
+        /* STUDIO */
+        .sidebar { width: 280px; border-right: 2px solid var(--gold); display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
+        .side-head { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .back-link { color: rgba(255,255,255,0.6); font-size: 0.9rem; cursor: pointer; display: block; margin-bottom: 10px; }
+        .back-link:hover { color: var(--gold); }
+        #proj-name { font-size: 1.2rem; font-weight: bold; color: var(--gold); cursor: pointer; border-bottom: 1px dashed rgba(204,164,59,0.5); }
+        
+        .bat-list { flex: 1; overflow-y: auto; padding: 15px; }
+        .bat-item { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .bat-item:hover { background: rgba(255,255,255,0.05); }
+        .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
+        .bat-actions { font-size: 0.8rem; display: flex; gap: 8px; }
+        
+        .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
+        .editor-bar { height: 60px; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: rgba(0,0,0,0.2); }
+        
+        .logo-btn { height: 40px; border: 1px dashed rgba(255,255,255,0.3); cursor: pointer; display: flex; align-items: center; padding: 0 10px; color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+        .logo-btn img { max-height: 100%; }
+
+        /* CONTENU & BLOCS PHOTOS */
+        .content { flex: 1; overflow-y: auto; padding: 40px; }
+        
+        .block { 
+            display: flex; 
+            border: 2px solid var(--gold); /* CADRE OR */
+            margin-bottom: 30px; 
+            background: black; /* Fond noir pour l'image */
+            height: 350px;
         }
+        
+        .block-img { 
+            width: 60%; 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-right: 1px solid var(--gold); 
+            background: black;
+        }
+        .block-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        /* BOUTONS SUR L'IMAGE */
+        .img-tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; }
+        .tool-btn { background: rgba(0,0,0,0.7); color: white; border: 1px solid white; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
+        .tool-btn:hover { background: var(--gold); color: black; border-color: var(--gold); }
+        .btn-del-blk { background: var(--red); border-color: var(--red); }
+
+        .block-txt { 
+            width: 40%; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 15px; 
+            background: var(--blue); /* FOND BLEU pour le texte */
+        }
+        
+        .txt-toolbar { margin-bottom: 10px; display: flex; gap: 5px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
+        .style-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .style-btn:hover { border-color: var(--gold); color: var(--gold); }
+        
+        .editable { 
+            flex: 1; 
+            overflow-y: auto; 
+            color: white; /* TEXTE BLANC */
+            font-size: 1rem; 
+            line-height: 1.4;
+            outline: none;
+        }
+        .editable:focus { background: rgba(255,255,255,0.05); }
+
+        /* PAINT */
+        #paint-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; flex-direction: column; }
+        .paint-head { height: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid #333; }
+        .paint-tools { height: 60px; display: flex; justify-content: center; align-items: center; gap: 15px; border-top: 1px solid #333; }
+        .p-tool { background: #333; color: white; border: 1px solid #555; width: 35px; height: 35px; cursor: pointer; }
+        .p-tool.active { background: var(--gold); color: black; }
+
+        /* NOTIF */
+        #toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 10px 20px; border-radius: 4px; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="content-area" contenteditable="true" id="zoneTexte">
-        <h1>Titre en Couleur</h1>
-        <p>Modifiez ce texte. Le fond est bleu et l'écriture est en couleur.</p>
+<div id="toast">Sauvegardé !</div>
+
+<input type="file" id="f-import" class="hidden" onchange="importFile(this)">
+<input type="file" id="f-photo" class="hidden" multiple accept="image/*" onchange="addPhotos(this)">
+<input type="file" id="f-logo" class="hidden" accept="image/*" onchange="setLogo(this)">
+
+<div id="view-dash">
+    <div class="header" style="width: 100%;">
+        <div class="logo">STUDIO CCAS</div>
+        <div class="actions">
+            <button class="btn" style="background:transparent; border:1px solid rgba(255,255,255,0.3); font-size:0.8rem;" onclick="exportPC()">📥 Export PC</button>
+            <button class="btn" style="background:transparent; border:1px solid rgba(255,255,255,0.3); font-size:0.8rem;" onclick="document.getElementById('f-import').click()">📂 Importer</button>
+        </div>
     </div>
+    <div id="grid" class="grid"></div>
+    <div style="margin-top: 50px;">
+        <button class="btn btn-blue" style="padding: 15px 40px; font-size: 1.1rem; border: 2px solid var(--gold); color: var(--gold);" onclick="newProj()">+ NOUVEAU DOSSIER</button>
+    </div>
+</div>
 
-    <button onclick="sauvegarder()">SAUVEGARDER</button>
-    <button onclick="charger()">CHARGER LA SAUVEGARDE</button>
+<div id="view-studio" style="display:none;">
+    <div class="sidebar">
+        <div class="side-head">
+            <span class="back-link" onclick="goHome()">⬅️ Mes Dossiers</span>
+            <div id="proj-name" onclick="renameProj()">...</div>
+        </div>
+        <div id="bat-list" class="bat-list"></div>
+        <div style="padding: 15px;">
+            <button class="btn" style="width: 100%; border: 1px dashed var(--gold); background: transparent; color: var(--gold);" onclick="newBat()">+ RUBRIQUE</button>
+        </div>
+    </div>
+    
+    <div class="editor">
+        <div class="editor-bar">
+            <div class="logo-btn" onclick="document.getElementById('f-logo').click()">
+                <img id="img-logo" src="" style="display:none; height:100%;">
+                <span id="lbl-logo">LOGO</span>
+            </div>
+            <div id="bat-title" style="color:var(--gold); font-weight:bold; font-size:1.2rem;">Accueil</div>
+            <div class="actions">
+                <button class="btn btn-green" onclick="saveSite()">💾 SAUVEGARDER</button>
+                <button class="btn btn-blue" onclick="genZip()">📦 GÉNÉRER PDF</button>
+            </div>
+        </div>
+        <div id="content" class="content"></div>
+    </div>
+</div>
 
-    <script>
-        // Script de sauvegarde optimisé (LocalStorage)
-        function sauvegarder() {
-            const contenu = document.getElementById('zoneTexte').innerHTML;
-            localStorage.setItem('maSauvegarde', contenu);
-            alert('Contenu sauvegardé avec succès !');
+<div id="paint-modal">
+    <div class="paint-head">
+        <b>RETOUCHE</b>
+        <div>
+            <button class="btn btn-green" onclick="savePaint()">OK</button>
+            <button class="btn" style="background:transparent; border:1px solid #666;" onclick="closePaint()">Annuler</button>
+        </div>
+    </div>
+    <div id="canvas-box" style="flex:1; display:flex; justify-content:center; align-items:center; overflow:hidden;">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div class="paint-tools">
+        <button class="p-tool" onclick="tool='rect'">⬜</button>
+        <button class="p-tool" onclick="tool='circle'">⭕</button>
+        <button class="p-tool" onclick="tool='arrow'">↗️</button>
+        <button class="p-tool" onclick="tool='free'">✏️</button>
+        <input type="color" onchange="color=this.value" value="#ff0000">
+        <input type="range" min="1" max="20" value="5" oninput="width=this.value">
+    </div>
+</div>
+
+<script>
+/* --- CORE --- */
+const STORAGE_KEY = "CCAS_V68_DATA";
+let app = { projects: {}, config: { logo: "" } };
+let curP = null, curB = null, dragSrc = null;
+
+// CHARGEMENT AUTOMATIQUE AU LANCEMENT
+if(localStorage.getItem(STORAGE_KEY)) {
+    try {
+        app = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if(app.config.logo) {
+            document.getElementById('img-logo').src = app.config.logo;
+            document.getElementById('img-logo').style.display = 'block';
+            document.getElementById('lbl-logo').style.display = 'none';
         }
+    } catch(e) { console.error("Erreur chargement", e); }
+}
+renderGrid();
 
-        function charger() {
-            const sauvegarde = localStorage.getItem('maSauvegarde');
-            if (sauvegarde) {
-                document.getElementById('zoneTexte').innerHTML = sauvegarde;
+/* --- SAUVEGARDE SITE (LOCALSTORAGE) --- */
+function saveSite() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
+    const t = document.getElementById('toast');
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 2000);
+}
+
+/* --- EXPORT PC (FILE) --- */
+function exportPC() {
+    const b = new Blob([JSON.stringify(app)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = `SAUVEGARDE_CCAS_${Date.now()}.json`;
+    a.click();
+}
+
+function importFile(input) {
+    if(!input.files[0]) return;
+    const r = new FileReader();
+    r.onload = e => {
+        try {
+            app = JSON.parse(e.target.result);
+            saveSite();
+            renderGrid();
+            alert("Projet importé avec succès !");
+        } catch(x) { alert("Fichier invalide"); }
+    };
+    r.readAsText(input.files[0]);
+}
+
+/* --- LOGIQUE PROJETS --- */
+function newProj() {
+    const n = prompt("Nom du dossier :");
+    if(n) {
+        const id = 'p' + Date.now();
+        app.projects[id] = { name: n, date: Date.now(), data: {} };
+        saveSite();
+        renderGrid();
+        openProj(id);
+    }
+}
+
+function openProj(id) {
+    curP = id; curB = null;
+    document.getElementById('view-dash').style.display = 'none';
+    document.getElementById('view-studio').style.display = 'flex';
+    document.getElementById('proj-name').innerText = app.projects[id].name;
+    // Si vide, créer zone 1 par défaut
+    if(Object.keys(app.projects[id].data).length === 0) {
+        app.projects[id].data["Zone 1"] = [];
+    }
+    renderBats();
+    // Ouvrir la première
+    const first = Object.keys(app.projects[id].data)[0];
+    if(first) openBat(first);
+}
+
+function renameProj() {
+    const n = prompt("Renommer le projet :", app.projects[curP].name);
+    if(n) { app.projects[curP].name = n; document.getElementById('proj-name').innerText = n; saveSite(); }
+}
+
+function goHome() {
+    document.getElementById('view-studio').style.display = 'none';
+    document.getElementById('view-dash').style.display = 'flex';
+    curP = null;
+    renderGrid();
+}
+
+function renderGrid() {
+    const g = document.getElementById('grid'); g.innerHTML = '';
+    Object.keys(app.projects).sort((a,b) => app.projects[b].date - app.projects[a].date).forEach(id => {
+        const p = app.projects[id];
+        const d = document.createElement('div'); d.className = 'card';
+        d.innerHTML = `<div class="card-del" onclick="delProj('${id}', event)">×</div><div style="font-size:3rem; margin-bottom:10px;">📁</div><div class="card-title">${p.name}</div>`;
+        d.onclick = () => openProj(id);
+        g.appendChild(d);
+    });
+}
+
+function delProj(id, e) {
+    e.stopPropagation();
+    if(confirm("Supprimer ce dossier ?")) { delete app.projects[id]; saveSite(); renderGrid(); }
+}
+
+/* --- LOGIQUE RUBRIQUES --- */
+function newBat() {
+    const n = prompt("Nom de la rubrique :");
+    if(n) {
+        if(!app.projects[curP].data[n]) app.projects[curP].data[n] = [];
+        saveSite();
+        openBat(n);
+    }
+}
+
+function renderBats() {
+    const l = document.getElementById('bat-list'); l.innerHTML = '';
+    Object.keys(app.projects[curP].data).forEach(b => {
+        const d = document.createElement('div'); d.className = `bat-item ${curB === b ? 'active' : ''}`;
+        d.draggable = true;
+        d.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px; flex:1;">
+                <span class="handle">☰</span>
+                <span onclick="openBat('${b}')" style="flex:1;">${b}</span>
+            </div>
+            <div class="bat-actions">
+                <span class="icon-btn icon-edit" onclick="renBat('${b}', event)">✏️</span>
+                <span class="icon-btn icon-del" onclick="delBat('${b}', event)">×</span>
+            </div>`;
+        
+        // Drag logic
+        d.ondragstart = e => { dragSrc = b; e.dataTransfer.effectAllowed = 'move'; };
+        d.ondragover = e => e.preventDefault();
+        d.ondrop = e => {
+            e.stopPropagation();
+            if(dragSrc !== b) {
+                // Reorder logic simple
+                const data = app.projects[curP].data;
+                const keys = Object.keys(data);
+                const fromIdx = keys.indexOf(dragSrc);
+                const toIdx = keys.indexOf(b);
+                // Swap logic (reconstruction object)
+                const newObj = {};
+                keys.splice(toIdx, 0, keys.splice(fromIdx, 1)[0]);
+                keys.forEach(k => newObj[k] = data[k]);
+                app.projects[curP].data = newObj;
+                saveSite();
+                renderBats();
+            }
+        };
+        l.appendChild(d);
+    });
+}
+
+function openBat(b) {
+    curB = b;
+    document.getElementById('bat-title').innerText = b;
+    renderBats();
+    renderContent();
+}
+
+function renBat(oldName, e) {
+    e.stopPropagation();
+    const n = prompt("Nouveau nom :", oldName);
+    if(n && n !== oldName && !app.projects[curP].data[n]) {
+        const data = app.projects[curP].data;
+        const newObj = {};
+        Object.keys(data).forEach(k => {
+            if(k === oldName) newObj[n] = data[k];
+            else newObj[k] = data[k];
+        });
+        app.projects[curP].data = newObj;
+        saveSite();
+        if(curB === oldName) openBat(n); else renderBats();
+    }
+}
+
+function delBat(b, e) {
+    e.stopPropagation();
+    if(confirm("Supprimer ?")) {
+        delete app.projects[curP].data[b];
+        if(curB === b) curB = null;
+        saveSite();
+        renderBats();
+        renderContent();
+    }
+}
+
+/* --- LOGIQUE PHOTOS & TEXTE --- */
+function addPhotos(input) {
+    if(!curB) return alert("Sélectionnez une rubrique !");
+    if(!input.files.length) return;
+    
+    Array.from(input.files).forEach(f => {
+        const r = new FileReader();
+        r.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                // Compression
+                const cvs = document.createElement('canvas');
+                const ctx = cvs.getContext('2d');
+                let w = img.width, h = img.height;
+                const max = 1000;
+                if(w > max) { h *= max/w; w = max; }
+                cvs.width = w; cvs.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+                
+                app.projects[curP].data[curB].push({
+                    src: cvs.toDataURL('image/jpeg', 0.7),
+                    text: "Description..."
+                });
+                saveSite();
+                renderContent();
+            };
+            img.src = e.target.result;
+        };
+        r.readAsDataURL(f);
+    });
+    input.value = '';
+}
+
+function renderContent() {
+    const c = document.getElementById('content'); c.innerHTML = '';
+    if(!curB) return;
+    
+    const btn = document.createElement('div');
+    btn.style = "border:2px dashed var(--gold); padding:20px; text-align:center; cursor:pointer; color:var(--gold); font-weight:bold; margin-bottom:20px;";
+    btn.innerText = "+ AJOUTER PHOTOS";
+    btn.onclick = () => document.getElementById('f-photo').click();
+    c.appendChild(btn);
+    
+    app.projects[curP].data[curB].forEach((item, idx) => {
+        const b = document.createElement('div'); b.className = 'block';
+        b.draggable = true;
+        b.innerHTML = `
+            <div class="drag-handle">☰</div>
+            <div class="block-img">
+                <div class="img-tools">
+                    <button class="tool-btn btn-del-blk" onclick="delPhoto(${idx})">✖</button>
+                    <button class="tool-btn" onclick="editPhoto(${idx})">🎨 Retouche</button>
+                </div>
+                <div class="img-wrap"><img src="${item.src}"></div>
+            </div>
+            <div class="block-txt">
+                <div class="txt-toolbar">
+                    <button class="style-btn" onclick="document.execCommand('bold')"><b>B</b></button>
+                    <button class="style-btn" onclick="document.execCommand('italic')"><i>I</i></button>
+                    <button class="style-btn" onclick="document.execCommand('underline')"><u>U</u></button>
+                    <input type="color" onchange="document.execCommand('foreColor', false, this.value)" style="background:none; border:none; width:25px; height:25px; cursor:pointer;">
+                </div>
+                <div class="editable" contenteditable="true" oninput="updTxt(${idx}, this.innerHTML)">${item.text}</div>
+            </div>
+        `;
+        
+        // Drag Item
+        b.ondragstart = e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('idx', idx); };
+        b.ondragover = e => e.preventDefault();
+        b.ondrop = e => {
+            e.stopPropagation();
+            const from = e.dataTransfer.getData('idx');
+            if(from !== "") {
+                const arr = app.projects[curP].data[curB];
+                const moved = arr.splice(from, 1)[0];
+                arr.splice(idx, 0, moved);
+                saveSite();
+                renderContent();
+            }
+        };
+        
+        c.appendChild(b);
+    });
+}
+
+function updTxt(idx, txt) {
+    app.projects[curP].data[curB][idx].text = txt;
+    // Debounce save
+    clearTimeout(window.saveTimer);
+    window.saveTimer = setTimeout(saveSite, 1000);
+}
+
+function delPhoto(idx) {
+    if(confirm("Supprimer photo ?")) {
+        app.projects[curP].data[curB].splice(idx, 1);
+        saveSite();
+        renderContent();
+    }
+}
+
+/* --- PAINT --- */
+let pIdx, pImg, tool='rect', color='#ff0000', width=5, draw=false, sx, sy;
+function editPhoto(idx) {
+    pIdx = idx;
+    const src = app.projects[curP].data[curB][idx].src;
+    pImg = new Image();
+    pImg.onload = () => {
+        const cvs = document.getElementById('canvas');
+        cvs.width = pImg.width;
+        cvs.height = pImg.height;
+        cvs.getContext('2d').drawImage(pImg, 0, 0);
+        document.getElementById('paint-modal').style.display = 'flex';
+    };
+    pImg.src = src;
+}
+function savePaint() {
+    app.projects[curP].data[curB][pIdx].src = document.getElementById('canvas').toDataURL('image/jpeg', 0.8);
+    saveSite();
+    document.getElementById('paint-modal').style.display = 'none';
+    renderContent();
+}
+function closePaint() { document.getElementById('paint-modal').style.display = 'none'; }
+
+// Canvas Logic
+const cvs = document.getElementById('canvas');
+cvs.addEventListener('mousedown', e => {
+    draw = true;
+    const r = cvs.getBoundingClientRect();
+    const s = cvs.width / r.width;
+    sx = (e.clientX - r.left) * s;
+    sy = (e.clientY - r.top) * s;
+    cvs.getContext('2d').beginPath();
+});
+cvs.addEventListener('mousemove', e => {
+    if(!draw) return;
+    const ctx = cvs.getContext('2d');
+    const r = cvs.getBoundingClientRect();
+    const s = cvs.width / r.width;
+    const x = (e.clientX - r.left) * s;
+    const y = (e.clientY - r.top) * s;
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+    
+    if(tool === 'free') {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+});
+cvs.addEventListener('mouseup', e => {
+    draw = false;
+    if(tool !== 'free') {
+        const ctx = cvs.getContext('2d');
+        const r = cvs.getBoundingClientRect();
+        const s = cvs.width / r.width;
+        const x = (e.clientX - r.left) * s;
+        const y = (e.clientY - r.top) * s;
+        
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        
+        if(tool === 'rect') ctx.strokeRect(sx, sy, x-sx, y-sy);
+        if(tool === 'circle') {
+            const rad = Math.sqrt(Math.pow(x-sx, 2) + Math.pow(y-sy, 2));
+            ctx.arc(sx, sy, rad, 0, 2*Math.PI);
+            ctx.stroke();
+        }
+        if(tool === 'arrow') {
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            // Arrowhead simple
+            const angle = Math.atan2(y-sy, x-sx);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - 15 * Math.cos(angle - Math.PI/6), y - 15 * Math.sin(angle - Math.PI/6));
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - 15 * Math.cos(angle + Math.PI/6), y - 15 * Math.sin(angle + Math.PI/6));
+            ctx.stroke();
+        }
+    }
+});
+
+/* --- CONFIG LOGO --- */
+function setLogo(input) {
+    if(input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+            app.config.logo = e.target.result;
+            document.getElementById('img-logo').src = e.target.result;
+            document.getElementById('img-logo').style.display = 'block';
+            document.getElementById('lbl-logo').style.display = 'none';
+            saveSite();
+        };
+        r.readAsDataURL(input.files[0]);
+    }
+}
+
+/* --- GENERATION PDF/ZIP --- */
+function genZip() {
+    if(!window.JSZip) return alert("Erreur ZIP");
+    const proj = app.projects[curP];
+    const jsonData = JSON.stringify(proj.data).replace(/</g, '\\u003c');
+    const logoSrc = app.config.logo || "";
+    
+    // TEMPLATE HTML FINAL (DESIGN BLEU/OR)
+    const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { margin:0; background:#0A1A3C; color:white; font-family:'Segoe UI', sans-serif; height:100vh; display:flex; overflow:hidden; }
+    #side { width:280px; background:rgba(0,0,0,0.3); border-right:3px solid #CCA43B; display:flex; flex-direction:column; }
+    .head { padding:20px; color:#CCA43B; font-weight:800; border-bottom:1px solid #555; text-align:center; font-size:1.2rem; text-transform:uppercase; }
+    .btn { width:100%; padding:15px; color:#ccc; background:none; border:none; text-align:left; cursor:pointer; border-bottom:1px solid #444; font-size:1rem; }
+    .btn.active { color:#CCA43B; border-left:5px solid #CCA43B; background:rgba(204,164,59,0.1); font-weight:bold; }
+    #main { flex:1; display:flex; flex-direction:column; position:relative; }
+    .view { height:75vh; width:100%; display:flex; align-items:center; justify-content:center; background:black; border-bottom:3px solid #CCA43B; position:relative; }
+    .frame img { max-width:100%; max-height:100%; object-fit:contain; }
+    .bot { height:25vh; background:#0A1A3C; padding:20px 40px; overflow-y:auto; box-sizing:border-box; }
+    #desc { color:white; font-size:1.3rem; line-height:1.5; }
+    /* Garder les couleurs du texte */
+    #desc * { background:transparent !important; }
+    #desc font { color:inherit; }
+    #tit { color:#CCA43B; text-transform:uppercase; border-bottom:1px solid #555; padding-bottom:10px; margin-top:0; font-size:1.4rem; }
+    
+    /* Boutons Nav */
+    .nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(204,164,59,0.5); color:white; border:none; font-size:40px; padding:10px; cursor:pointer; border-radius:50%; }
+    .p { left:20px; } .n { right:20px; }
+    
+    .pdf-btn { position:absolute; top:10px; left:10px; background:#c0392b; color:white; border:none; padding:5px 15px; border-radius:4px; font-weight:bold; cursor:pointer; z-index:99; }
+    .top-logo { position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.9); padding:5px 10px; border:1px solid #CCA43B; display:flex; align-items:center; border-radius:4px; }
+    
+    @media print { 
+        #side, .nav, .pdf-btn { display:none; } 
+        .view { height:70vh; page-break-inside:avoid; } 
+        .bot { height:30vh; page-break-after:always; } 
+    }
+</style>
+</head>
+<body>
+    <button class="pdf-btn" onclick="window.print()">🖨️ IMPRIMER / PDF</button>
+    <div id="side"><div class="head">${proj.name}</div><div id="nav"></div></div>
+    <div id="main">
+        <div class="view">
+            <div class="top-logo"><img src="${logoSrc}" height="40"></div>
+            <div id="sc"></div>
+        </div>
+        <div class="bot">
+            <h2 id="tit"></h2>
+            <div id="desc"></div>
+        </div>
+    </div>
+    <script>
+        const data = ${jsonData};
+        const keys = Object.keys(data);
+        let cBat = keys[0];
+        let cIdx = 0;
+        
+        function renderNav() {
+            const n = document.getElementById('nav'); n.innerHTML = '';
+            keys.forEach(k => {
+                const b = document.createElement('button');
+                b.className = 'btn' + (cBat === k ? ' active' : '');
+                b.innerText = k;
+                b.onclick = () => { cBat = k; cIdx = 0; show(); renderNav(); };
+                n.appendChild(b);
+            });
+        }
+        
+        function show() {
+            const s = document.getElementById('sc');
+            const arr = data[cBat];
+            
+            // Nettoyage nav
+            document.querySelectorAll('.nav').forEach(e => e.remove());
+            
+            if(!arr || !arr.length) {
+                s.innerHTML = '';
+                document.getElementById('tit').innerText = cBat;
+                document.getElementById('desc').innerHTML = "Aucune photo.";
+                return;
+            }
+            
+            const item = arr[cIdx];
+            s.innerHTML = '<img src="' + item.src + '">';
+            document.getElementById('tit').innerText = cBat + " (" + (cIdx + 1) + "/" + arr.length + ")";
+            document.getElementById('desc').innerHTML = item.text;
+            
+            if(arr.length > 1) {
+                const prev = document.createElement('button'); prev.className='nav p'; prev.innerText='❮';
+                prev.onclick = () => { cIdx = (cIdx - 1 + arr.length) % arr.length; show(); };
+                document.querySelector('.view').appendChild(prev);
+                
+                const next = document.createElement('button'); next.className='nav n'; next.innerText='❯';
+                next.onclick = () => { cIdx = (cIdx + 1) % arr.length; show(); };
+                document.querySelector('.view').appendChild(next);
             }
         }
+        
+        if(keys.length) { renderNav(); show(); }
+    <\/script>
+</body>
+</html>`;
 
-        // Chargement auto au démarrage si dispo
-        if(localStorage.getItem('maSauvegarde')) {
-            charger();
-        }
-    </script>
+    const z = new JSZip();
+    z.file("Dossier_" + proj.name + ".html", htmlContent);
+    z.generateAsync({type:"blob"}).then(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = "Dossier_" + proj.name + ".zip";
+        a.click();
+    });
+}
+</script>
 </body>
 </html>
