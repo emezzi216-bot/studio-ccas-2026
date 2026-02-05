@@ -3,25 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio CCAS | v62 DESIGN FIX</title>
+    <title>Studio CCAS | v63 STABLE</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* --- STYLE DESIGN CCAS --- */
+        /* --- CHARTE GRAPHIQUE --- */
         :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; --white: #fff; --green: #27ae60; --red: #c0392b; }
-        /* Le fond de l'éditeur sera bleu nuit comme le rendu final */
+        
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
         * { box-sizing: border-box; outline: none; }
-        button { cursor: pointer; transition: 0.1s; font-family: inherit; } button:active { transform: scale(0.98); }
+        button { cursor: pointer; transition: 0.1s; } button:active { transform: scale(0.98); }
         .hidden { display: none !important; }
 
         /* HEADER */
-        .header { height: 70px; background: var(--white); padding: 0 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { height: 70px; background: var(--white); padding: 0 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); }
         .title h1 { margin: 0; color: var(--blue); font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
-        .badge { background: var(--gold); color: black; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
-        
-        .actions { display: flex; gap: 10px; }
         .btn { padding: 10px 20px; border-radius: 6px; font-weight: bold; border: none; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-        .btn-green { background: var(--green); color: white; }
+        .btn-green { background: var(--green); color: white; border: 1px solid var(--green); }
         .btn-blue { background: var(--blue); color: white; }
         .btn-outline { background: white; border: 2px solid #ccc; color: #333; }
 
@@ -31,39 +28,37 @@
 
         /* DASHBOARD */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-top: 30px; }
-        .card { background: white; padding: 30px; border-radius: 12px; text-align: center; border: 2px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; cursor: pointer; transition: 0.2s; }
+        .card { background: white; padding: 30px; border-radius: 12px; text-align: center; border: 2px solid transparent; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
         .card:hover { transform: translateY(-5px); border-color: var(--gold); }
         .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); background: #fee2e2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-        /* STUDIO: SIDEBAR (Fond Bleu CCAS) */
-        .sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 20px rgba(0,0,0,0.2); border-right: 2px solid var(--gold); }
+        /* STUDIO: SIDEBAR (DESIGN BLEU) */
+        .sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; border-right: 2px solid var(--gold); }
         .side-head { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
         .back-btn { background: none; border: none; color: var(--gold); font-weight: bold; width: 100%; text-align: left; cursor: pointer; }
         
-        #proj-title { cursor: pointer; border-bottom: 1px dashed rgba(255,255,255,0.3); padding-bottom: 2px; color: white; }
-        #proj-title:hover { color: var(--gold); border-color: var(--gold); }
+        #proj-title { cursor: pointer; border-bottom: 1px dashed rgba(255,255,255,0.3); padding-bottom: 2px; }
         
         .bat-list { flex: 1; overflow-y: auto; padding: 10px; }
         .bat-item { padding: 10px; background: rgba(255,255,255,0.08); margin-bottom: 5px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
         .bat-item:hover { background: rgba(255,255,255,0.15); }
         .bat-item.active { background: white; color: var(--blue); border-left-color: var(--gold); font-weight: bold; }
-        
-        .bat-actions { display: flex; gap: 5px; }
-        .icon-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 12px; cursor: pointer; }
-        .icon-edit { background: #3498db; color: white; }
-        .icon-del { background: #e74c3c; color: white; }
-        
+        .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
         .handle { cursor: grab; padding-right: 10px; opacity: 0.5; font-size: 1.2rem; }
 
-        /* STUDIO: EDITOR (Fond Bleu CCAS pour l'éditeur aussi) */
-        .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
+        /* STUDIO: EDITOR (DESIGN BLEU AUSSI) */
+        .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); } /* FOND BLEU DEMANDÉ */
+        
         .editor-tools { height: 70px; background: white; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
         .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: white; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+        
         .content { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
 
-        /* PHOTO BLOCK (Fond blanc sur fond bleu) */
-        .block { background: white; border-radius: 10px; margin-bottom: 30px; display: flex; border: 1px solid var(--gold); height: 400px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        /* PHOTO BLOCK */
+        .block { background: white; border-radius: 10px; margin-bottom: 30px; display: flex; border: 2px solid var(--gold); height: 400px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .block.dragging { opacity: 0.4; border: 2px dashed white; }
+        
         .drag-handle { width: 40px; background: #f8f9fa; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #eee; color: #aaa; font-size: 24px; }
         .block-img { width: 350px; background: #f8fafc; padding: 15px; border-right: 1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         .img-wrap { width: 100%; height: 250px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; }
@@ -74,12 +69,12 @@
         .block-txt { flex: 1; padding: 20px; display: flex; flex-direction: column; background: #fdfdfd; }
         .txt-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: #eee; padding: 5px; border-radius: 6px; align-items: center; }
         .t-btn { width: 30px; height: 30px; border: 1px solid #ccc; background: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
-        /* Editeur de texte : fond gris foncé, texte blanc pour simuler le rendu final */
+        /* ZONE TEXTE GRIS FONCÉ POUR VOIR LES COULEURS CLAIRES */
         .editable { flex: 1; border: 1px solid #333; border-radius: 6px; padding: 15px; overflow-y: auto; background: #222; color: white; font-size: 16px; line-height: 1.5; }
-        .editable:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 2px rgba(204, 164, 59, 0.3); }
+        .editable:focus { border-color: var(--gold); outline: none; }
 
-        /* LOADING & TOAST */
-        #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        /* LOADING */
+        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
         .bar-bg { width: 300px; height: 10px; background: #ddd; border-radius: 5px; margin-top: 20px; overflow: hidden; }
         .bar-fill { height: 100%; width: 0%; background: var(--green); transition: width 0.2s; }
         
@@ -91,17 +86,14 @@
         .paint-top { height: 50px; background: #333; padding: 0 20px; display:flex; justify-content:space-between; align-items:center; color:white; }
         #canvas-box { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .paint-tools { height: 60px; background: #333; display: flex; justify-content: center; align-items: center; gap: 15px; color:white; }
-        .p-btn { width: 40px; height: 40px; background:#555; color:white; border:1px solid #777; font-size:18px; }
-        .p-btn.active { background:var(--gold); color:black; }
     </style>
 </head>
 <body>
 
 <div id="toast">Message</div>
-<div id="loading">
-    <h2 style="color:var(--blue);">Démarrage sécurisé...</h2>
+<div id="loader">
+    <h2 style="color:var(--blue);">Traitement...</h2>
     <div class="bar-bg"><div class="bar-fill" id="progress"></div></div>
-    <p id="load-msg" style="margin-top:10px; color:#666;">Connexion mémoire...</p>
 </div>
 
 <input type="file" id="f-import" class="hidden" onchange="importData(this)">
@@ -110,9 +102,9 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div class="title"><h1>STUDIO CCAS <span class="badge">v62 DESIGN</span></h1></div>
+        <div class="title"><h1>STUDIO CCAS <span class="badge">v63</span></h1></div>
         <div class="actions">
-            <button class="btn btn-success" onclick="exportData()">📥 SAUVEGARDE PC</button>
+            <button class="btn btn-green" onclick="exportData()">📥 SAUVEGARDE PC</button>
             <button class="btn btn-outline" onclick="document.getElementById('f-import').click()">📂 CHARGER</button>
         </div>
     </div>
@@ -127,7 +119,7 @@
         <div class="side-head">
             <button class="back-btn" onclick="goHome()">⬅️ RETOUR ACCUEIL</button>
             <div style="text-align:center; margin-top:10px;">
-                <span id="proj-title" onclick="renameProj()" title="Renommer">Projet</span>
+                <span id="proj-title" onclick="renameProj()" title="Renommer" style="color:white; font-weight:bold;">Projet</span>
             </div>
         </div>
         <div id="bat-list" class="bat-list"></div>
@@ -135,8 +127,8 @@
     </div>
     <div class="editor">
         <div class="editor-tools">
-            <div class="logo-box" onclick="document.getElementById('f-logo').click()">
-                <img id="img-logo" src="https://upload.wikimedia.org/wikipedia/fr/thumb/8/8f/Logo_Cr%C3%A9teil.svg/1200px-Logo_Cr%C3%A9teil.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
+            <div class="logo-box" onclick="document.getElementById('f-logo').click()" title="Changer Logo">
+                <img id="img-logo" src="" onerror="this.style.display='none'; this.parentNode.innerText='LOGO';">
             </div>
             <div id="bat-title" style="font-weight:bold; color:var(--blue); font-size:1.2rem;">Accueil</div>
             <div class="actions">
@@ -155,75 +147,22 @@
     </div>
     <div id="canvas-box"><canvas id="canvas"></canvas></div>
     <div class="paint-tools">
-        <button class="p-btn" onclick="setTool('rect')">⬜</button> 
-        <button class="p-btn" onclick="setTool('circle')">⭕</button> 
-        <button class="p-btn" onclick="setTool('arrow')">↗️</button> 
-        <button class="p-btn" onclick="setTool('free')">✏️</button>
-        <span style="margin-left:10px">Couleur:</span>
-        <input type="color" onchange="color=this.value" value="#ff0000"> 
-        <span style="margin-left:10px">Épaisseur:</span>
-        <input type="range" min="1" max="30" value="5" oninput="brushSize=this.value">
+        <button onclick="tool='rect'">⬜</button> <button onclick="tool='circle'">⭕</button> <button onclick="tool='arrow'">↗️</button> <button onclick="tool='free'">✏️</button>
+        <input type="color" onchange="color=this.value" value="#ff0000"> <input type="range" min="2" max="20" value="5" oninput="width=this.value">
     </div>
 </div>
 
 <script>
-/* --- CORE --- */
-const DB_NAME='CCAS_V62', STORE='data';
-let db, app={ projects:{}, config:{logo:""} };
-let curP=null, curB=null, dragSrc=null;
+/* MOTEUR V63 - STABLE RAM - DESIGN FIX */
+let app = { projects: {}, config: { logo: "" } };
+let curP = null, curB = null, dragSrc = null;
 
-/* --- PAINT VARS --- */
-let pIdx, pImg, tool='rect', color='#ff0000', brushSize=5, draw=false, sx, sy;
-
-// INIT SECURISE
-window.onload = function() {
-    let forced = false;
-    const safetyTimer = setTimeout(() => {
-        forced = true;
-        document.getElementById('loading').style.display = 'none';
-        renderGrid();
-    }, 2500); 
-
-    const r = indexedDB.open(DB_NAME, 1);
-    r.onupgradeneeded = e => e.target.result.createObjectStore(STORE);
-    r.onsuccess = e => {
-        if(forced) return;
-        clearTimeout(safetyTimer);
-        db = e.target.result;
-        loadFromDB();
-    };
-    r.onerror = e => {
-        if(forced) return;
-        clearTimeout(safetyTimer);
-        document.getElementById('loading').style.display = 'none';
-    };
-};
-
-function saveDB(){
-    if(!db) return; 
-    const tx = db.transaction(STORE,'readwrite');
-    tx.objectStore(STORE).put(app, 'root');
-    showToast("☁️ Sauvegardé");
-}
-
-function loadFromDB(){
-    const tx = db.transaction(STORE,'readonly');
-    const r = tx.objectStore(STORE).get('root');
-    r.onsuccess = () => {
-        if(r.result) app = r.result;
-        document.getElementById('loading').style.display = 'none';
-        renderGrid();
-        // Si un logo personnalisé est sauvé, on le charge, sinon on garde celui par défaut
-        if(app.config.logo) document.getElementById('img-logo').src=app.config.logo;
-    };
-}
-
-function showToast(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+function toast(m){ const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
 
 /* --- DASHBOARD --- */
 function renderGrid(){
     const g=document.getElementById('grid'); g.innerHTML='';
-    if(Object.keys(app.projects).length===0) { g.innerHTML='<div style="grid-column:1/-1; text-align:center; color:#999; margin-top:50px;">Aucun dossier. Créez-en un.</div>'; return; }
+    if(Object.keys(app.projects).length===0) { g.innerHTML='<div style="grid-column:1/-1; text-align:center; color:#999; margin-top:50px;">Aucun dossier ouvert.<br>Créez-en un ou chargez une sauvegarde.</div>'; return; }
     Object.keys(app.projects).forEach(id=>{
         const p=app.projects[id];
         const d=document.createElement('div'); d.className='card';
@@ -231,44 +170,35 @@ function renderGrid(){
         d.onclick=()=>{ openProj(id); }; g.appendChild(d);
     });
 }
-function addProj(){ const n=prompt("Nom :"); if(n){ const id='p'+Date.now(); app.projects[id]={name:n,date:Date.now(),data:{}}; saveDB(); renderGrid(); openProj(id); } }
-function delProj(id,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[id]; saveDB(); renderGrid(); } }
-function goHome(){ document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; curP=null; }
+function addProj(){ const n=prompt("Nom du dossier :"); if(n){ const id='p'+Date.now(); app.projects[id]={name:n,date:Date.now(),data:{}}; renderGrid(); openProj(id); } }
+function delProj(id,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[id]; renderGrid(); } }
+function goHome(){ 
+    if(confirm("ATTENTION : Avez-vous fait une SAUVEGARDE PC ?")) {
+        document.getElementById('view-studio').style.display='none'; document.getElementById('view-dashboard').style.display='flex'; curP=null; 
+    }
+}
 function openProj(id){ 
     curP=id; curB=null; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-studio').style.display='flex';
     document.getElementById('proj-title').innerText=app.projects[id].name;
     if(Object.keys(app.projects[id].data).length===0) app.projects[id].data["Zone 1"]=[];
     renderBats();
     const first=Object.keys(app.projects[id].data)[0]; if(first) openBat(first);
+    if(app.config.logo) { document.getElementById('img-logo').src=app.config.logo; document.getElementById('img-logo').style.display='block'; }
 }
 function renameProj(){
     const n = prompt("Renommer le projet :", app.projects[curP].name);
-    if(n){ app.projects[curP].name=n; document.getElementById('proj-title').innerText=n; saveDB(); }
+    if(n){ app.projects[curP].name=n; document.getElementById('proj-title').innerText=n; }
 }
 
 /* --- BATIMENTS --- */
-function addBat(){ const n=prompt("Nom :"); if(n){ if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; saveDB(); openBat(n); } }
-function renameBat(oldName,e){
-    e.stopPropagation();
-    const n = prompt("Renommer :", oldName);
-    if(n && n!==oldName && !app.projects[curP].data[n]){
-        const data = app.projects[curP].data;
-        const keys = Object.keys(data);
-        const newData = {};
-        keys.forEach(k => { if(k===oldName) newData[n]=data[k]; else newData[k]=data[k]; });
-        app.projects[curP].data = newData;
-        saveDB(); if(curB===oldName) openBat(n); else renderBats();
-    }
-}
+function addBat(){ const n=prompt("Nom :"); if(n){ if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; openBat(n); } }
 function renderBats(){
     const l=document.getElementById('bat-list'); l.innerHTML='';
     const bats=Object.keys(app.projects[curP].data);
     bats.forEach(b=>{
         const d=document.createElement('div'); d.className=`bat-item ${curB===b?'active':''}`;
         d.draggable=true; d.dataset.bat=b;
-        d.innerHTML=`
-            <div style="display:flex;align-items:center;flex:1;"><span class="handle">☰</span><span onclick="openBat('${b}')" style="flex:1;font-weight:bold;">${b}</span></div>
-            <div class="bat-actions"><div class="icon-btn icon-edit" onclick="renameBat('${b}',event)">✏️</div><div class="icon-btn icon-del" onclick="delBat('${b}',event)">×</div></div>`;
+        d.innerHTML=`<span class="handle">☰</span><span onclick="openBat('${b}')" style="flex:1;font-weight:bold;">${b}</span><span onclick="delBat('${b}',event)" style="color:#e74c3c;font-weight:bold;">×</span>`;
         d.ondragstart=e=>{ dragSrc=d; e.dataTransfer.effectAllowed='move'; };
         d.ondragover=e=>{ e.preventDefault(); };
         d.ondrop=function(e){
@@ -278,19 +208,20 @@ function renderBats(){
                 const keys=Object.keys(data), sI=keys.indexOf(src), tI=keys.indexOf(tgt);
                 keys.splice(sI,1); keys.splice(tI,0,src);
                 const newData={}; keys.forEach(k=>newData[k]=data[k]);
-                app.projects[curP].data=newData; saveDB(); renderBats();
+                app.projects[curP].data=newData; renderBats();
             }
         };
         l.appendChild(d);
     });
 }
-function delBat(b,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[curP].data[b]; if(curB===b) curB=null; saveDB(); renderBats(); renderContent(); } }
+function delBat(b,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[curP].data[b]; if(curB===b) curB=null; renderBats(); renderContent(); } }
 function openBat(b){ curB=b; document.getElementById('bat-title').innerText=b; renderBats(); renderContent(); }
 
 /* --- PHOTOS --- */
 function addPhotos(input){
     if(!curB) { app.projects[curP].data["Zone 1"]=[]; openBat("Zone 1"); }
     if(!input.files.length) return;
+    document.getElementById('loading').style.display='flex';
     let c=0; const total=input.files.length;
     Array.from(input.files).forEach(f=>{
         if(f.type==="image/heic") return c++;
@@ -302,7 +233,9 @@ function addPhotos(input){
                 const max=1000; let w=img.width, h=img.height;
                 if(w>max){h*=max/w; w=max;} cvs.width=w; cvs.height=h; ctx.drawImage(img,0,0,w,h);
                 app.projects[curP].data[curB].push({src:cvs.toDataURL('image/jpeg',0.7), text:"Description..."});
-                c++; if(c===total){ saveDB(); renderContent(); }
+                c++; 
+                document.getElementById('progress').style.width=(c/total*100)+'%';
+                if(c===total){ renderContent(); setTimeout(()=>document.getElementById('loading').style.display='none',500); }
             }; img.src=e.target.result;
         }; r.readAsDataURL(f);
     });
@@ -338,34 +271,33 @@ function renderContent(){
                 const old=parseInt(dragSrc.dataset.idx), cur=parseInt(this.dataset.idx);
                 const arr=app.projects[curP].data[curB];
                 const mv=arr.splice(old,1)[0]; arr.splice(cur,0,mv);
-                saveDB(); renderContent();
+                renderContent();
             }
         };
         c.appendChild(b);
     });
 }
-function updTxt(i,t){ app.projects[curP].data[curB][i].text=t; clearTimeout(window.t); window.t=setTimeout(saveDB,1000); }
-function delItem(i){ if(confirm("Supprimer ?")){ app.projects[curP].data[curB].splice(i,1); saveDB(); renderContent(); } }
+function updTxt(i,t){ app.projects[curP].data[curB][i].text=t; }
+function delItem(i){ if(confirm("Supprimer ?")){ app.projects[curP].data[curB].splice(i,1); renderContent(); } }
 
-/* --- PAINT FIX --- */
+/* --- PAINT --- */
+let pIdx, pImg, tool='rect', color='#ff0000', width=5, draw=false, sx, sy;
 function editP(i){ pIdx=i; const s=app.projects[curP].data[curB][i].src; pImg=new Image(); pImg.onload=()=>{ const cvs=document.getElementById('canvas'); cvs.width=pImg.width; cvs.height=pImg.height; cvs.getContext('2d').drawImage(pImg,0,0); document.getElementById('paint-modal').style.display='flex'; }; pImg.src=s; }
-function savePaint(){ app.projects[curP].data[curB][pIdx].src=document.getElementById('canvas').toDataURL('image/jpeg',0.8); saveDB(); closePaint(); renderContent(); }
+function savePaint(){ app.projects[curP].data[curB][pIdx].src=document.getElementById('canvas').toDataURL('image/jpeg',0.8); closePaint(); renderContent(); }
 function closePaint(){ document.getElementById('paint-modal').style.display='none'; }
-function setTool(t){ tool=t; }
-
 const cvs=document.getElementById('canvas');
 cvs.addEventListener('mousedown',e=>{ draw=true; const r=cvs.getBoundingClientRect(), s=cvs.width/r.width; sx=(e.clientX-r.left)*s; sy=(e.clientY-r.top)*s; cvs.getContext('2d').beginPath(); });
 cvs.addEventListener('mousemove',e=>{ 
     if(!draw)return; 
     const r=cvs.getBoundingClientRect(), s=cvs.width/r.width, x=(e.clientX-r.left)*s, y=(e.clientY-r.top)*s, ctx=cvs.getContext('2d'); 
-    ctx.strokeStyle=color; ctx.lineWidth=brushSize; ctx.lineCap="round"; 
+    ctx.strokeStyle=color; ctx.lineWidth=width; ctx.lineCap="round"; 
     if(tool==='free'){ ctx.lineTo(x,y); ctx.stroke(); } 
 });
 cvs.addEventListener('mouseup',e=>{ 
     draw=false; 
     if(tool!=='free'){ 
         const ctx=cvs.getContext('2d'), r=cvs.getBoundingClientRect(), s=cvs.width/r.width, x=(e.clientX-r.left)*s, y=(e.clientY-r.top)*s; 
-        ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=brushSize; 
+        ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=width; 
         if(tool==='rect') ctx.strokeRect(sx,sy,x-sx,y-sy); 
         if(tool==='circle'){let rad=Math.sqrt(Math.pow(x-sx,2)+Math.pow(y-sy,2)); ctx.arc(sx,sy,rad,0,2*Math.PI); ctx.stroke();} 
         if(tool==='arrow'){ctx.moveTo(sx,sy); ctx.lineTo(x,y); ctx.stroke();} 
@@ -373,19 +305,17 @@ cvs.addEventListener('mouseup',e=>{
 });
 
 /* --- FILES --- */
-function exportData(){ const b=new Blob([JSON.stringify(app)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`CCAS_FULL.json`; a.click(); showToast("Fichier téléchargé"); }
-function importData(i){ if(!i.files[0])return; const r=new FileReader(); r.onload=e=>{ try{ app=JSON.parse(e.target.result); saveDB(); renderGrid(); showToast("Chargé"); }catch(x){alert("Erreur fichier");} }; r.readAsText(i.files[0]); }
-function setLogo(i){ if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; saveDB(); }; r.readAsDataURL(i.files[0]); } }
+function exportData(){ const b=new Blob([JSON.stringify(app)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`CCAS_FULL.json`; a.click(); toast("Fichier téléchargé"); }
+function importData(i){ if(!i.files[0])return; const r=new FileReader(); r.onload=e=>{ try{ app=JSON.parse(e.target.result); renderGrid(); toast("Chargé"); }catch(x){alert("Fichier invalide");} }; r.readAsText(i.files[0]); }
+function setLogo(i){ if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; document.getElementById('img-logo').style.display='block'; }; r.readAsDataURL(i.files[0]); } }
 
-/* --- ZIP (AVEC CORRECTION COULEUR TEXTE) --- */
+/* --- ZIP (FIX COULEUR TEXTE) --- */
 function genZip(){
     if(!window.JSZip){alert("Erreur ZIP");return;}
     document.getElementById('loading').style.display='flex';
-    // On utilise le logo actuellement affiché
     const currentLogo = document.getElementById('img-logo').src;
     setTimeout(()=>{
         const proj=app.projects[curP]; const json=JSON.stringify(proj.data).replace(/</g,'\\u003c');
-        
         const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
         body{margin:0;background:#000;font-family:sans-serif;height:100vh;display:flex;overflow:hidden;color:white;}
         #side{width:280px;background:#0A1A3C;border-right:3px solid #CCA43B;display:flex;flex-direction:column;}
@@ -396,10 +326,9 @@ function genZip(){
         .view{height:75vh;width:100%;display:flex;align-items:center;justify-content:center;background:#000;border-bottom:3px solid #CCA43B;position:relative;}
         .frame img{max-width:100%;max-height:100%;object-fit:contain;}
         .bot{height:25vh;background:#111;padding:20px 40px;overflow-y:auto;box-sizing:border-box;}
-        /* CORRECTION COULEUR TEXTE : On force les balises font et span à garder leur couleur */
-        #desc{color:white;font-size:1.3rem;line-height:1.5;} 
+        #desc{color:white!important;font-size:1.3rem;line-height:1.5;} 
         #desc * {background:transparent!important;} 
-        #desc font, #desc span[style] { color: inherit !important; }
+        #desc font { color: inherit !important; }
         #tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:10px;margin-top:0;font-size:1.4rem;}
         .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(204,164,59,0.5);color:white;border:none;font-size:40px;padding:10px;cursor:pointer;border-radius:50%;}
         .p{left:20px;} .n{right:20px;}
