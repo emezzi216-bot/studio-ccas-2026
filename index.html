@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio CCAS | v71 FINAL</title>
+    <title>Studio CCAS | v72 FINAL FIX</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* --- CHARTE GRAPHIQUE : BLEU NUIT / OR / BLANC --- */
+        /* --- CHARTE : BLEU NUIT / OR --- */
         :root { 
             --blue: #0A1A3C; 
             --gold: #CCA43B; 
@@ -18,7 +18,7 @@
         body { 
             font-family: 'Segoe UI', sans-serif; 
             margin: 0; 
-            background-color: var(--blue); /* FOND BLEU OBLIGATOIRE */
+            background-color: var(--blue); 
             color: var(--white); 
             height: 100vh; 
             display: flex; 
@@ -29,7 +29,7 @@
         
         * { box-sizing: border-box; outline: none; }
         
-        /* CACHER LES INPUTS FICHIERS (Correction Image 4) */
+        /* CACHER LES INPUTS */
         input[type="file"] { display: none !important; }
 
         /* HEADER */
@@ -42,12 +42,21 @@
             padding: 0 20px;
             background: rgba(0,0,0,0.3);
         }
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; display:flex; align-items:center; gap:10px; }
-        .save-indicator { font-size: 0.8rem; background: var(--green); color: white; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: 0.3s; }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; display:flex; align-items:center; gap:15px; }
+        
+        /* INDICATEUR SILENCIEUX (PLUS D'ALERTE POPUP) */
+        .status-badge { 
+            font-size: 0.75rem; 
+            padding: 4px 10px; 
+            border-radius: 4px; 
+            font-weight: normal;
+            color: #aaa;
+            border: 1px solid #555;
+        }
+        .status-badge.err { color: #ff6b6b; border-color: #ff6b6b; font-weight:bold; }
         
         .btn { padding: 8px 20px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; color: white; display:flex; align-items:center; gap:8px; font-size:0.9rem; transition:0.2s; }
         .btn-green { background: var(--green); border: 1px solid #2ecc71; }
-        .btn-green:hover { background: #219150; }
         .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
         .btn-outline:hover { background: var(--gold); color: var(--blue); }
 
@@ -69,11 +78,10 @@
         .card:hover { background: rgba(204, 164, 59, 0.2); box-shadow: 0 0 15px rgba(204, 164, 59, 0.3); }
         .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); font-weight: bold; cursor: pointer; font-size:1.2rem; background:white; border-radius:50%; width:25px; height:25px; display:flex; align-items:center; justify-content:center; }
 
-        /* STUDIO: SIDEBAR */
+        /* STUDIO */
         .sidebar { width: 280px; border-right: 2px solid var(--gold); display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
         .side-head { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .back-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-weight: bold; width: 100%; text-align: left; cursor: pointer; margin-bottom:10px; }
-        .back-btn:hover { color: var(--gold); }
         
         #proj-name { font-size: 1.2rem; font-weight: bold; color: var(--gold); cursor: pointer; border-bottom: 1px dashed rgba(204,164,59,0.5); padding-bottom:5px; }
         
@@ -83,7 +91,7 @@
         .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
         .bat-actions { display:flex; gap:8px; }
         
-        /* STUDIO: EDITOR */
+        /* EDITOR */
         .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
         .editor-bar { height: 60px; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: rgba(0,0,0,0.2); }
         
@@ -92,7 +100,7 @@
         
         .content { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
 
-        /* PHOTO BLOCK */
+        /* PHOTO BLOCK - CORRECTION AFFICHAGE */
         .block { 
             display: flex; 
             border: 2px solid var(--gold); 
@@ -105,15 +113,25 @@
         .block-img { 
             width: 60%; 
             position: relative; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-right: 1px solid var(--gold); 
             background: black;
+            border-right: 1px solid var(--gold); 
+            overflow: hidden; /* Empêche tout dépassement */
         }
-        .block-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
-        .img-tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; }
+        /* L'IMAGE NE SORT PLUS JAMAIS DU CADRE */
+        .block-img img { 
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 100%; 
+            max-height: 100%; 
+            width: auto;
+            height: auto;
+            object-fit: contain; 
+        }
+        
+        .img-tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; z-index: 10; }
         .tool-btn { background: rgba(0,0,0,0.6); color: white; border: 1px solid white; padding: 4px 8px; font-size: 0.8rem; cursor: pointer; border-radius:4px; }
         .tool-btn:hover { background: var(--gold); color: black; border-color: var(--gold); }
         .btn-del-blk { background: var(--red); border-color: var(--red); }
@@ -123,12 +141,11 @@
             display: flex; 
             flex-direction: column; 
             padding: 15px; 
-            background: var(--blue); /* FOND BLEU CONFIRMÉ */
+            background: var(--blue); 
         }
         
         .txt-toolbar { margin-bottom: 10px; display: flex; gap: 5px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
         .style-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius:3px; }
-        .style-btn:hover { background:white; color:black; }
         
         .editable { 
             flex: 1; 
@@ -146,11 +163,9 @@
         #paint-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; flex-direction: column; }
         .paint-head { height: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid #333; }
         .paint-tools { height: 60px; display: flex; justify-content: center; align-items: center; gap: 15px; border-top: 1px solid #333; }
-        .p-tool { background: #333; color: white; border: 1px solid #555; width: 35px; height: 35px; cursor: pointer; }
-        .p-tool.active { background: var(--gold); color: black; }
-
-        /* NOTIF */
-        #toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 10px 20px; border-radius: 4px; display: none; z-index:9999; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .p-btn { width: 40px; height: 40px; background:#555; color:white; border:1px solid #777; font-size:18px; cursor:pointer; }
+        
+        #toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 10px 20px; border-radius: 4px; display: none; z-index:9999; }
     </style>
 </head>
 <body>
@@ -163,7 +178,10 @@
 
 <div id="view-dash">
     <div class="header" style="width: 100%;">
-        <div class="logo">STUDIO CCAS <span id="save-tag" class="save-indicator">Sauvé</span></div>
+        <div class="logo">
+            STUDIO CCAS 
+            <span id="save-status" class="status-badge">Prêt</span>
+        </div>
         <div class="actions">
             <button class="btn btn-green" onclick="exportPC()">📥 SAUVEGARDE PC</button>
             <button class="btn btn-outline" onclick="document.getElementById('f-import').click()">📂 CHARGER</button>
@@ -215,22 +233,22 @@
         <canvas id="canvas"></canvas>
     </div>
     <div class="paint-tools">
-        <button class="p-tool" onclick="tool='rect'">⬜</button>
-        <button class="p-tool" onclick="tool='circle'">⭕</button>
-        <button class="p-tool" onclick="tool='arrow'">↗️</button>
-        <button class="p-tool" onclick="tool='free'">✏️</button>
+        <button class="p-btn" onclick="tool='rect'">⬜</button>
+        <button class="p-btn" onclick="tool='circle'">⭕</button>
+        <button class="p-btn" onclick="tool='arrow'">↗️</button>
+        <button class="p-btn" onclick="tool='free'">✏️</button>
         <input type="color" onchange="color=this.value" value="#ff0000">
         <input type="range" min="1" max="20" value="5" oninput="width=this.value">
     </div>
 </div>
 
 <script>
-/* --- MOTEUR SANS BASE DE DONNEES (ANTI-BLOCAGE) --- */
-const STORAGE_KEY = "CCAS_V71_DATA";
+/* MOTEUR V72 - SILENCIEUX & ROBUSTE */
+const STORAGE_KEY = "CCAS_V72_FINAL";
 let app = { projects: {}, config: { logo: "" } };
 let curP = null, curB = null, dragSrc = null;
 
-// CHARGEMENT INSTANTANÉ (Pas de "Loading...")
+// CHARGEMENT
 if(localStorage.getItem(STORAGE_KEY)) {
     try {
         app = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -243,27 +261,33 @@ if(localStorage.getItem(STORAGE_KEY)) {
 }
 renderGrid();
 
-/* SAUVEGARDE AUTOMATIQUE (LocalStorage) */
+/* SAUVEGARDE AUTO SILENCIEUSE */
 function autoSave() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
-        const ind = document.getElementById('save-tag');
-        ind.style.opacity = 1;
-        setTimeout(() => ind.style.opacity = 0, 1000);
+        updateStatus("Sauvegardé", "ok");
     } catch(e) {
-        alert("⚠️ ATTENTION : Mémoire pleine. Faites une 'Sauvegarde PC' maintenant !");
+        // PLUS D'ALERTE BLOQUANTE - Juste un statut
+        updateStatus("⚠️ Mémoire Pleine - Utilisez le bouton Vert", "err");
     }
 }
 
-/* EXPORT PC (Fichier JSON) */
+function updateStatus(msg, type) {
+    const s = document.getElementById('save-status');
+    s.innerText = msg;
+    s.className = "status-badge " + type;
+    if(type === 'ok') setTimeout(() => { s.innerText = "Prêt"; s.className = "status-badge"; }, 2000);
+}
+
+/* EXPORT PC */
 function exportPC() {
     autoSave();
     const b = new Blob([JSON.stringify(app)], {type: 'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(b);
-    a.download = `CCAS_PROJET_${Date.now()}.json`;
+    a.download = `CCAS_SAUVEGARDE_${Date.now()}.json`;
     a.click();
-    showToast("Fichier téléchargé sur votre PC");
+    showToast("✅ Sauvegardé sur l'ordinateur !");
 }
 
 function importFile(input) {
@@ -422,12 +446,12 @@ function addPhotos(input) {
                 const cvs = document.createElement('canvas');
                 const ctx = cvs.getContext('2d');
                 let w = img.width, h = img.height;
-                const max = 1000;
+                const max = 800; // COMPRESSION ANTI-CRASH
                 if(w > max) { h *= max/w; w = max; }
                 cvs.width = w; cvs.height = h;
                 ctx.drawImage(img, 0, 0, w, h);
                 app.projects[curP].data[curB].push({
-                    src: cvs.toDataURL('image/jpeg', 0.6),
+                    src: cvs.toDataURL('image/jpeg', 0.6), 
                     text: "Description..."
                 });
                 autoSave(); renderContent();
@@ -459,7 +483,7 @@ function renderContent() {
                     <button class="tool-btn btn-del-blk" onclick="delPhoto(${idx})">✖</button>
                     <button class="tool-btn" onclick="editPhoto(${idx})">🎨 Retouche</button>
                 </div>
-                <div class="img-wrap"><img src="${item.src}"></div>
+                <img src="${item.src}">
             </div>
             <div class="block-txt">
                 <div class="txt-toolbar">
@@ -484,7 +508,6 @@ function renderContent() {
                 autoSave(); renderContent();
             }
         };
-        
         c.appendChild(b);
     });
 }
