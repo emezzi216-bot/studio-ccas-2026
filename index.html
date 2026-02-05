@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio CCAS | v61 PAINT FIX</title>
+    <title>Studio CCAS | v62 DESIGN FIX</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
+        /* --- STYLE DESIGN CCAS --- */
         :root { --blue: #0A1A3C; --gold: #CCA43B; --bg: #f0f2f5; --white: #fff; --green: #27ae60; --red: #c0392b; }
+        /* Le fond de l'éditeur sera bleu nuit comme le rendu final */
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
         * { box-sizing: border-box; outline: none; }
         button { cursor: pointer; transition: 0.1s; font-family: inherit; } button:active { transform: scale(0.98); }
@@ -15,7 +17,7 @@
         /* HEADER */
         .header { height: 70px; background: var(--white); padding: 0 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--gold); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .title h1 { margin: 0; color: var(--blue); font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
-        .badge { background: var(--green); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+        .badge { background: var(--gold); color: black; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
         
         .actions { display: flex; gap: 10px; }
         .btn { padding: 10px 20px; border-radius: 6px; font-weight: bold; border: none; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
@@ -33,15 +35,17 @@
         .card:hover { transform: translateY(-5px); border-color: var(--gold); }
         .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); background: #fee2e2; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-        /* STUDIO: SIDEBAR */
-        .sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 20px rgba(0,0,0,0.1); }
+        /* STUDIO: SIDEBAR (Fond Bleu CCAS) */
+        .sidebar { width: 300px; background: var(--blue); color: white; display: flex; flex-direction: column; z-index: 10; box-shadow: 5px 0 20px rgba(0,0,0,0.2); border-right: 2px solid var(--gold); }
         .side-head { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
         .back-btn { background: none; border: none; color: var(--gold); font-weight: bold; width: 100%; text-align: left; cursor: pointer; }
         
-        #proj-title { cursor: pointer; border-bottom: 1px dashed rgba(255,255,255,0.3); padding-bottom: 2px; }
+        #proj-title { cursor: pointer; border-bottom: 1px dashed rgba(255,255,255,0.3); padding-bottom: 2px; color: white; }
+        #proj-title:hover { color: var(--gold); border-color: var(--gold); }
         
         .bat-list { flex: 1; overflow-y: auto; padding: 10px; }
         .bat-item { padding: 10px; background: rgba(255,255,255,0.08); margin-bottom: 5px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid transparent; }
+        .bat-item:hover { background: rgba(255,255,255,0.15); }
         .bat-item.active { background: white; color: var(--blue); border-left-color: var(--gold); font-weight: bold; }
         
         .bat-actions { display: flex; gap: 5px; }
@@ -51,26 +55,28 @@
         
         .handle { cursor: grab; padding-right: 10px; opacity: 0.5; font-size: 1.2rem; }
 
-        /* STUDIO: EDITOR */
-        .editor { flex: 1; display: flex; flex-direction: column; background: #eef2f6; }
-        .editor-tools { height: 70px; background: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
-        .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; }
+        /* STUDIO: EDITOR (Fond Bleu CCAS pour l'éditeur aussi) */
+        .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
+        .editor-tools { height: 70px; background: white; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
+        .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: white; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
         .content { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
 
-        /* PHOTO BLOCK */
-        .block { background: white; border-radius: 10px; margin-bottom: 30px; display: flex; border: 1px solid #ddd; height: 400px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        /* PHOTO BLOCK (Fond blanc sur fond bleu) */
+        .block { background: white; border-radius: 10px; margin-bottom: 30px; display: flex; border: 1px solid var(--gold); height: 400px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .drag-handle { width: 40px; background: #f8f9fa; cursor: grab; display: flex; align-items: center; justify-content: center; border-right: 1px solid #eee; color: #aaa; font-size: 24px; }
         .block-img { width: 350px; background: #f8fafc; padding: 15px; border-right: 1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         .img-wrap { width: 100%; height: 250px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; }
         .img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .btn-del { position: absolute; top: 10px; left: 10px; width: 30px; height: 30px; background: var(--red); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; z-index: 5; }
-        .btn-retouch { margin-top: 15px; width: 100%; background: #333; color: white; border: none; padding: 8px; border-radius: 4px; font-weight: bold; }
+        .btn-retouch { margin-top: 15px; width: 100%; background: var(--blue); color: white; border: none; padding: 8px; border-radius: 4px; font-weight: bold; }
 
         .block-txt { flex: 1; padding: 20px; display: flex; flex-direction: column; background: #fdfdfd; }
         .txt-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: #eee; padding: 5px; border-radius: 6px; align-items: center; }
         .t-btn { width: 30px; height: 30px; border: 1px solid #ccc; background: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        /* Editeur de texte : fond gris foncé, texte blanc pour simuler le rendu final */
         .editable { flex: 1; border: 1px solid #333; border-radius: 6px; padding: 15px; overflow-y: auto; background: #222; color: white; font-size: 16px; line-height: 1.5; }
+        .editable:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 2px rgba(204, 164, 59, 0.3); }
 
         /* LOADING & TOAST */
         #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
@@ -104,7 +110,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div class="title"><h1>STUDIO CCAS <span class="badge">v61 FINAL</span></h1></div>
+        <div class="title"><h1>STUDIO CCAS <span class="badge">v62 DESIGN</span></h1></div>
         <div class="actions">
             <button class="btn btn-success" onclick="exportData()">📥 SAUVEGARDE PC</button>
             <button class="btn btn-outline" onclick="document.getElementById('f-import').click()">📂 CHARGER</button>
@@ -125,12 +131,12 @@
             </div>
         </div>
         <div id="bat-list" class="bat-list"></div>
-        <div style="padding:20px;"><button class="btn btn-outline" style="width:100%; border-style:dashed; color:white; background:transparent; border-color:rgba(255,255,255,0.5);" onclick="addBat()">+ RUBRIQUE</button></div>
+        <div style="padding:20px;"><button class="btn btn-outline" style="width:100%; border-style:dashed; color:var(--gold); background:transparent; border-color:var(--gold);" onclick="addBat()">+ RUBRIQUE</button></div>
     </div>
     <div class="editor">
         <div class="editor-tools">
             <div class="logo-box" onclick="document.getElementById('f-logo').click()">
-                <img id="img-logo" src="Logo_Créteil_Val_Marne.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
+                <img id="img-logo" src="https://upload.wikimedia.org/wikipedia/fr/thumb/8/8f/Logo_Cr%C3%A9teil.svg/1200px-Logo_Cr%C3%A9teil.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
             </div>
             <div id="bat-title" style="font-weight:bold; color:var(--blue); font-size:1.2rem;">Accueil</div>
             <div class="actions">
@@ -162,7 +168,7 @@
 
 <script>
 /* --- CORE --- */
-const DB_NAME='CCAS_V61', STORE='data';
+const DB_NAME='CCAS_V62', STORE='data';
 let db, app={ projects:{}, config:{logo:""} };
 let curP=null, curB=null, dragSrc=null;
 
@@ -207,6 +213,7 @@ function loadFromDB(){
         if(r.result) app = r.result;
         document.getElementById('loading').style.display = 'none';
         renderGrid();
+        // Si un logo personnalisé est sauvé, on le charge, sinon on garde celui par défaut
         if(app.config.logo) document.getElementById('img-logo').src=app.config.logo;
     };
 }
@@ -305,7 +312,7 @@ function addPhotos(input){
 function renderContent(){
     const c=document.getElementById('content'); c.innerHTML='';
     if(!curB) return;
-    const btn=document.createElement('div'); btn.style="border:2px dashed #ccc;padding:25px;text-align:center;border-radius:10px;cursor:pointer;color:#666;font-weight:bold;margin-bottom:25px;";
+    const btn=document.createElement('div'); btn.style="border:2px dashed var(--gold);padding:25px;text-align:center;border-radius:10px;cursor:pointer;color:white;font-weight:bold;margin-bottom:25px;background:rgba(204,164,59,0.1);";
     btn.innerText="📸 AJOUTER PHOTOS"; btn.onclick=()=>document.getElementById('f-photo').click();
     c.appendChild(btn);
 
@@ -351,7 +358,7 @@ cvs.addEventListener('mousedown',e=>{ draw=true; const r=cvs.getBoundingClientRe
 cvs.addEventListener('mousemove',e=>{ 
     if(!draw)return; 
     const r=cvs.getBoundingClientRect(), s=cvs.width/r.width, x=(e.clientX-r.left)*s, y=(e.clientY-r.top)*s, ctx=cvs.getContext('2d'); 
-    ctx.strokeStyle=color; ctx.lineWidth=brushSize; ctx.lineCap="round"; // UTILISATION DE brushSize
+    ctx.strokeStyle=color; ctx.lineWidth=brushSize; ctx.lineCap="round"; 
     if(tool==='free'){ ctx.lineTo(x,y); ctx.stroke(); } 
 });
 cvs.addEventListener('mouseup',e=>{ 
@@ -370,15 +377,18 @@ function exportData(){ const b=new Blob([JSON.stringify(app)],{type:'application
 function importData(i){ if(!i.files[0])return; const r=new FileReader(); r.onload=e=>{ try{ app=JSON.parse(e.target.result); saveDB(); renderGrid(); showToast("Chargé"); }catch(x){alert("Erreur fichier");} }; r.readAsText(i.files[0]); }
 function setLogo(i){ if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; saveDB(); }; r.readAsDataURL(i.files[0]); } }
 
-/* --- ZIP --- */
+/* --- ZIP (AVEC CORRECTION COULEUR TEXTE) --- */
 function genZip(){
     if(!window.JSZip){alert("Erreur ZIP");return;}
     document.getElementById('loading').style.display='flex';
+    // On utilise le logo actuellement affiché
+    const currentLogo = document.getElementById('img-logo').src;
     setTimeout(()=>{
-        const proj=app.projects[curP]; const json=JSON.stringify(proj.data).replace(/</g,'\\u003c'); const logo=app.config.logo||"";
+        const proj=app.projects[curP]; const json=JSON.stringify(proj.data).replace(/</g,'\\u003c');
+        
         const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
         body{margin:0;background:#000;font-family:sans-serif;height:100vh;display:flex;overflow:hidden;color:white;}
-        #side{width:250px;background:#0A1A3C;border-right:3px solid #CCA43B;display:flex;flex-direction:column;}
+        #side{width:280px;background:#0A1A3C;border-right:3px solid #CCA43B;display:flex;flex-direction:column;}
         .head{padding:20px;color:#CCA43B;font-weight:800;border-bottom:1px solid #333;text-align:center;font-size:1.2rem;text-transform:uppercase;}
         .btn{width:100%;padding:15px;color:#888;background:none;border:none;text-align:left;cursor:pointer;border-bottom:1px solid #222;font-size:16px;}
         .btn.active{color:#CCA43B;border-left:5px solid #CCA43B;background:rgba(204,164,59,0.1);font-weight:bold;}
@@ -386,18 +396,21 @@ function genZip(){
         .view{height:75vh;width:100%;display:flex;align-items:center;justify-content:center;background:#000;border-bottom:3px solid #CCA43B;position:relative;}
         .frame img{max-width:100%;max-height:100%;object-fit:contain;}
         .bot{height:25vh;background:#111;padding:20px 40px;overflow-y:auto;box-sizing:border-box;}
-        #desc{color:white!important;font-size:1.3rem;line-height:1.5;} #desc *{background:transparent!important;} #desc font[color]{color:inherit!important;}
+        /* CORRECTION COULEUR TEXTE : On force les balises font et span à garder leur couleur */
+        #desc{color:white;font-size:1.3rem;line-height:1.5;} 
+        #desc * {background:transparent!important;} 
+        #desc font, #desc span[style] { color: inherit !important; }
         #tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:10px;margin-top:0;font-size:1.4rem;}
         .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(204,164,59,0.5);color:white;border:none;font-size:40px;padding:10px;cursor:pointer;border-radius:50%;}
         .p{left:20px;} .n{right:20px;}
         .pdf{position:absolute;top:10px;left:10px;background:#c0392b;color:white;border:none;padding:5px 15px;border-radius:4px;font-weight:bold;cursor:pointer;opacity:0.6;z-index:99;}
         .top{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.8);padding:5px 10px;border:1px solid #CCA43B;display:flex;align-items:center;gap:10px;border-radius:4px;}
         @media print{ #side,.nav,.pdf{display:none;} .view{height:70vh;page-break-inside:avoid;} .bot{height:30vh;page-break-after:always;} }
-        </style></head><body><button class="pdf" onclick="window.print()">🖨️ PDF</button><div id="side"><div class="head">${proj.name}</div><div id="nav"></div></div><div id="main"><div class="view"><div class="top"><img src="${logo}" height="40"><div style="color:#CCA43B;font-weight:bold;font-size:10px;">DIRECTION<br>FINANCES</div></div><div id="sc"></div></div><div class="bot"><h2 id="tit"></h2><div id="desc"></div></div></div>
+        </style></head><body><button class="pdf" onclick="window.print()">🖨️ PDF</button><div id="side"><div class="head">${proj.name}</div><div id="nav"></div></div><div id="main"><div class="view"><div class="top"><img src="${currentLogo}" height="40"><div style="color:#CCA43B;font-weight:bold;font-size:10px;">DIRECTION<br>FINANCES</div></div><div id="sc"></div></div><div class="bot"><h2 id="tit"></h2><div id="desc"></div></div></div>
         <script>
         const d=${json}; let keys=Object.keys(d), cB=keys[0], cI=0;
         function rn(){ const n=document.getElementById('nav'); n.innerHTML=''; keys.forEach(k=>{ const b=document.createElement('button'); b.className='btn '+(cB===k?'active':''); b.innerText=k; b.onclick=()=>{cB=k;cI=0;sh();rn()}; n.appendChild(b); }); }
-        function sh(){ const s=document.getElementById('sc'), i=d[cB]; if(!i||!i.length){ s.innerHTML=''; document.getElementById('desc').innerHTML='Aucune photo'; return; } s.innerHTML='<img src="'+i[cI].src+'">'; document.getElementById('tit').innerText=cB+" ("+(cI+1)+"/"+i.length+")"; document.getElementById('desc').innerHTML=i[cI].text.replace("Description...","");
+        function sh(){ const s=document.getElementById('sc'), i=d[cB]; if(!i||!i.length){ s.innerHTML=''; document.getElementById('desc').innerHTML='Aucune photo'; return; } s.innerHTML='<img src="'+i[cI].src+'">'; document.getElementById('tit').innerText=cB+" ("+(cI+1)+"/"+i.length+")"; document.getElementById('desc').innerHTML=i[cI].text;
         document.querySelectorAll('.nav').forEach(e=>e.remove()); if(i.length>1){ const p=document.createElement('button'); p.className='nav p'; p.innerText='❮'; p.onclick=()=>{cI=(cI-1+i.length)%i.length;sh()}; document.querySelector('.view').appendChild(p); const n=document.createElement('button'); n.className='nav n'; n.innerText='❯'; n.onclick=()=>{cI=(cI+1)%i.length;sh()}; document.querySelector('.view').appendChild(n); } }
         window.onload=()=>{ if(keys.length){rn();sh();} };
         <\/script></body></html>`;
