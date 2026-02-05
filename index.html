@@ -26,6 +26,7 @@
         .btn:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-gold { background: var(--gold); color: var(--blue); }
         .btn-blue { background: var(--blue); color: white; }
+        .btn-green { background: var(--green); color: white; }
         .btn-red { background: white; color: var(--red); border: 1px solid var(--red); }
         .btn-ghost { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
         
@@ -60,24 +61,53 @@
 
         /* MAIN (Photos) */
         .main-editor { flex: 1; display: flex; flex-direction: column; background: #eef2f6; position: relative; }
-        .editor-toolbar { height: 60px; background: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .content-area { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        .editor-toolbar { height: 60px; background: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; flex-shrink: 0; }
         
-        /* BLOC PHOTO */
-        .block { width: 100%; max-width: 900px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; overflow: hidden; margin-bottom: 30px; border: 2px solid transparent; transition: 0.2s; position: relative; }
+        /* ZONE DE CONTENU - C'EST ICI QUE LE BUG A ÉTÉ CORRIGÉ */
+        .content-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 40px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            gap: 30px; /* Espace entre les blocs */
+        }
+        
+        /* BLOC PHOTO CORRIGÉ */
+        .block { 
+            width: 100%; 
+            max-width: 900px; 
+            background: white; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            display: flex; 
+            overflow: hidden; 
+            border: 2px solid transparent; 
+            transition: 0.2s; 
+            position: relative;
+            
+            /* --- CORRECTIF ANTI-ÉCRASEMENT --- */
+            flex-shrink: 0;   /* Interdit au bloc de rétrécir */
+            min-height: 250px; /* Force une hauteur minimale */
+            height: 250px;     /* Hauteur fixe pour alignement propre */
+        }
+
         .block.drag-over { border-color: var(--green); transform: scale(1.02); box-shadow: 0 10px 30px rgba(39, 174, 96, 0.2); }
-        .block-img-area { width: 400px; background: #000; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        
+        .block-img-area { width: 350px; background: #000; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; height: 100%; }
         .block-img-area img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
         .block-tools { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: 0.3s; }
         .block:hover .block-tools { opacity: 1; }
         .tool-btn { background: rgba(0,0,0,0.7); color: white; border: 1px solid white; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         
-        .block-txt-area { flex: 1; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #eee; position: relative; }
-        .rich-editor { flex: 1; min-height: 100px; font-size: 1rem; color: #333; line-height: 1.5; padding: 10px; border: 1px dashed transparent; border-radius: 4px; }
+        .block-txt-area { flex: 1; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #eee; position: relative; height: 100%; }
+        .rich-editor { flex: 1; font-size: 1rem; color: #333; line-height: 1.5; padding: 10px; border: 1px dashed transparent; border-radius: 4px; overflow-y: auto; }
         .rich-editor:focus { border-color: var(--gold); background: #fffdf5; }
         .rich-editor ul { padding-left: 20px; margin: 5px 0; }
         
-        /* TEXT TOOLBAR (Flottante ou intégrée) */
+        /* TEXT TOOLBAR */
         .txt-tools { display: flex; gap: 5px; margin-bottom: 10px; background: #f0f0f0; padding: 5px; border-radius: 4px; width: fit-content; }
         .txt-btn { background: white; border: 1px solid #ccc; cursor: pointer; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
         .txt-btn:hover { background: var(--gold); color: white; border-color: var(--gold); }
@@ -182,14 +212,10 @@
 
 <script>
 /**
- * ARCHITECTURE V90 "MAMAN PROOF"
- * - Base de données: IndexedDB (Robuste)
- * - Gestion Images: Base64
- * - Logo: Auto-load & Persistance
+ * ARCHITECTURE V91 "MAMAN PROOF + FIX CSS"
  */
 
-// --- 1. CONFIGURATION & BDD ---
-const DB_NAME = "CCAS_STUDIO_V90";
+const DB_NAME = "CCAS_STUDIO_V91";
 const DB_VERSION = 1;
 let db;
 let currentProjectId = null;
@@ -205,99 +231,58 @@ window.onload = async () => {
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 500);
 };
 
-// Gestion Logo : Essaie de charger le fichier local, sinon utilise celui en DB, sinon placeholder
+// Gestion Logo
 function loadLogoInit() {
     return new Promise(resolve => {
         const img = document.getElementById('sys-logo');
-        // Si l'image locale charge
         if(img.complete && img.naturalHeight !== 0) {
-            convertImgToBase64(img, (b64) => {
-                appData.settings.logo = b64;
-                saveData();
-                updateLogoUI();
-                resolve();
-            });
+            convertImgToBase64(img, (b64) => { appData.settings.logo = b64; saveData(); updateLogoUI(); resolve(); });
         } else {
-            img.onload = () => {
-                convertImgToBase64(img, (b64) => {
-                    appData.settings.logo = b64;
-                    saveData();
-                    updateLogoUI();
-                    resolve();
-                });
-            };
-            img.onerror = () => {
-                // Pas d'image locale, on vérifie la DB
-                if(!appData.settings.logo) {
-                    // Placeholder ou on laisse vide
-                    console.log("Aucun logo détecté.");
-                }
-                updateLogoUI();
-                resolve();
-            };
+            img.onload = () => { convertImgToBase64(img, (b64) => { appData.settings.logo = b64; saveData(); updateLogoUI(); resolve(); }); };
+            img.onerror = () => { updateLogoUI(); resolve(); };
         }
-        // Timeout de sécurité
         setTimeout(resolve, 1000);
     });
 }
 
 function updateLogoUI() {
     const uiLogo = document.getElementById('app-logo');
-    if(appData.settings.logo) {
-        uiLogo.src = appData.settings.logo;
-        uiLogo.style.display = 'block';
-    } else {
-        uiLogo.style.display = 'none';
-    }
+    if(appData.settings.logo) { uiLogo.src = appData.settings.logo; uiLogo.style.display = 'block'; }
+    else { uiLogo.style.display = 'none'; }
 }
 
 function convertImgToBase64(img, callback) {
     const c = document.createElement('canvas');
-    c.width = img.naturalWidth;
-    c.height = img.naturalHeight;
-    const ctx = c.getContext('2d');
-    ctx.drawImage(img, 0, 0);
+    c.width = img.naturalWidth; c.height = img.naturalHeight;
+    c.getContext('2d').drawImage(img, 0, 0);
     callback(c.toDataURL('image/png'));
 }
 
-// --- INDEXED DB WRAPPER ---
+// --- INDEXED DB ---
 function initDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
         request.onupgradeneeded = (event) => {
             const d = event.target.result;
-            if (!d.objectStoreNames.contains('store')) {
-                d.createObjectStore('store', { keyPath: 'id' });
-            }
+            if (!d.objectStoreNames.contains('store')) d.createObjectStore('store', { keyPath: 'id' });
         };
-        request.onsuccess = (event) => {
-            db = event.target.result;
-            loadData().then(resolve);
-        };
-        request.onerror = (e) => {
-            alert("Erreur critique Base de Données. Utilisez Chrome ou Firefox.");
-            reject(e);
-        };
+        request.onsuccess = (event) => { db = event.target.result; loadData().then(resolve); };
+        request.onerror = (e) => { alert("Erreur BDD. Changez de navigateur."); reject(e); };
     });
 }
 
 function loadData() {
     return new Promise(resolve => {
         const tx = db.transaction(['store'], 'readonly');
-        const store = tx.objectStore('store');
-        const req = store.get('main_data');
-        req.onsuccess = () => {
-            if (req.result) appData = req.result.val;
-            resolve();
-        };
-        req.onerror = () => resolve(); // Si vide, on garde les valeurs par défaut
+        const req = tx.objectStore('store').get('main_data');
+        req.onsuccess = () => { if (req.result) appData = req.result.val; resolve(); };
+        req.onerror = () => resolve();
     });
 }
 
 function saveData() {
     const tx = db.transaction(['store'], 'readwrite');
-    const store = tx.objectStore('store');
-    store.put({ id: 'main_data', val: appData });
+    tx.objectStore('store').put({ id: 'main_data', val: appData });
     showToast();
 }
 
@@ -307,65 +292,49 @@ function showToast() {
     setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// --- 2. DASHBOARD LOGIC ---
+// --- DASHBOARD ---
 function renderDashboard() {
     document.getElementById('dashboard').style.display = 'flex';
     document.getElementById('studio').style.display = 'none';
     const grid = document.getElementById('projects-grid');
     grid.innerHTML = '';
     
-    // Trier par date
     const sortedKeys = Object.keys(appData.projects).sort((a,b) => appData.projects[b].date - appData.projects[a].date);
     
     sortedKeys.forEach(pid => {
         const p = appData.projects[pid];
         const card = document.createElement('div');
         card.className = 'project-card';
-        card.innerHTML = `
-            <div class="del-proj" onclick="deleteProject('${pid}', event)">×</div>
+        card.innerHTML = `<div class="del-proj" onclick="deleteProject('${pid}', event)">×</div>
             <div style="font-size:3rem; margin-bottom:10px;">📁</div>
             <div style="font-weight:bold; color:var(--blue); font-size:1.1rem;">${p.name}</div>
-            <div style="color:#999; font-size:0.8rem; margin-top:5px;">${new Date(p.date).toLocaleDateString()}</div>
-        `;
+            <div style="color:#999; font-size:0.8rem; margin-top:5px;">${new Date(p.date).toLocaleDateString()}</div>`;
         card.onclick = () => openProject(pid);
         grid.appendChild(card);
     });
     
-    if(sortedKeys.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#999; margin-top:50px;">Aucun dossier. Créez-en un !</div>';
-    }
+    if(sortedKeys.length === 0) grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#999;">Aucun dossier. Créez-en un !</div>';
 }
 
 function createNewProject() {
     const name = prompt("Nom du nouveau dossier (ex: Mairie RDC) :");
     if (name) {
         const id = 'proj_' + Date.now();
-        appData.projects[id] = {
-            name: name,
-            date: Date.now(),
-            rubriques: { "Zone d'accueil": [] }, // Rubrique par défaut
-            order: ["Zone d'accueil"] // Ordre des rubriques
-        };
-        saveData();
-        renderDashboard();
-        openProject(id);
+        appData.projects[id] = { name: name, date: Date.now(), rubriques: { "Zone d'accueil": [] }, order: ["Zone d'accueil"] };
+        saveData(); renderDashboard(); openProject(id);
     }
 }
 
 function deleteProject(id, e) {
     e.stopPropagation();
-    if (confirm("Maman, tu es sûre de vouloir supprimer ce dossier ?")) {
-        delete appData.projects[id];
-        saveData();
-        renderDashboard();
-    }
+    if (confirm("Supprimer ce dossier définitivement ?")) { delete appData.projects[id]; saveData(); renderDashboard(); }
 }
 
 function exportBackup() {
     const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `CCAS_BACKUP_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `CCAS_BACKUP_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`;
     a.click();
 }
 
@@ -376,55 +345,37 @@ function importDB(input) {
     reader.onload = (e) => {
         try {
             const json = JSON.parse(e.target.result);
-            if(confirm("Attention, cela va fusionner avec les dossiers existants. Continuer ?")) {
-                // Merge intelligent
+            if(confirm("Fusionner avec les dossiers existants ?")) {
                 appData.projects = { ...appData.projects, ...json.projects };
                 if(json.settings && json.settings.logo) appData.settings.logo = json.settings.logo;
-                saveData();
-                renderDashboard();
-                alert("Restauration réussie !");
+                saveData(); renderDashboard(); alert("Restauration réussie !");
             }
-        } catch (err) {
-            alert("Fichier invalide.");
-        }
+        } catch (err) { alert("Fichier invalide."); }
     };
     reader.readAsText(file);
     input.value = '';
 }
 
-// --- 3. STUDIO LOGIC ---
+// --- STUDIO ---
 function openProject(id) {
     currentProjectId = id;
     const p = appData.projects[id];
     document.getElementById('lbl-proj-name').innerText = p.name;
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('studio').style.display = 'flex';
-    
-    // Si l'ordre n'existe pas (vieux format), on le crée
     if(!p.order) p.order = Object.keys(p.rubriques);
-    
-    // Ouvrir la première rubrique
-    if(p.order.length > 0) openBat(p.order[0]);
-    else addBat(); // Force creation if empty
-    
+    if(p.order.length > 0) openBat(p.order[0]); else addBat();
     renderSidebar();
 }
 
 function renameProject() {
-    const newName = prompt("Nouveau nom du dossier :", appData.projects[currentProjectId].name);
-    if(newName) {
-        appData.projects[currentProjectId].name = newName;
-        document.getElementById('lbl-proj-name').innerText = newName;
-        saveData();
-    }
+    const newName = prompt("Nouveau nom :", appData.projects[currentProjectId].name);
+    if(newName) { appData.projects[currentProjectId].name = newName; document.getElementById('lbl-proj-name').innerText = newName; saveData(); }
 }
 
-function goHome() {
-    currentProjectId = null;
-    renderDashboard();
-}
+function goHome() { currentProjectId = null; renderDashboard(); }
 
-// --- GESTION DES RUBRIQUES (Sidebar) ---
+// --- RUBRIQUES ---
 function renderSidebar() {
     const list = document.getElementById('list-bats');
     list.innerHTML = '';
@@ -434,92 +385,61 @@ function renderSidebar() {
         const item = document.createElement('div');
         item.className = `bat-item ${currentBatName === key ? 'active' : ''}`;
         item.draggable = true;
-        item.innerHTML = `
-            <span class="handle">☰</span>
-            <span style="flex:1; overflow:hidden; text-overflow:ellipsis;">${key}</span>
-            <span onclick="deleteBat('${key}', event)" style="color:var(--red); font-weight:bold; padding:0 5px;">×</span>
-        `;
+        item.innerHTML = `<span class="handle">☰</span><span style="flex:1; overflow:hidden; text-overflow:ellipsis;">${key}</span>
+            <span onclick="deleteBat('${key}', event)" style="color:var(--red); font-weight:bold; padding:0 5px;">×</span>`;
         item.onclick = () => openBat(key);
         
-        // Drag Events Rubriques
-        item.ondragstart = e => {
-            e.dataTransfer.setData('type', 'bat');
-            e.dataTransfer.setData('index', index);
-        };
+        item.ondragstart = e => { e.dataTransfer.setData('type', 'bat'); e.dataTransfer.setData('index', index); };
         item.ondragover = e => { e.preventDefault(); item.classList.add('drag-over'); };
         item.ondragleave = () => item.classList.remove('drag-over');
         item.ondrop = e => {
-            e.stopPropagation();
-            item.classList.remove('drag-over');
-            const type = e.dataTransfer.getData('type');
-            if(type !== 'bat') return;
+            e.stopPropagation(); item.classList.remove('drag-over');
+            if(e.dataTransfer.getData('type') !== 'bat') return;
             const fromIdx = parseInt(e.dataTransfer.getData('index'));
             if(fromIdx !== index) {
-                // Reorder array
                 const movedItem = p.order.splice(fromIdx, 1)[0];
                 p.order.splice(index, 0, movedItem);
-                saveData();
-                renderSidebar();
+                saveData(); renderSidebar();
             }
         };
-        
         list.appendChild(item);
     });
 }
 
 function addBat() {
-    const name = prompt("Nom de la rubrique (ex: Salle de Réunion) :");
+    const name = prompt("Nom de la rubrique :");
     if(name) {
         const p = appData.projects[currentProjectId];
-        if(p.rubriques[name]) return alert("Ce nom existe déjà !");
-        p.rubriques[name] = [];
-        p.order.push(name);
-        saveData();
-        openBat(name);
-        renderSidebar();
+        if(p.rubriques[name]) return alert("Déjà existant !");
+        p.rubriques[name] = []; p.order.push(name);
+        saveData(); openBat(name); renderSidebar();
     }
 }
 
 function deleteBat(name, e) {
     e.stopPropagation();
-    if(confirm(`Supprimer la rubrique "${name}" et toutes ses photos ?`)) {
+    if(confirm(`Supprimer "${name}" et ses photos ?`)) {
         const p = appData.projects[currentProjectId];
         delete p.rubriques[name];
         p.order = p.order.filter(k => k !== name);
-        
-        if(currentBatName === name) {
-            currentBatName = p.order.length > 0 ? p.order[0] : null;
-        }
-        saveData();
-        renderSidebar();
-        renderContent();
+        if(currentBatName === name) currentBatName = p.order.length > 0 ? p.order[0] : null;
+        saveData(); renderSidebar(); renderContent();
     }
 }
 
-function openBat(name) {
-    currentBatName = name;
-    renderSidebar();
-    renderContent();
-}
+function openBat(name) { currentBatName = name; renderSidebar(); renderContent(); }
 
-// --- GESTION DU CONTENU (Photos) ---
+// --- CONTENU ---
 function renderContent() {
     const area = document.getElementById('area-content');
     const title = document.getElementById('lbl-bat-name');
     area.innerHTML = '';
     
-    if(!currentBatName) {
-        title.innerText = "Aucune rubrique";
-        return;
-    }
-    
+    if(!currentBatName) { title.innerText = "Aucune rubrique"; return; }
     title.innerText = currentBatName;
     const photos = appData.projects[currentProjectId].rubriques[currentBatName];
     
-    if(photos.length === 0) {
-        area.innerHTML = '<div style="color:#999; margin-top:50px;">Aucune photo. Cliquez sur "Ajouter Photos" 📷</div>';
-        return;
-    }
+    if(photos.length === 0) { area.innerHTML = '<div style="color:#999; margin-top:50px;">Aucune photo. Cliquez sur "Ajouter Photos" 📷</div>'; return; }
     
     photos.forEach((photo, idx) => {
         const block = document.createElement('div');
@@ -547,71 +467,50 @@ function renderContent() {
             </div>
         `;
         
-        // Drag Photos
-        block.ondragstart = e => {
-            e.dataTransfer.setData('type', 'photo');
-            e.dataTransfer.setData('index', idx);
-            block.style.opacity = '0.5';
-        };
+        block.ondragstart = e => { e.dataTransfer.setData('type', 'photo'); e.dataTransfer.setData('index', idx); block.style.opacity = '0.5'; };
         block.ondragend = () => block.style.opacity = '1';
         block.ondragover = e => { e.preventDefault(); block.classList.add('drag-over'); };
         block.ondragleave = () => block.classList.remove('drag-over');
         block.ondrop = e => {
-            e.stopPropagation();
-            block.classList.remove('drag-over');
-            const type = e.dataTransfer.getData('type');
-            if(type !== 'photo') return;
+            e.stopPropagation(); block.classList.remove('drag-over');
+            if(e.dataTransfer.getData('type') !== 'photo') return;
             const fromIdx = parseInt(e.dataTransfer.getData('index'));
             if(fromIdx !== idx) {
                 const moved = photos.splice(fromIdx, 1)[0];
                 photos.splice(idx, 0, moved);
-                saveData();
-                renderContent();
+                saveData(); renderContent();
             }
         };
-        
         area.appendChild(block);
     });
 }
 
 function processPhotos(input) {
-    if(!currentBatName) return alert("Sélectionnez une rubrique d'abord !");
-    
+    if(!currentBatName) return alert("Sélectionnez une rubrique !");
     const files = Array.from(input.files);
     let loaded = 0;
     
     files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
-            // Compress Image via Canvas
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
+                let w = img.width, h = img.height;
                 const maxSize = 1200;
+                if (w > h) { if (w > maxSize) { h *= maxSize / w; w = maxSize; } } 
+                else { if (h > maxSize) { w *= maxSize / h; h = maxSize; } }
                 
-                if (width > height) {
-                    if (width > maxSize) { height *= maxSize / width; width = maxSize; }
-                } else {
-                    if (height > maxSize) { width *= maxSize / height; height = maxSize; }
-                }
-                
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                 
                 appData.projects[currentProjectId].rubriques[currentBatName].push({
-                    src: canvas.toDataURL('image/jpeg', 0.8), // Compression JPEG 80%
+                    src: canvas.toDataURL('image/jpeg', 0.8),
                     text: "Description..."
                 });
                 
                 loaded++;
-                if(loaded === files.length) {
-                    saveData();
-                    renderContent();
-                }
+                if(loaded === files.length) { saveData(); renderContent(); }
             };
             img.src = e.target.result;
         };
@@ -623,59 +522,38 @@ function processPhotos(input) {
 function deletePhoto(idx) {
     if(confirm("Supprimer cette photo ?")) {
         appData.projects[currentProjectId].rubriques[currentBatName].splice(idx, 1);
-        saveData();
-        renderContent();
+        saveData(); renderContent();
     }
 }
 
 function updateText(idx, html) {
     appData.projects[currentProjectId].rubriques[currentBatName][idx].text = html;
-    // Debounce save (wait 1s after typing stops)
-    clearTimeout(window.saveTimer);
-    window.saveTimer = setTimeout(saveData, 1000);
+    clearTimeout(window.saveTimer); window.saveTimer = setTimeout(saveData, 1000);
 }
 
-function formatText(cmd, e, val=null) {
-    e.preventDefault(); // Keep focus
-    document.execCommand(cmd, false, val);
-}
+function formatText(cmd, e, val=null) { e.preventDefault(); document.execCommand(cmd, false, val); }
 
-// --- 4. IMAGE EDITOR (PAINT) ---
-let currentPaintIdx = null;
-let canvas, ctx, paintImg;
-let isDrawing = false;
-let paintTool = 'rect';
-let startX, startY;
+// --- PAINT ---
+let currentPaintIdx = null, canvas, ctx, paintImg, isDrawing = false, paintTool = 'rect', startX, startY;
 
 function openPaint(idx) {
     currentPaintIdx = idx;
     const src = appData.projects[currentProjectId].rubriques[currentBatName][idx].src;
     document.getElementById('paint-modal').style.display = 'flex';
-    
     canvas = document.getElementById('paint-canvas');
     ctx = canvas.getContext('2d');
     paintImg = new Image();
     paintImg.onload = () => {
-        // Fit canvas to screen
-        const maxW = window.innerWidth * 0.9;
-        const maxH = window.innerHeight * 0.7;
+        const maxW = window.innerWidth * 0.9, maxH = window.innerHeight * 0.7;
         let w = paintImg.width, h = paintImg.height;
         const ratio = Math.min(maxW/w, maxH/h);
-        
-        canvas.width = w; // Keep original resolution for drawing
-        canvas.height = h;
-        canvas.style.width = (w * ratio) + "px"; // CSS scaling
-        canvas.style.height = (h * ratio) + "px";
-        
+        canvas.width = w; canvas.height = h;
+        canvas.style.width = (w * ratio) + "px"; canvas.style.height = (h * ratio) + "px";
         ctx.drawImage(paintImg, 0, 0);
     };
     paintImg.src = src;
     
-    // Events
-    canvas.onmousedown = startDraw;
-    canvas.onmousemove = draw;
-    canvas.onmouseup = endDraw;
-    // Touch support basic
+    canvas.onmousedown = startDraw; canvas.onmousemove = draw; canvas.onmouseup = endDraw;
     canvas.ontouchstart = (e) => { e.clientX=e.touches[0].clientX; e.clientY=e.touches[0].clientY; startDraw(e); };
     canvas.ontouchmove = (e) => { e.preventDefault(); e.clientX=e.touches[0].clientX; e.clientY=e.touches[0].clientY; draw(e); };
     canvas.ontouchend = endDraw;
@@ -683,223 +561,111 @@ function openPaint(idx) {
 
 function getPos(e) {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    return {
-        x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY
-    };
+    return { x: (e.clientX - rect.left) * (canvas.width / rect.width), y: (e.clientY - rect.top) * (canvas.height / rect.height) };
 }
 
 function startDraw(e) {
-    isDrawing = true;
-    const pos = getPos(e);
-    startX = pos.x;
-    startY = pos.y;
-    ctx.beginPath();
-    ctx.strokeStyle = document.getElementById('p-color').value;
+    isDrawing = true; const pos = getPos(e); startX = pos.x; startY = pos.y;
+    ctx.beginPath(); ctx.strokeStyle = document.getElementById('p-color').value;
     ctx.lineWidth = document.getElementById('p-size').value;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    
-    if(paintTool === 'free') {
-        ctx.moveTo(startX, startY);
-    }
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    if(paintTool === 'free') ctx.moveTo(startX, startY);
 }
 
 function draw(e) {
     if(!isDrawing) return;
     const pos = getPos(e);
-    
-    if(paintTool === 'free') {
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-    } else {
-        // Redraw image then shape for preview effect (basic implementation)
-        // Note: For perfect preview we'd need a secondary canvas layer, 
-        // but for simplicity we just trace on top. 
-        // Better implementation: Just trace. Maman won't mind if it's not live-preview perfect.
-    }
+    if(paintTool === 'free') { ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
 }
 
 function endDraw(e) {
-    if(!isDrawing) return;
-    isDrawing = false;
-    const pos = getPos(e);
-    const w = pos.x - startX;
-    const h = pos.y - startY;
-    
+    if(!isDrawing) return; isDrawing = false;
+    const pos = getPos(e); const w = pos.x - startX, h = pos.y - startY;
     ctx.beginPath();
-    // Re-set styles as they might be lost
-    ctx.strokeStyle = document.getElementById('p-color').value;
-    ctx.lineWidth = document.getElementById('p-size').value;
-    
-    if(paintTool === 'rect') {
-        ctx.strokeRect(startX, startY, w, h);
-    } else if (paintTool === 'circle') {
-        const r = Math.sqrt(w*w + h*h);
-        ctx.arc(startX, startY, r, 0, 2*Math.PI);
+    ctx.strokeStyle = document.getElementById('p-color').value; ctx.lineWidth = document.getElementById('p-size').value;
+    if(paintTool === 'rect') ctx.strokeRect(startX, startY, w, h);
+    else if (paintTool === 'circle') { ctx.arc(startX, startY, Math.sqrt(w*w + h*h), 0, 2*Math.PI); ctx.stroke(); }
+    else if (paintTool === 'arrow') {
+        const angle = Math.atan2(h, w), headlen = 20;
+        ctx.moveTo(startX, startY); ctx.lineTo(pos.x, pos.y);
+        ctx.lineTo(pos.x - headlen * Math.cos(angle - Math.PI / 6), pos.y - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(pos.x, pos.y);
+        ctx.lineTo(pos.x - headlen * Math.cos(angle + Math.PI / 6), pos.y - headlen * Math.sin(angle + Math.PI / 6));
         ctx.stroke();
-    } else if (paintTool === 'arrow') {
-        drawArrow(ctx, startX, startY, pos.x, pos.y);
     }
 }
 
-function drawArrow(ctx, fromx, fromy, tox, toy) {
-    const headlen = 20; // length of head in pixels
-    const dx = tox - fromx;
-    const dy = toy - fromy;
-    const angle = Math.atan2(dy, dx);
-    ctx.moveTo(fromx, fromy);
-    ctx.lineTo(tox, toy);
-    ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
-    ctx.moveTo(tox, toy);
-    ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
-    ctx.stroke();
-}
-
 function setTool(t) { paintTool = t; }
-
 function savePaint() {
-    const newSrc = canvas.toDataURL('image/jpeg', 0.9);
-    appData.projects[currentProjectId].rubriques[currentBatName][currentPaintIdx].src = newSrc;
-    saveData();
-    renderContent();
-    closePaint();
+    appData.projects[currentProjectId].rubriques[currentBatName][currentPaintIdx].src = canvas.toDataURL('image/jpeg', 0.9);
+    saveData(); renderContent(); closePaint();
 }
+function closePaint() { document.getElementById('paint-modal').style.display = 'none'; }
 
-function closePaint() {
-    document.getElementById('paint-modal').style.display = 'none';
-}
-
-// --- 5. EXPORT HTML/ZIP ---
+// --- EXPORT ---
 function generateWebsite() {
     const proj = appData.projects[currentProjectId];
     const zip = new JSZip();
+    const logoSrc = appData.settings.logo || "";
     
-    const logoSrc = appData.settings.logo || ""; // Logo en Base64
-    
-    // HTML Template
-    let html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>${proj.name}</title>
+    let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${proj.name}</title>
     <style>
         body { margin:0; font-family:'Segoe UI', sans-serif; background:#0A1A3C; color:white; height:100vh; display:flex; overflow:hidden; }
         #sidebar { width:280px; background:rgba(0,0,0,0.3); border-right:4px solid #CCA43B; display:flex; flex-direction:column; }
         .head { padding:20px; text-align:center; border-bottom:1px solid #444; }
         .head img { max-height:60px; background:white; padding:5px; border-radius:4px; margin-bottom:10px; }
         .head h1 { margin:0; font-size:1.2rem; color:#CCA43B; text-transform:uppercase; }
-        
         .nav-btn { display:block; width:100%; padding:15px 20px; background:none; border:none; color:#ccc; text-align:left; cursor:pointer; border-bottom:1px solid #333; font-size:1rem; transition:0.2s; }
         .nav-btn:hover { background:rgba(255,255,255,0.05); color:white; }
         .nav-btn.active { background:rgba(204,164,59,0.2); color:#CCA43B; border-left:5px solid #CCA43B; font-weight:bold; }
-        
         #viewer { flex:1; display:flex; flex-direction:column; position:relative; }
         #photo-frame { flex:1; background:black; display:flex; align-items:center; justify-content:center; position:relative; border-bottom:4px solid #CCA43B; }
         #photo-frame img { max-width:100%; max-height:100%; object-fit:contain; }
-        
         #info-panel { height:200px; background:#0F2045; padding:30px; overflow-y:auto; }
         #info-title { color:#CCA43B; border-bottom:1px solid #444; padding-bottom:10px; margin-top:0; }
         #info-desc { font-size:1.2rem; line-height:1.6; }
-        
         .arrow { position:absolute; top:50%; transform:translateY(-50%); font-size:50px; color:rgba(255,255,255,0.5); cursor:pointer; user-select:none; padding:20px; }
         .arrow:hover { color:#CCA43B; }
-        .prev { left:10px; }
-        .next { right:10px; }
-        
-        /* IMPRESSION */
+        .prev { left:10px; } .next { right:10px; }
         @media print {
             body { height:auto; overflow:visible; display:block; background:white; color:black; }
             #sidebar, .arrow { display:none; }
-            #viewer { display:block; }
             #photo-frame { height:600px; background:white; border:none; }
             #info-panel { height:auto; background:white; color:black; border:none; }
             #info-title { color:#0A1A3C; border-color:#000; }
             .page-break { page-break-after: always; }
         }
-    </style>
-</head>
-<body>
-    <div id="sidebar">
-        <div class="head">
-            ${logoSrc ? `<img src="${logoSrc}">` : ''}
-            <h1>${proj.name}</h1>
-        </div>
-        <div id="nav"></div>
-    </div>
-    <div id="viewer">
-        <div id="photo-frame">
-            <div class="arrow prev" onclick="move(-1)">❮</div>
-            <img id="main-img" src="">
-            <div class="arrow next" onclick="move(1)">❯</div>
-        </div>
-        <div id="info-panel">
-            <h2 id="info-title">Rubrique</h2>
-            <div id="info-desc">Description</div>
-        </div>
-    </div>
-
+    </style></head><body>
+    <div id="sidebar"><div class="head">${logoSrc ? `<img src="${logoSrc}">` : ''}<h1>${proj.name}</h1></div><div id="nav"></div></div>
+    <div id="viewer"><div id="photo-frame"><div class="arrow prev" onclick="move(-1)">❮</div><img id="main-img" src=""><div class="arrow next" onclick="move(1)">❯</div></div>
+    <div id="info-panel"><h2 id="info-title">Rubrique</h2><div id="info-desc">Description</div></div></div>
     <script>
-        const data = ${JSON.stringify(proj.rubriques)};
-        const order = ${JSON.stringify(proj.order)};
-        let curBat = order[0];
-        let curIdx = 0;
-        
+        const data = ${JSON.stringify(proj.rubriques)}; const order = ${JSON.stringify(proj.order)};
+        let curBat = order[0], curIdx = 0;
         function init() {
-            const nav = document.getElementById('nav');
-            nav.innerHTML = '';
+            const nav = document.getElementById('nav'); nav.innerHTML = '';
             order.forEach(k => {
-                const b = document.createElement('button');
-                b.className = 'nav-btn' + (k === curBat ? ' active' : '');
-                b.innerText = k;
-                b.onclick = () => { curBat = k; curIdx = 0; render(); };
+                const b = document.createElement('button'); b.className = 'nav-btn' + (k === curBat ? ' active' : '');
+                b.innerText = k; b.onclick = () => { curBat = k; curIdx = 0; render(); };
                 nav.appendChild(b);
-            });
-            render();
+            }); render();
         }
-        
         function render() {
-            // Update Menu Active
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                if(b.innerText === curBat) b.classList.add('active');
-                else b.classList.remove('active');
-            });
-            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.innerText === curBat));
             const photos = data[curBat];
-            if(!photos || photos.length === 0) {
-                document.getElementById('main-img').src = '';
-                document.getElementById('info-title').innerText = curBat;
-                document.getElementById('info-desc').innerText = "Aucune photo.";
-                return;
-            }
-            
+            if(!photos || !photos.length) { document.getElementById('main-img').src = ''; document.getElementById('info-desc').innerText = "Vide"; return; }
             const p = photos[curIdx];
             document.getElementById('main-img').src = p.src;
             document.getElementById('info-title').innerText = curBat + ' (' + (curIdx+1) + '/' + photos.length + ')';
             document.getElementById('info-desc').innerHTML = p.text;
         }
-        
-        function move(dir) {
-            const photos = data[curBat];
-            if(!photos) return;
-            curIdx = (curIdx + dir + photos.length) % photos.length;
-            render();
-        }
-        
+        function move(dir) { const ps = data[curBat]; if(ps) { curIdx = (curIdx + dir + ps.length) % ps.length; render(); } }
         init();
-    <\/script>
-</body>
-</html>`;
+    <\/script></body></html>`;
 
     zip.file("Rapport_" + proj.name.replace(/\s+/g, '_') + ".html", html);
-    
-    zip.generateAsync({type:"blob"}).then(function(content) {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(content);
-        a.download = "Rapport_" + proj.name + ".zip";
-        a.click();
+    zip.generateAsync({type:"blob"}).then(c => {
+        const a = document.createElement('a'); a.href = URL.createObjectURL(c); a.download = "Rapport_" + proj.name + ".zip"; a.click();
     });
 }
 </script>
