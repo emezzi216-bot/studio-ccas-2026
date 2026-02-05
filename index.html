@@ -3,206 +3,436 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio CCAS | v69 GITHUB SAFE</title>
+    <title>Studio CCAS | v70 FINAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* CHARTE : BLEU NUIT (#0A1A3C) & OR (#CCA43B) */
-        :root { --blue: #0A1A3C; --gold: #CCA43B; --white: #fff; --green: #27ae60; --red: #c0392b; }
+        /* --- CHARTE GRAPHIQUE STRICTE : BLEU NUIT / OR / BLANC --- */
+        :root { 
+            --blue: #0A1A3C; 
+            --gold: #CCA43B; 
+            --white: #ffffff; 
+            --green: #27ae60; 
+            --red: #c0392b; 
+        }
         
         body { 
-            font-family: 'Segoe UI', sans-serif; margin: 0; 
-            background-color: var(--blue); color: var(--white); 
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            background-color: var(--blue); /* FOND GLOBAL BLEU */
+            color: var(--white); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            user-select: none; 
         }
+        
         * { box-sizing: border-box; outline: none; }
         
         /* HEADER */
-        .header { height: 60px; background: rgba(0,0,0,0.3); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); }
-        .logo { font-size: 1.3rem; font-weight: 800; color: var(--gold); }
-        .status-bar { font-size: 0.8rem; padding: 5px 10px; border-radius: 4px; border: 1px solid #555; }
+        .header { 
+            height: 60px; 
+            border-bottom: 2px solid var(--gold); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 20px;
+            background: rgba(0,0,0,0.3);
+        }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; }
         
-        .btn { padding: 8px 15px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; color: white; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; }
+        .btn { padding: 8px 20px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; color: white; display:flex; align-items:center; gap:8px; font-size:0.9rem; }
         .btn-green { background: var(--green); border: 1px solid #2ecc71; }
         .btn-blue { background: var(--blue); border: 1px solid var(--gold); color: var(--gold); }
-        
+        .btn-blue:hover { background: var(--gold); color: var(--blue); }
+
         /* VUES */
         #view-dash, #view-studio { flex: 1; overflow: hidden; display: flex; }
-        #view-dash { flex-direction: column; padding: 30px; align-items: center; }
+        #view-dash { flex-direction: column; padding: 40px; align-items: center; }
         
-        /* DASHBOARD */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; width: 100%; max-width: 900px; margin-top: 30px; }
-        .card { background: rgba(255,255,255,0.05); border: 1px solid var(--gold); padding: 20px; text-align: center; cursor: pointer; position: relative; }
-        .card:hover { background: rgba(204, 164, 59, 0.15); }
-        .card-del { position: absolute; top: 5px; right: 5px; color: var(--red); font-weight: bold; cursor: pointer; font-size: 1.2rem; }
+        /* DASHBOARD - CARTES */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; width: 100%; max-width: 1000px; margin-top: 40px; }
+        .card { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid var(--gold); 
+            padding: 30px; 
+            text-align: center; 
+            cursor: pointer; 
+            position: relative;
+            transition: 0.2s;
+        }
+        .card:hover { background: rgba(204, 164, 59, 0.1); box-shadow: 0 0 20px rgba(204, 164, 59, 0.2); }
+        .card-title { color: var(--gold); font-weight: bold; font-size: 1.1rem; margin-top: 10px; }
+        .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); font-weight: bold; cursor: pointer; font-size:1.2rem; }
 
         /* STUDIO */
-        .sidebar { width: 260px; border-right: 2px solid var(--gold); display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
-        .side-head { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .back-link { color: #aaa; cursor: pointer; display: block; margin-bottom: 5px; font-size: 0.9rem; }
-        #proj-name { font-size: 1.1rem; font-weight: bold; color: var(--gold); cursor: pointer; border-bottom: 1px dashed #666; }
+        .sidebar { width: 280px; border-right: 2px solid var(--gold); display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
+        .side-head { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .back-link { color: rgba(255,255,255,0.6); font-size: 0.9rem; cursor: pointer; display: block; margin-bottom: 10px; text-align: left; }
+        .back-link:hover { color: var(--gold); }
+        #proj-name { font-size: 1.2rem; font-weight: bold; color: var(--gold); cursor: pointer; border-bottom: 1px dashed rgba(204,164,59,0.5); }
         
-        .bat-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .bat-item { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; justify-content: space-between; }
+        .bat-list { flex: 1; overflow-y: auto; padding: 15px; }
+        .bat-item { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .bat-item:hover { background: rgba(255,255,255,0.05); }
         .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
         
-        .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
-        .editor-bar { height: 50px; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: rgba(0,0,0,0.2); }
-        .content { flex: 1; overflow-y: auto; padding: 30px; }
+        .bat-actions { display:flex; gap:8px; }
+        .icon-btn { cursor:pointer; font-size:1.1rem; }
+        .handle { cursor: grab; padding-right: 10px; opacity: 0.5; }
 
-        /* BLOCS */
-        .block { display: flex; border: 1px solid var(--gold); margin-bottom: 20px; background: black; height: 300px; }
-        .block-img { width: 60%; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--gold); position: relative; }
+        .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
+        .editor-bar { height: 60px; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: rgba(0,0,0,0.2); }
+        
+        .logo-box { width: 50px; height: 50px; border: 1px dashed #666; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: white; }
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .content { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
+
+        /* PHOTO BLOCK - DESIGN FINAL */
+        .block { 
+            display: flex; 
+            border: 2px solid var(--gold); 
+            margin-bottom: 30px; 
+            background: black; 
+            height: 350px;
+        }
+        
+        .block-img { 
+            width: 60%; 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-right: 1px solid var(--gold); 
+            background: black;
+        }
         .block-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .btn-del-blk { position: absolute; top: 5px; left: 5px; background: var(--red); color: white; border: none; cursor: pointer; padding: 2px 6px; }
         
-        .block-txt { width: 40%; display: flex; flex-direction: column; padding: 10px; background: var(--blue); }
-        .toolbar { display: flex; gap: 5px; margin-bottom: 5px; border-bottom: 1px solid #444; padding-bottom: 5px; }
-        .tb-btn { background: #333; color: white; border: 1px solid #555; width: 25px; height: 25px; cursor: pointer; }
-        .editable { flex: 1; overflow-y: auto; color: white; font-size: 0.95rem; outline: none; }
+        .img-tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; }
+        .tool-btn { background: rgba(0,0,0,0.7); color: white; border: 1px solid white; padding: 4px 8px; font-size: 0.8rem; cursor: pointer; }
+        .tool-btn:hover { background: var(--gold); color: black; border-color: var(--gold); }
+        .btn-del-blk { background: var(--red); border-color: var(--red); }
+
+        .block-txt { 
+            width: 40%; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 15px; 
+            background: var(--blue); /* FOND BLEU TEXTE */
+        }
         
-        /* NOTIFICATIONS */
-        #toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; border-radius: 4px; font-weight: bold; display: none; z-index: 9999; }
-        .toast-ok { background: var(--green); color: white; }
-        .toast-err { background: var(--red); color: white; }
+        .txt-toolbar { margin-bottom: 10px; display: flex; gap: 5px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
+        .style-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
+        .editable { 
+            flex: 1; 
+            overflow-y: auto; 
+            color: white; 
+            font-size: 1rem; 
+            line-height: 1.4;
+            outline: none;
+            border: 1px dotted rgba(255,255,255,0.1);
+            padding: 5px;
+        }
+        .editable:focus { border-color: var(--gold); }
+
+        /* PAINT */
+        #paint-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; flex-direction: column; }
+        .paint-head { height: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid #333; }
+        .paint-tools { height: 60px; display: flex; justify-content: center; align-items: center; gap: 15px; border-top: 1px solid #333; }
+        .p-tool { background: #333; color: white; border: 1px solid #555; width: 35px; height: 35px; cursor: pointer; }
+        .p-tool.active { background: var(--gold); color: black; }
+
+        /* NOTIF */
+        #toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 10px 20px; border-radius: 4px; display: none; z-index:9999; }
     </style>
 </head>
 <body>
 
-<div id="toast"></div>
+<div id="toast">✅ Sauvegardé !</div>
 
 <input type="file" id="f-import" class="hidden" onchange="importFile(this)">
 <input type="file" id="f-photo" class="hidden" multiple accept="image/*" onchange="addPhotos(this)">
 <input type="file" id="f-logo" class="hidden" accept="image/*" onchange="setLogo(this)">
 
 <div id="view-dash">
-    <div class="header" style="width:100%">
-        <div class="logo">STUDIO CCAS v69</div>
-        <div class="status-bar" id="mem-status">Mémoire: OK</div>
-        <div style="display:flex; gap:10px;">
+    <div class="header" style="width: 100%;">
+        <div class="logo">STUDIO CCAS</div>
+        <div class="actions">
             <button class="btn btn-green" onclick="exportPC()">📥 SAUVEGARDE PC</button>
-            <button class="btn" style="border:1px solid #aaa;" onclick="document.getElementById('f-import').click()">📂 Ouvrir</button>
+            <button class="btn" style="background:transparent; border:1px solid white;" onclick="document.getElementById('f-import').click()">📂 CHARGER</button>
         </div>
     </div>
     <div id="grid" class="grid"></div>
-    <div style="margin-top: 40px;">
-        <button class="btn btn-blue" style="padding: 15px 30px; font-size: 1.1rem;" onclick="newProj()">+ NOUVEAU DOSSIER</button>
+    <div style="margin-top: 50px;">
+        <button class="btn btn-blue" style="padding: 15px 40px; font-size: 1.1rem; border: 2px solid var(--gold); color: var(--gold);" onclick="newProj()">+ NOUVEAU DOSSIER</button>
     </div>
 </div>
 
 <div id="view-studio" style="display:none;">
     <div class="sidebar">
         <div class="side-head">
-            <span class="back-link" onclick="goHome()">⬅️ Retour</span>
-            <div id="proj-name" onclick="renameProj()">Projet</div>
+            <span class="back-link" onclick="goHome()">⬅️ Mes Dossiers</span>
+            <div id="proj-name" onclick="renameProj()">...</div>
         </div>
         <div id="bat-list" class="bat-list"></div>
-        <div style="padding:10px;"><button class="btn" style="width:100%; border:1px dashed var(--gold); color:var(--gold); background:transparent;" onclick="newBat()">+ RUBRIQUE</button></div>
+        <div style="padding: 15px;">
+            <button class="btn" style="width: 100%; border: 1px dashed var(--gold); background: transparent; color: var(--gold);" onclick="newBat()">+ RUBRIQUE</button>
+        </div>
     </div>
     
     <div class="editor">
         <div class="editor-bar">
-            <div onclick="document.getElementById('f-logo').click()" style="cursor:pointer; border:1px dashed #555; padding:2px;">
-                <img id="img-logo" src="" style="height:30px; display:none;">
-                <span id="lbl-logo" style="font-size:0.7rem; color:#888;">LOGO</span>
+            <div class="logo-box" onclick="document.getElementById('f-logo').click()">
+                <img id="img-logo" src="" style="display:none; height:100%;">
+                <span id="lbl-logo" style="color:#888; font-size:0.7rem;">LOGO</span>
             </div>
-            <div id="bat-title" style="color:var(--gold); font-weight:bold;">Accueil</div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-green" onclick="saveSite()">💾 SAUVER</button>
-                <button class="btn btn-blue" onclick="genZip()">📦 PDF</button>
+            <div id="bat-title" style="color:var(--gold); font-weight:bold; font-size:1.2rem;">Accueil</div>
+            <div class="actions">
+                <button class="btn btn-green" onclick="exportPC()">💾 SAUVEGARDE PC</button>
+                <button class="btn btn-blue" onclick="genZip()">📦 GÉNÉRER PDF</button>
             </div>
         </div>
         <div id="content" class="content"></div>
     </div>
 </div>
 
-<script>
-/* MOTEUR V69 - GESTION MEMOIRE */
-const STORAGE_KEY = "CCAS_V69_DATA";
-let app = { projects: {}, config: { logo: "" } };
-let curP = null, curB = null;
+<div id="paint-modal">
+    <div class="paint-head">
+        <b>RETOUCHE</b>
+        <div>
+            <button class="btn btn-green" onclick="savePaint()">VALIDER</button>
+            <button class="btn" style="background:transparent; border:1px solid #666;" onclick="closePaint()">ANNULER</button>
+        </div>
+    </div>
+    <div id="canvas-box" style="flex:1; display:flex; justify-content:center; align-items:center; overflow:hidden;">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div class="paint-tools">
+        <button class="p-tool" onclick="tool='rect'">⬜</button>
+        <button class="p-tool" onclick="tool='circle'">⭕</button>
+        <button class="p-tool" onclick="tool='arrow'">↗️</button>
+        <button class="p-tool" onclick="tool='free'">✏️</button>
+        <input type="color" onchange="color=this.value" value="#ff0000">
+        <input type="range" min="1" max="20" value="5" oninput="brushSize=this.value">
+    </div>
+</div>
 
-// CHARGEMENT
-try {
-    const d = localStorage.getItem(STORAGE_KEY);
-    if(d) app = JSON.parse(d);
-    if(app.config.logo) { document.getElementById('img-logo').src=app.config.logo; document.getElementById('img-logo').style.display='block'; document.getElementById('lbl-logo').style.display='none'; }
-} catch(e) { console.log("Reset"); }
+<script>
+/* MOTEUR V70 - LOCALSTORAGE + DOWNLOAD */
+const STORAGE_KEY = "CCAS_V70_FINAL";
+let app = { projects: {}, config: { logo: "" } };
+let curP = null, curB = null, dragSrc = null;
+
+// CHARGEMENT AUTO
+if(localStorage.getItem(STORAGE_KEY)) {
+    try {
+        app = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if(app.config.logo) {
+            document.getElementById('img-logo').src = app.config.logo;
+            document.getElementById('img-logo').style.display = 'block';
+            document.getElementById('lbl-logo').style.display = 'none';
+        }
+    } catch(e) { console.error("Reset data"); }
+}
 renderGrid();
 
-/* SAUVEGARDE INTELLIGENTE */
+/* SYSTEME DE SAUVEGARDE ROBUSTE */
 function saveSite() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
-        notify("Sauvegardé !", "toast-ok");
-        document.getElementById('mem-status').innerText = "Mémoire: OK";
-        document.getElementById('mem-status').style.color = "white";
     } catch(e) {
-        // MEMOIRE PLEINE -> FORCE DOWNLOAD
-        notify("⚠️ MÉMOIRE PLEINE ! TÉLÉCHARGEMENT REQUIS", "toast-err");
-        document.getElementById('mem-status').innerText = "⚠️ MÉMOIRE PLEINE";
-        document.getElementById('mem-status').style.color = "red";
-        exportPC(); // Force le téléchargement pour ne pas perdre les données
+        alert("⚠️ MÉMOIRE NAVIGATEUR PLEINE !\n\nVeuillez cliquer sur 'SAUVEGARDE PC' immédiatement pour ne rien perdre.");
     }
 }
 
-function notify(msg, cls) {
+function exportPC() {
+    saveSite(); // Tente une save locale avant
+    const b = new Blob([JSON.stringify(app)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = `CCAS_SAUVEGARDE_${Date.now()}.json`;
+    a.click();
+    showToast("✅ Sauvegardé sur l'ordinateur !");
+}
+
+function importFile(input) {
+    if(!input.files[0]) return;
+    const r = new FileReader();
+    r.onload = e => {
+        try {
+            app = JSON.parse(e.target.result);
+            saveSite();
+            renderGrid();
+            if(app.config.logo) {
+                document.getElementById('img-logo').src = app.config.logo;
+                document.getElementById('img-logo').style.display = 'block';
+            }
+            showToast("Projet restauré !");
+        } catch(x) { alert("Fichier invalide"); }
+    };
+    r.readAsText(input.files[0]);
+}
+
+function showToast(msg) {
     const t = document.getElementById('toast');
-    t.innerText = msg; t.className = cls; t.style.display = 'block';
+    t.innerText = msg; t.style.display = 'block';
     setTimeout(() => t.style.display = 'none', 3000);
 }
 
-/* EXPORT/IMPORT */
-function exportPC() {
-    const b = new Blob([JSON.stringify(app)], {type:'application/json'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `CCAS_V69_${Date.now()}.json`; a.click();
-}
-function importFile(i) {
-    if(!i.files[0]) return;
-    const r = new FileReader();
-    r.onload = e => { try { app = JSON.parse(e.target.result); saveSite(); renderGrid(); notify("Projet chargé", "toast-ok"); } catch(x){alert("Erreur fichier");} };
-    r.readAsText(i.files[0]);
+/* NAVIGATION */
+function newProj() {
+    const n = prompt("Nom du dossier :");
+    if(n) {
+        const id = 'p' + Date.now();
+        app.projects[id] = { name: n, date: Date.now(), data: {} };
+        saveSite();
+        renderGrid();
+        openProj(id);
+    }
 }
 
-/* NAVIGATION */
-function newProj() { const n = prompt("Nom :"); if(n) { const id = 'p'+Date.now(); app.projects[id] = {name:n, date:Date.now(), data:{}}; saveSite(); renderGrid(); openProj(id); } }
-function openProj(id) { curP=id; curB=null; document.getElementById('view-dash').style.display='none'; document.getElementById('view-studio').style.display='flex'; document.getElementById('proj-name').innerText=app.projects[id].name; if(Object.keys(app.projects[id].data).length===0) app.projects[id].data["Zone 1"]=[]; renderBats(); openBat(Object.keys(app.projects[id].data)[0]); }
-function goHome() { document.getElementById('view-studio').style.display='none'; document.getElementById('view-dash').style.display='flex'; curP=null; renderGrid(); }
-function renderGrid() { const g = document.getElementById('grid'); g.innerHTML=''; Object.keys(app.projects).forEach(id => { const p=app.projects[id]; const d=document.createElement('div'); d.className='card'; d.innerHTML=`<div class="card-del" onclick="delProj('${id}',event)">×</div><div style="font-size:2rem;margin-bottom:10px;">📁</div><b>${p.name}</b>`; d.onclick=()=>openProj(id); g.appendChild(d); }); }
-function delProj(id,e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete app.projects[id]; saveSite(); renderGrid(); } }
-function renameProj() { const n=prompt("Nom :", app.projects[curP].name); if(n) { app.projects[curP].name=n; document.getElementById('proj-name').innerText=n; saveSite(); } }
+function openProj(id) {
+    curP = id; curB = null;
+    document.getElementById('view-dash').style.display = 'none';
+    document.getElementById('view-studio').style.display = 'flex';
+    document.getElementById('proj-name').innerText = app.projects[id].name;
+    if(Object.keys(app.projects[id].data).length === 0) app.projects[id].data["Zone 1"] = [];
+    renderBats();
+    openBat(Object.keys(app.projects[id].data)[0]);
+}
+
+function renameProj() {
+    const n = prompt("Nouveau nom :", app.projects[curP].name);
+    if(n) { app.projects[curP].name = n; document.getElementById('proj-name').innerText = n; saveSite(); }
+}
+
+function goHome() {
+    document.getElementById('view-studio').style.display = 'none';
+    document.getElementById('view-dash').style.display = 'flex';
+    curP = null;
+    renderGrid();
+}
+
+function renderGrid() {
+    const g = document.getElementById('grid'); g.innerHTML = '';
+    Object.keys(app.projects).sort((a,b) => app.projects[b].date - app.projects[a].date).forEach(id => {
+        const p = app.projects[id];
+        const d = document.createElement('div'); d.className = 'card';
+        d.innerHTML = `<div class="card-del" onclick="delProj('${id}', event)">×</div><div style="font-size:3rem; margin-bottom:10px;">📁</div><div class="card-title">${p.name}</div>`;
+        d.onclick = () => openProj(id);
+        g.appendChild(d);
+    });
+}
+
+function delProj(id, e) {
+    e.stopPropagation();
+    if(confirm("Supprimer ce dossier ?")) { delete app.projects[id]; saveSite(); renderGrid(); }
+}
 
 /* RUBRIQUES */
-function newBat() { const n=prompt("Nom :"); if(n) { if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; saveSite(); openBat(n); } }
+function newBat() {
+    const n = prompt("Nom de la rubrique :");
+    if(n) {
+        if(!app.projects[curP].data[n]) app.projects[curP].data[n] = [];
+        saveSite();
+        openBat(n);
+    }
+}
+
 function renderBats() {
     const l = document.getElementById('bat-list'); l.innerHTML = '';
     Object.keys(app.projects[curP].data).forEach(b => {
-        const d = document.createElement('div'); d.className = `bat-item ${curB===b ? 'active':''}`;
-        d.innerHTML = `<span onclick="openBat('${b}')" style="flex:1;">${b}</span> <span onclick="delBat('${b}',event)" style="color:var(--red);font-weight:bold;">×</span>`;
+        const d = document.createElement('div'); d.className = `bat-item ${curB === b ? 'active' : ''}`;
+        d.draggable = true;
+        d.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px; flex:1;">
+                <span class="handle">☰</span>
+                <span onclick="openBat('${b}')" style="flex:1;">${b}</span>
+            </div>
+            <div class="bat-actions">
+                <span class="icon-btn icon-edit" onclick="renBat('${b}', event)">✏️</span>
+                <span class="icon-btn icon-del" onclick="delBat('${b}', event)">×</span>
+            </div>`;
+        
+        d.ondragstart = e => { dragSrc = b; e.dataTransfer.effectAllowed = 'move'; };
+        d.ondragover = e => e.preventDefault();
+        d.ondrop = e => {
+            e.stopPropagation();
+            if(dragSrc !== b) {
+                const data = app.projects[curP].data;
+                const keys = Object.keys(data);
+                const fromIdx = keys.indexOf(dragSrc);
+                const toIdx = keys.indexOf(b);
+                const newObj = {};
+                keys.splice(toIdx, 0, keys.splice(fromIdx, 1)[0]);
+                keys.forEach(k => newObj[k] = data[k]);
+                app.projects[curP].data = newObj;
+                saveSite();
+                renderBats();
+            }
+        };
         l.appendChild(d);
     });
 }
-function openBat(b) { curB=b; document.getElementById('bat-title').innerText=b; renderBats(); renderContent(); }
-function delBat(b,e) { e.stopPropagation(); if(confirm("Supprimer ?")) { delete app.projects[curP].data[b]; saveSite(); if(curB===b) curB=null; renderBats(); renderContent(); } }
 
-/* PHOTOS & TEXTE */
+function openBat(b) { curB = b; document.getElementById('bat-title').innerText = b; renderBats(); renderContent(); }
+
+function renBat(oldName, e) {
+    e.stopPropagation();
+    const n = prompt("Renommer la rubrique :", oldName);
+    if(n && n !== oldName && !app.projects[curP].data[n]) {
+        const data = app.projects[curP].data;
+        const newObj = {};
+        Object.keys(data).forEach(k => {
+            if(k === oldName) newObj[n] = data[k]; else newObj[k] = data[k];
+        });
+        app.projects[curP].data = newObj;
+        saveSite();
+        if(curB === oldName) openBat(n); else renderBats();
+    }
+}
+
+function delBat(b, e) {
+    e.stopPropagation();
+    if(confirm("Supprimer la rubrique " + b + " ?")) {
+        delete app.projects[curP].data[b];
+        if(curB === b) curB = null;
+        saveSite();
+        renderBats();
+        renderContent();
+    }
+}
+
+/* PHOTOS & CONTENU */
 function addPhotos(input) {
     if(!curB) return alert("Sélectionnez une rubrique !");
     if(!input.files.length) return;
+    
     Array.from(input.files).forEach(f => {
         const r = new FileReader();
         r.onload = e => {
             const img = new Image();
             img.onload = () => {
-                const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d');
-                // COMPRESSION ULTRA AGRESSIVE (MAX 600px, Qualité 0.5) POUR LE STOCKAGE GITHUB
-                let w = img.width, h = img.height; const max = 600;
+                const cvs = document.createElement('canvas');
+                const ctx = cvs.getContext('2d');
+                let w = img.width, h = img.height;
+                const max = 800; // COMPRESSION ANTI-CRASH
                 if(w > max) { h *= max/w; w = max; }
                 cvs.width = w; cvs.height = h;
                 ctx.drawImage(img, 0, 0, w, h);
-                app.projects[curP].data[curB].push({ src: cvs.toDataURL('image/jpeg', 0.5), text: "Description..." });
-                saveSite(); renderContent();
-            }; img.src = e.target.result;
-        }; r.readAsDataURL(f);
+                
+                app.projects[curP].data[curB].push({
+                    src: cvs.toDataURL('image/jpeg', 0.6), // Qualité 60% pour éviter surcharge
+                    text: "Description..."
+                });
+                saveSite();
+                renderContent();
+            };
+            img.src = e.target.result;
+        };
+        r.readAsDataURL(f);
     });
     input.value = '';
 }
@@ -210,72 +440,194 @@ function addPhotos(input) {
 function renderContent() {
     const c = document.getElementById('content'); c.innerHTML = '';
     if(!curB) return;
+    
     const btn = document.createElement('div');
-    btn.style = "border:2px dashed var(--gold); padding:15px; text-align:center; color:var(--gold); cursor:pointer; margin-bottom:20px;";
-    btn.innerText = "+ AJOUTER PHOTOS";
+    btn.style = "border:2px dashed var(--gold); padding:20px; text-align:center; cursor:pointer; color:var(--gold); font-weight:bold; margin-bottom:20px;";
+    btn.innerText = "+ AJOUTER DES PHOTOS";
     btn.onclick = () => document.getElementById('f-photo').click();
     c.appendChild(btn);
-
+    
     app.projects[curP].data[curB].forEach((item, idx) => {
         const b = document.createElement('div'); b.className = 'block';
+        b.draggable = true;
         b.innerHTML = `
+            <div class="drag-handle">☰</div>
             <div class="block-img">
-                <button class="btn-del-blk" onclick="delPhoto(${idx})">✖</button>
-                <img src="${item.src}">
+                <div class="img-tools">
+                    <button class="tool-btn btn-del-blk" onclick="delPhoto(${idx})">✖</button>
+                    <button class="tool-btn" onclick="editPhoto(${idx})">🎨 Retouche</button>
+                </div>
+                <div class="img-wrap"><img src="${item.src}"></div>
             </div>
             <div class="block-txt">
-                <div class="toolbar">
-                    <button class="tb-btn" onclick="document.execCommand('bold')">B</button>
-                    <button class="tb-btn" onclick="document.execCommand('italic')">I</button>
-                    <button class="tb-btn" onclick="document.execCommand('underline')">U</button>
-                    <input type="color" onchange="document.execCommand('foreColor',false,this.value)" style="width:25px;height:25px;border:none;">
+                <div class="txt-toolbar">
+                    <button class="style-btn" onclick="document.execCommand('bold')"><b>B</b></button>
+                    <button class="style-btn" onclick="document.execCommand('italic')"><i>I</i></button>
+                    <button class="style-btn" onclick="document.execCommand('underline')"><u>U</u></button>
+                    <input type="color" onchange="document.execCommand('foreColor', false, this.value)" style="background:none; border:none; width:25px; height:25px; cursor:pointer;">
                 </div>
                 <div class="editable" contenteditable="true" oninput="updTxt(${idx}, this.innerHTML)">${item.text}</div>
-            </div>`;
+            </div>
+        `;
+        
+        b.ondragstart = e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('idx', idx); };
+        b.ondragover = e => e.preventDefault();
+        b.ondrop = e => {
+            e.stopPropagation();
+            const from = e.dataTransfer.getData('idx');
+            if(from !== "") {
+                const arr = app.projects[curP].data[curB];
+                const moved = arr.splice(from, 1)[0];
+                arr.splice(idx, 0, moved);
+                saveSite();
+                renderContent();
+            }
+        };
+        
         c.appendChild(b);
     });
 }
-function updTxt(i, t) { app.projects[curP].data[curB][i].text = t; clearTimeout(window.st); window.st=setTimeout(saveSite, 1000); }
-function delPhoto(i) { if(confirm("Supprimer ?")) { app.projects[curP].data[curB].splice(i,1); saveSite(); renderContent(); } }
 
-function setLogo(i) { if(i.files[0]) { const r = new FileReader(); r.onload = e => { app.config.logo = e.target.result; document.getElementById('img-logo').src = e.target.result; document.getElementById('img-logo').style.display='block'; document.getElementById('lbl-logo').style.display='none'; saveSite(); }; r.readAsDataURL(i.files[0]); } }
+function updTxt(idx, txt) {
+    app.projects[curP].data[curB][idx].text = txt;
+    clearTimeout(window.st); window.st = setTimeout(saveSite, 1000);
+}
 
-/* PDF GENERATOR */
+function delPhoto(idx) {
+    if(confirm("Supprimer ?")) {
+        app.projects[curP].data[curB].splice(idx, 1);
+        saveSite();
+        renderContent();
+    }
+}
+
+/* PAINT */
+let pIdx, pImg, tool='rect', color='#ff0000', brushSize=5, draw=false, sx, sy;
+function editPhoto(idx) {
+    pIdx = idx;
+    const src = app.projects[curP].data[curB][idx].src;
+    pImg = new Image();
+    pImg.onload = () => {
+        const cvs = document.getElementById('canvas');
+        cvs.width = pImg.width;
+        cvs.height = pImg.height;
+        cvs.getContext('2d').drawImage(pImg, 0, 0);
+        document.getElementById('paint-modal').style.display = 'flex';
+    };
+    pImg.src = src;
+}
+function savePaint() {
+    app.projects[curP].data[curB][pIdx].src = document.getElementById('canvas').toDataURL('image/jpeg', 0.8);
+    saveSite();
+    document.getElementById('paint-modal').style.display = 'none';
+    renderContent();
+}
+function closePaint() { document.getElementById('paint-modal').style.display = 'none'; }
+
+const cvs = document.getElementById('canvas');
+cvs.addEventListener('mousedown', e => { draw=true; const r=cvs.getBoundingClientRect(); const s=cvs.width/r.width; sx=(e.clientX-r.left)*s; sy=(e.clientY-r.top)*s; cvs.getContext('2d').beginPath(); });
+cvs.addEventListener('mousemove', e => { if(!draw)return; const ctx=cvs.getContext('2d'); const r=cvs.getBoundingClientRect(); const s=cvs.width/r.width; const x=(e.clientX-r.left)*s; const y=(e.clientY-r.top)*s; ctx.strokeStyle=color; ctx.lineWidth=brushSize; ctx.lineCap="round"; if(tool==='free'){ctx.lineTo(x,y);ctx.stroke();} });
+cvs.addEventListener('mouseup', e => { draw=false; if(tool!=='free'){ const ctx=cvs.getContext('2d'); const r=cvs.getBoundingClientRect(); const s=cvs.width/r.width; const x=(e.clientX-r.left)*s; const y=(e.clientY-r.top)*s; ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=brushSize; if(tool==='rect') ctx.strokeRect(sx,sy,x-sx,y-sy); if(tool==='circle'){const rad=Math.sqrt(Math.pow(x-sx,2)+Math.pow(y-sy,2)); ctx.arc(sx,sy,rad,0,2*Math.PI); ctx.stroke();} if(tool==='arrow'){ctx.moveTo(sx,sy); ctx.lineTo(x,y); ctx.stroke(); 
+const angle = Math.atan2(y-sy, x-sx); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x-15*Math.cos(angle-Math.PI/6), y-15*Math.sin(angle-Math.PI/6)); ctx.moveTo(x, y); ctx.lineTo(x-15*Math.cos(angle+Math.PI/6), y-15*Math.sin(angle+Math.PI/6)); ctx.stroke();
+} } });
+
+/* CONFIG LOGO */
+function setLogo(input) {
+    if(input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+            app.config.logo = e.target.result;
+            document.getElementById('img-logo').src = e.target.result;
+            document.getElementById('img-logo').style.display = 'block';
+            document.getElementById('lbl-logo').style.display = 'none';
+            saveSite();
+        };
+        r.readAsDataURL(input.files[0]);
+    }
+}
+
+/* PDF/ZIP GENERATOR */
 function genZip() {
     if(!window.JSZip) return alert("Erreur ZIP");
     const proj = app.projects[curP];
-    const json = JSON.stringify(proj.data).replace(/</g, '\\u003c');
-    const logo = app.config.logo || "";
+    const jsonData = JSON.stringify(proj.data).replace(/</g, '\\u003c');
+    const logoSrc = app.config.logo || "";
     
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${proj.name}</title><style>
-    body{margin:0;background:#0A1A3C;color:white;font-family:sans-serif;height:100vh;display:flex;overflow:hidden;}
-    #side{width:280px;background:rgba(0,0,0,0.3);border-right:3px solid #CCA43B;display:flex;flex-direction:column;}
-    .head{padding:20px;color:#CCA43B;font-weight:800;border-bottom:1px solid #555;text-align:center;text-transform:uppercase;}
-    .btn{width:100%;padding:15px;color:#ccc;background:none;border:none;text-align:left;cursor:pointer;border-bottom:1px solid #444;}
-    .btn.active{color:#CCA43B;border-left:5px solid #CCA43B;background:rgba(204,164,59,0.1);font-weight:bold;}
-    #main{flex:1;display:flex;flex-direction:column;position:relative;}
-    .view{height:75vh;width:100%;display:flex;align-items:center;justify-content:center;background:black;border-bottom:3px solid #CCA43B;}
-    .view img {max-width:100%;max-height:100%;}
-    .bot{height:25vh;background:#0A1A3C;padding:20px 40px;overflow-y:auto;}
-    #desc{color:white;font-size:1.3rem;} #desc * {background:transparent!important;} #desc font {color:inherit;}
-    #tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #555;padding-bottom:10px;margin-top:0;}
-    .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(204,164,59,0.5);color:white;border:none;font-size:40px;padding:10px;cursor:pointer;border-radius:50%;}
-    .p{left:20px;} .n{right:20px;}
-    .top-logo{position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.9);padding:5px;border:1px solid #CCA43B;border-radius:4px;}
-    @media print{ #side,.nav{display:none;} .view{height:70vh;} .bot{height:30vh;} }
-    </style></head><body>
+    // HTML FINAL IDENTIQUE AU DESIGN EDITEUR
+    const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { margin:0; background:#0A1A3C; color:white; font-family:'Segoe UI', sans-serif; height:100vh; display:flex; overflow:hidden; }
+    #side { width:280px; background:rgba(0,0,0,0.3); border-right:3px solid #CCA43B; display:flex; flex-direction:column; }
+    .head { padding:20px; color:#CCA43B; font-weight:800; border-bottom:1px solid #555; text-align:center; font-size:1.2rem; text-transform:uppercase; }
+    .btn { width:100%; padding:15px; color:#ccc; background:none; border:none; text-align:left; cursor:pointer; border-bottom:1px solid #444; font-size:1rem; }
+    .btn.active { color:#CCA43B; border-left:5px solid #CCA43B; background:rgba(204,164,59,0.1); font-weight:bold; }
+    #main { flex:1; display:flex; flex-direction:column; position:relative; }
+    .view { height:75vh; width:100%; display:flex; align-items:center; justify-content:center; background:black; border-bottom:3px solid #CCA43B; position:relative; }
+    .frame img { max-width:100%; max-height:100%; object-fit:contain; }
+    .bot { height:25vh; background:#0A1A3C; padding:20px 40px; overflow-y:auto; box-sizing:border-box; }
+    #desc { color:white; font-size:1.3rem; line-height:1.5; }
+    #desc * { background:transparent !important; }
+    #desc font { color:inherit; }
+    #tit { color:#CCA43B; text-transform:uppercase; border-bottom:1px solid #555; padding-bottom:10px; margin-top:0; font-size:1.4rem; }
+    .nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(204,164,59,0.5); color:white; border:none; font-size:40px; padding:10px; cursor:pointer; border-radius:50%; }
+    .p { left:20px; } .n { right:20px; }
+    .pdf-btn { position:absolute; top:10px; left:10px; background:#c0392b; color:white; border:none; padding:5px 15px; border-radius:4px; font-weight:bold; cursor:pointer; z-index:99; }
+    .top-logo { position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.9); padding:5px 10px; border:1px solid #CCA43B; display:flex; align-items:center; border-radius:4px; }
+    @media print { #side, .nav, .pdf-btn { display:none; } .view { height:70vh; page-break-inside:avoid; } .bot { height:30vh; page-break-after:always; } }
+</style>
+</head>
+<body>
+    <button class="pdf-btn" onclick="window.print()">🖨️ IMPRIMER / PDF</button>
     <div id="side"><div class="head">${proj.name}</div><div id="nav"></div></div>
-    <div id="main"><div class="view"><div class="top-logo"><img src="${logo}" height="40"></div><div id="sc"></div></div><div class="bot"><h2 id="tit"></h2><div id="desc"></div></div></div>
+    <div id="main">
+        <div class="view"><div class="top-logo"><img src="${logoSrc}" height="40"></div><div id="sc"></div></div>
+        <div class="bot"><h2 id="tit"></h2><div id="desc"></div></div>
+    </div>
     <script>
-    const d=${json}; let k=Object.keys(d), cb=k[0], ci=0;
-    function rn(){ const n=document.getElementById('nav'); n.innerHTML=''; k.forEach(x=>{ const b=document.createElement('button'); b.className='btn'+(cb===x?' active':''); b.innerText=x; b.onclick=()=>{cb=x;ci=0;sh();rn()}; n.appendChild(b); }); }
-    function sh(){ const s=document.getElementById('sc'), i=d[cb]; if(!i||!i.length){ s.innerHTML=''; return; } const it=i[ci]; s.innerHTML='<img src="'+it.src+'">'; document.getElementById('tit').innerText=cb+" ("+(ci+1)+"/"+i.length+")"; document.getElementById('desc').innerHTML=it.text;
-    document.querySelectorAll('.nav').forEach(e=>e.remove()); if(i.length>1){ const p=document.createElement('button'); p.className='nav p'; p.innerText='❮'; p.onclick=()=>{ci=(ci-1+i.length)%i.length;sh()}; document.querySelector('.view').appendChild(p); const n=document.createElement('button'); n.className='nav n'; n.innerText='❯'; n.onclick=()=>{ci=(ci+1)%i.length;sh()}; document.querySelector('.view').appendChild(n); } }
-    if(k.length){rn();sh();}
-    <\/script></body></html>`;
-    
-    const z = new JSZip(); z.file("Dossier_"+proj.name+".html", html);
-    z.generateAsync({type:"blob"}).then(b=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="Dossier_"+proj.name+".zip"; a.click(); });
+        const data = ${jsonData};
+        const keys = Object.keys(data);
+        let cBat = keys[0];
+        let cIdx = 0;
+        function renderNav() {
+            const n = document.getElementById('nav'); n.innerHTML = '';
+            keys.forEach(k => {
+                const b = document.createElement('button');
+                b.className = 'btn' + (cBat === k ? ' active' : '');
+                b.innerText = k;
+                b.onclick = () => { cBat = k; cIdx = 0; show(); renderNav(); };
+                n.appendChild(b);
+            });
+        }
+        function show() {
+            const s = document.getElementById('sc');
+            const arr = data[cBat];
+            document.querySelectorAll('.nav').forEach(e => e.remove());
+            if(!arr || !arr.length) { s.innerHTML = ''; document.getElementById('tit').innerText = cBat; document.getElementById('desc').innerHTML = "Aucune photo."; return; }
+            const item = arr[cIdx];
+            s.innerHTML = '<img src="' + item.src + '">';
+            document.getElementById('tit').innerText = cBat + " (" + (cIdx + 1) + "/" + arr.length + ")";
+            document.getElementById('desc').innerHTML = item.text;
+            if(arr.length > 1) {
+                const prev = document.createElement('button'); prev.className='nav p'; prev.innerText='❮'; prev.onclick = () => { cIdx = (cIdx - 1 + arr.length) % arr.length; show(); }; document.querySelector('.view').appendChild(prev);
+                const next = document.createElement('button'); next.className='nav n'; next.innerText='❯'; next.onclick = () => { cIdx = (cIdx + 1) % arr.length; show(); }; document.querySelector('.view').appendChild(next);
+            }
+        }
+        if(keys.length) { renderNav(); show(); }
+    <\/script>
+</body>
+</html>`;
+
+    const z = new JSZip();
+    z.file("Dossier_" + proj.name + ".html", htmlContent);
+    z.generateAsync({type:"blob"}).then(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = "Dossier_" + proj.name + ".zip";
+        a.click();
+    });
 }
 </script>
 </body>
