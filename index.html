@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio CCAS | v63 STABLE</title>
+    <title>Studio CCAS | v64 RESTORED</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         /* --- CHARTE GRAPHIQUE --- */
@@ -11,7 +11,7 @@
         
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
         * { box-sizing: border-box; outline: none; }
-        button { cursor: pointer; transition: 0.1s; } button:active { transform: scale(0.98); }
+        button { cursor: pointer; transition: 0.1s; font-family: inherit; } button:active { transform: scale(0.98); }
         .hidden { display: none !important; }
 
         /* HEADER */
@@ -45,9 +45,15 @@
         .bat-item.active { background: white; color: var(--blue); border-left-color: var(--gold); font-weight: bold; }
         .bat-item.dragging { opacity: 0.5; border: 1px dashed white; }
         .handle { cursor: grab; padding-right: 10px; opacity: 0.5; font-size: 1.2rem; }
+        
+        /* Actions Batiment (Renommer/Supprimer) */
+        .bat-actions { display:flex; gap:5px; }
+        .icon-btn { width:24px; height:24px; border-radius:4px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+        .icon-edit { background:#3498db; }
+        .icon-del { background:#e74c3c; }
 
-        /* STUDIO: EDITOR (DESIGN BLEU AUSSI) */
-        .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); } /* FOND BLEU DEMANDÉ */
+        /* STUDIO: EDITOR (DESIGN BLEU) */
+        .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
         
         .editor-tools { height: 70px; background: white; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
         .logo-box { width: 50px; height: 50px; border: 1px dashed #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: white; }
@@ -69,12 +75,12 @@
         .block-txt { flex: 1; padding: 20px; display: flex; flex-direction: column; background: #fdfdfd; }
         .txt-toolbar { display: flex; gap: 5px; margin-bottom: 10px; background: #eee; padding: 5px; border-radius: 6px; align-items: center; }
         .t-btn { width: 30px; height: 30px; border: 1px solid #ccc; background: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
-        /* ZONE TEXTE GRIS FONCÉ POUR VOIR LES COULEURS CLAIRES */
+        /* ZONE TEXTE GRIS FONCÉ */
         .editable { flex: 1; border: 1px solid #333; border-radius: 6px; padding: 15px; overflow-y: auto; background: #222; color: white; font-size: 16px; line-height: 1.5; }
         .editable:focus { border-color: var(--gold); outline: none; }
 
-        /* LOADING */
-        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        /* LOADING & TOAST */
+        #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
         .bar-bg { width: 300px; height: 10px; background: #ddd; border-radius: 5px; margin-top: 20px; overflow: hidden; }
         .bar-fill { height: 100%; width: 0%; background: var(--green); transition: width 0.2s; }
         
@@ -86,12 +92,14 @@
         .paint-top { height: 50px; background: #333; padding: 0 20px; display:flex; justify-content:space-between; align-items:center; color:white; }
         #canvas-box { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .paint-tools { height: 60px; background: #333; display: flex; justify-content: center; align-items: center; gap: 15px; color:white; }
+        .p-btn { width: 40px; height: 40px; background:#555; color:white; border:1px solid #777; font-size:18px; }
+        .p-btn.active { background:var(--gold); color:black; }
     </style>
 </head>
 <body>
 
 <div id="toast">Message</div>
-<div id="loader">
+<div id="loading">
     <h2 style="color:var(--blue);">Traitement...</h2>
     <div class="bar-bg"><div class="bar-fill" id="progress"></div></div>
 </div>
@@ -102,7 +110,7 @@
 
 <div id="view-dashboard">
     <div class="header">
-        <div class="title"><h1>STUDIO CCAS <span class="badge">v63</span></h1></div>
+        <div class="title"><h1>STUDIO CCAS <span class="badge">v64 FULL</span></h1></div>
         <div class="actions">
             <button class="btn btn-green" onclick="exportData()">📥 SAUVEGARDE PC</button>
             <button class="btn btn-outline" onclick="document.getElementById('f-import').click()">📂 CHARGER</button>
@@ -119,7 +127,7 @@
         <div class="side-head">
             <button class="back-btn" onclick="goHome()">⬅️ RETOUR ACCUEIL</button>
             <div style="text-align:center; margin-top:10px;">
-                <span id="proj-title" onclick="renameProj()" title="Renommer" style="color:white; font-weight:bold;">Projet</span>
+                <span id="proj-title" onclick="renameProj()" title="Renommer">Projet</span>
             </div>
         </div>
         <div id="bat-list" class="bat-list"></div>
@@ -128,7 +136,7 @@
     <div class="editor">
         <div class="editor-tools">
             <div class="logo-box" onclick="document.getElementById('f-logo').click()" title="Changer Logo">
-                <img id="img-logo" src="" onerror="this.style.display='none'; this.parentNode.innerText='LOGO';">
+                <img id="img-logo" src="https://upload.wikimedia.org/wikipedia/fr/thumb/8/8f/Logo_Cr%C3%A9teil.svg/1200px-Logo_Cr%C3%A9teil.svg.png" onerror="this.src='https://via.placeholder.com/50?text=LOGO'">
             </div>
             <div id="bat-title" style="font-weight:bold; color:var(--blue); font-size:1.2rem;">Accueil</div>
             <div class="actions">
@@ -147,13 +155,19 @@
     </div>
     <div id="canvas-box"><canvas id="canvas"></canvas></div>
     <div class="paint-tools">
-        <button onclick="tool='rect'">⬜</button> <button onclick="tool='circle'">⭕</button> <button onclick="tool='arrow'">↗️</button> <button onclick="tool='free'">✏️</button>
-        <input type="color" onchange="color=this.value" value="#ff0000"> <input type="range" min="2" max="20" value="5" oninput="width=this.value">
+        <button class="p-btn" onclick="setTool('rect')">⬜</button> 
+        <button class="p-btn" onclick="setTool('circle')">⭕</button> 
+        <button class="p-btn" onclick="setTool('arrow')">↗️</button> 
+        <button class="p-btn" onclick="setTool('free')">✏️</button>
+        <span style="margin-left:10px">Couleur:</span>
+        <input type="color" onchange="color=this.value" value="#ff0000"> 
+        <span style="margin-left:10px">Épaisseur:</span>
+        <input type="range" min="1" max="30" value="5" oninput="brushSize=this.value">
     </div>
 </div>
 
 <script>
-/* MOTEUR V63 - STABLE RAM - DESIGN FIX */
+/* MOTEUR V64 - FULL RESTORED */
 let app = { projects: {}, config: { logo: "" } };
 let curP = null, curB = null, dragSrc = null;
 
@@ -170,7 +184,7 @@ function renderGrid(){
         d.onclick=()=>{ openProj(id); }; g.appendChild(d);
     });
 }
-function addProj(){ const n=prompt("Nom du dossier :"); if(n){ const id='p'+Date.now(); app.projects[id]={name:n,date:Date.now(),data:{}}; renderGrid(); openProj(id); } }
+function addProj(){ const n=prompt("Nom :"); if(n){ const id='p'+Date.now(); app.projects[id]={name:n,date:Date.now(),data:{}}; renderGrid(); openProj(id); } }
 function delProj(id,e){ e.stopPropagation(); if(confirm("Supprimer ?")){ delete app.projects[id]; renderGrid(); } }
 function goHome(){ 
     if(confirm("ATTENTION : Avez-vous fait une SAUVEGARDE PC ?")) {
@@ -183,8 +197,9 @@ function openProj(id){
     if(Object.keys(app.projects[id].data).length===0) app.projects[id].data["Zone 1"]=[];
     renderBats();
     const first=Object.keys(app.projects[id].data)[0]; if(first) openBat(first);
-    if(app.config.logo) { document.getElementById('img-logo').src=app.config.logo; document.getElementById('img-logo').style.display='block'; }
+    if(app.config.logo) document.getElementById('img-logo').src=app.config.logo;
 }
+// FONCTION RENOMMER PROJET (Restaurée)
 function renameProj(){
     const n = prompt("Renommer le projet :", app.projects[curP].name);
     if(n){ app.projects[curP].name=n; document.getElementById('proj-title').innerText=n; }
@@ -192,13 +207,31 @@ function renameProj(){
 
 /* --- BATIMENTS --- */
 function addBat(){ const n=prompt("Nom :"); if(n){ if(!app.projects[curP].data[n]) app.projects[curP].data[n]=[]; openBat(n); } }
+// FONCTION RENOMMER BATIMENT (Restaurée)
+function renameBat(oldName,e){
+    e.stopPropagation();
+    const n = prompt("Renommer :", oldName);
+    if(n && n!==oldName && !app.projects[curP].data[n]){
+        const data = app.projects[curP].data;
+        const keys = Object.keys(data);
+        const newData = {};
+        keys.forEach(k => { if(k===oldName) newData[n]=data[k]; else newData[k]=data[k]; });
+        app.projects[curP].data = newData;
+        if(curB===oldName) openBat(n); else renderBats();
+    }
+}
 function renderBats(){
     const l=document.getElementById('bat-list'); l.innerHTML='';
     const bats=Object.keys(app.projects[curP].data);
     bats.forEach(b=>{
         const d=document.createElement('div'); d.className=`bat-item ${curB===b?'active':''}`;
         d.draggable=true; d.dataset.bat=b;
-        d.innerHTML=`<span class="handle">☰</span><span onclick="openBat('${b}')" style="flex:1;font-weight:bold;">${b}</span><span onclick="delBat('${b}',event)" style="color:#e74c3c;font-weight:bold;">×</span>`;
+        d.innerHTML=`
+            <div style="display:flex;align-items:center;flex:1;"><span class="handle">☰</span><span onclick="openBat('${b}')" style="flex:1;font-weight:bold;">${b}</span></div>
+            <div class="bat-actions">
+                <div class="icon-btn icon-edit" onclick="renameBat('${b}',event)">✏️</div>
+                <div class="icon-btn icon-del" onclick="delBat('${b}',event)">×</div>
+            </div>`;
         d.ondragstart=e=>{ dragSrc=d; e.dataTransfer.effectAllowed='move'; };
         d.ondragover=e=>{ e.preventDefault(); };
         d.ondrop=function(e){
@@ -280,24 +313,26 @@ function renderContent(){
 function updTxt(i,t){ app.projects[curP].data[curB][i].text=t; }
 function delItem(i){ if(confirm("Supprimer ?")){ app.projects[curP].data[curB].splice(i,1); renderContent(); } }
 
-/* --- PAINT --- */
-let pIdx, pImg, tool='rect', color='#ff0000', width=5, draw=false, sx, sy;
+/* --- PAINT RESTORED (VARIABLE FIX) --- */
+let pIdx, pImg, tool='rect', color='#ff0000', brushSize=5, draw=false, sx, sy; // brushSize reinstated
 function editP(i){ pIdx=i; const s=app.projects[curP].data[curB][i].src; pImg=new Image(); pImg.onload=()=>{ const cvs=document.getElementById('canvas'); cvs.width=pImg.width; cvs.height=pImg.height; cvs.getContext('2d').drawImage(pImg,0,0); document.getElementById('paint-modal').style.display='flex'; }; pImg.src=s; }
 function savePaint(){ app.projects[curP].data[curB][pIdx].src=document.getElementById('canvas').toDataURL('image/jpeg',0.8); closePaint(); renderContent(); }
 function closePaint(){ document.getElementById('paint-modal').style.display='none'; }
+function setTool(t){ tool=t; }
+
 const cvs=document.getElementById('canvas');
 cvs.addEventListener('mousedown',e=>{ draw=true; const r=cvs.getBoundingClientRect(), s=cvs.width/r.width; sx=(e.clientX-r.left)*s; sy=(e.clientY-r.top)*s; cvs.getContext('2d').beginPath(); });
 cvs.addEventListener('mousemove',e=>{ 
     if(!draw)return; 
     const r=cvs.getBoundingClientRect(), s=cvs.width/r.width, x=(e.clientX-r.left)*s, y=(e.clientY-r.top)*s, ctx=cvs.getContext('2d'); 
-    ctx.strokeStyle=color; ctx.lineWidth=width; ctx.lineCap="round"; 
+    ctx.strokeStyle=color; ctx.lineWidth=brushSize; ctx.lineCap="round"; 
     if(tool==='free'){ ctx.lineTo(x,y); ctx.stroke(); } 
 });
 cvs.addEventListener('mouseup',e=>{ 
     draw=false; 
     if(tool!=='free'){ 
         const ctx=cvs.getContext('2d'), r=cvs.getBoundingClientRect(), s=cvs.width/r.width, x=(e.clientX-r.left)*s, y=(e.clientY-r.top)*s; 
-        ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=width; 
+        ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=brushSize; 
         if(tool==='rect') ctx.strokeRect(sx,sy,x-sx,y-sy); 
         if(tool==='circle'){let rad=Math.sqrt(Math.pow(x-sx,2)+Math.pow(y-sy,2)); ctx.arc(sx,sy,rad,0,2*Math.PI); ctx.stroke();} 
         if(tool==='arrow'){ctx.moveTo(sx,sy); ctx.lineTo(x,y); ctx.stroke();} 
@@ -307,9 +342,9 @@ cvs.addEventListener('mouseup',e=>{
 /* --- FILES --- */
 function exportData(){ const b=new Blob([JSON.stringify(app)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`CCAS_FULL.json`; a.click(); toast("Fichier téléchargé"); }
 function importData(i){ if(!i.files[0])return; const r=new FileReader(); r.onload=e=>{ try{ app=JSON.parse(e.target.result); renderGrid(); toast("Chargé"); }catch(x){alert("Fichier invalide");} }; r.readAsText(i.files[0]); }
-function setLogo(i){ if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; document.getElementById('img-logo').style.display='block'; }; r.readAsDataURL(i.files[0]); } }
+function setLogo(i){ if(i.files[0]){ const r=new FileReader(); r.onload=e=>{ app.config.logo=e.target.result; document.getElementById('img-logo').src=e.target.result; }; r.readAsDataURL(i.files[0]); } }
 
-/* --- ZIP (FIX COULEUR TEXTE) --- */
+/* --- ZIP --- */
 function genZip(){
     if(!window.JSZip){alert("Erreur ZIP");return;}
     document.getElementById('loading').style.display='flex';
@@ -328,7 +363,7 @@ function genZip(){
         .bot{height:25vh;background:#111;padding:20px 40px;overflow-y:auto;box-sizing:border-box;}
         #desc{color:white!important;font-size:1.3rem;line-height:1.5;} 
         #desc * {background:transparent!important;} 
-        #desc font { color: inherit !important; }
+        #desc font, #desc span[style] { color: inherit !important; }
         #tit{color:#CCA43B;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:10px;margin-top:0;font-size:1.4rem;}
         .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(204,164,59,0.5);color:white;border:none;font-size:40px;padding:10px;cursor:pointer;border-radius:50%;}
         .p{left:20px;} .n{right:20px;}
