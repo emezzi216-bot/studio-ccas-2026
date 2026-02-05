@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio CCAS | v70 FINAL</title>
+    <title>Studio CCAS | v71 FINAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* --- CHARTE GRAPHIQUE STRICTE : BLEU NUIT / OR / BLANC --- */
+        /* --- CHARTE GRAPHIQUE : BLEU NUIT / OR / BLANC --- */
         :root { 
             --blue: #0A1A3C; 
             --gold: #CCA43B; 
@@ -18,7 +18,7 @@
         body { 
             font-family: 'Segoe UI', sans-serif; 
             margin: 0; 
-            background-color: var(--blue); /* FOND GLOBAL BLEU */
+            background-color: var(--blue); /* FOND BLEU OBLIGATOIRE */
             color: var(--white); 
             height: 100vh; 
             display: flex; 
@@ -29,6 +29,9 @@
         
         * { box-sizing: border-box; outline: none; }
         
+        /* CACHER LES INPUTS FICHIERS (Correction Image 4) */
+        input[type="file"] { display: none !important; }
+
         /* HEADER */
         .header { 
             height: 60px; 
@@ -39,18 +42,20 @@
             padding: 0 20px;
             background: rgba(0,0,0,0.3);
         }
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; display:flex; align-items:center; gap:10px; }
+        .save-indicator { font-size: 0.8rem; background: var(--green); color: white; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: 0.3s; }
         
-        .btn { padding: 8px 20px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; color: white; display:flex; align-items:center; gap:8px; font-size:0.9rem; }
+        .btn { padding: 8px 20px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; color: white; display:flex; align-items:center; gap:8px; font-size:0.9rem; transition:0.2s; }
         .btn-green { background: var(--green); border: 1px solid #2ecc71; }
-        .btn-blue { background: var(--blue); border: 1px solid var(--gold); color: var(--gold); }
-        .btn-blue:hover { background: var(--gold); color: var(--blue); }
+        .btn-green:hover { background: #219150; }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+        .btn-outline:hover { background: var(--gold); color: var(--blue); }
 
         /* VUES */
         #view-dash, #view-studio { flex: 1; overflow: hidden; display: flex; }
         #view-dash { flex-direction: column; padding: 40px; align-items: center; }
         
-        /* DASHBOARD - CARTES */
+        /* DASHBOARD */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; width: 100%; max-width: 1000px; margin-top: 40px; }
         .card { 
             background: rgba(255,255,255,0.05); 
@@ -61,26 +66,24 @@
             position: relative;
             transition: 0.2s;
         }
-        .card:hover { background: rgba(204, 164, 59, 0.1); box-shadow: 0 0 20px rgba(204, 164, 59, 0.2); }
-        .card-title { color: var(--gold); font-weight: bold; font-size: 1.1rem; margin-top: 10px; }
-        .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); font-weight: bold; cursor: pointer; font-size:1.2rem; }
+        .card:hover { background: rgba(204, 164, 59, 0.2); box-shadow: 0 0 15px rgba(204, 164, 59, 0.3); }
+        .card-del { position: absolute; top: 10px; right: 10px; color: var(--red); font-weight: bold; cursor: pointer; font-size:1.2rem; background:white; border-radius:50%; width:25px; height:25px; display:flex; align-items:center; justify-content:center; }
 
-        /* STUDIO */
+        /* STUDIO: SIDEBAR */
         .sidebar { width: 280px; border-right: 2px solid var(--gold); display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
         .side-head { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .back-link { color: rgba(255,255,255,0.6); font-size: 0.9rem; cursor: pointer; display: block; margin-bottom: 10px; text-align: left; }
-        .back-link:hover { color: var(--gold); }
-        #proj-name { font-size: 1.2rem; font-weight: bold; color: var(--gold); cursor: pointer; border-bottom: 1px dashed rgba(204,164,59,0.5); }
+        .back-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-weight: bold; width: 100%; text-align: left; cursor: pointer; margin-bottom:10px; }
+        .back-btn:hover { color: var(--gold); }
+        
+        #proj-name { font-size: 1.2rem; font-weight: bold; color: var(--gold); cursor: pointer; border-bottom: 1px dashed rgba(204,164,59,0.5); padding-bottom:5px; }
         
         .bat-list { flex: 1; overflow-y: auto; padding: 15px; }
         .bat-item { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .bat-item:hover { background: rgba(255,255,255,0.05); }
         .bat-item.active { background: var(--gold); color: var(--blue); font-weight: bold; }
-        
         .bat-actions { display:flex; gap:8px; }
-        .icon-btn { cursor:pointer; font-size:1.1rem; }
-        .handle { cursor: grab; padding-right: 10px; opacity: 0.5; }
-
+        
+        /* STUDIO: EDITOR */
         .editor { flex: 1; display: flex; flex-direction: column; background: var(--blue); }
         .editor-bar { height: 60px; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: rgba(0,0,0,0.2); }
         
@@ -89,13 +92,14 @@
         
         .content { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
 
-        /* PHOTO BLOCK - DESIGN FINAL */
+        /* PHOTO BLOCK */
         .block { 
             display: flex; 
             border: 2px solid var(--gold); 
             margin-bottom: 30px; 
             background: black; 
             height: 350px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         
         .block-img { 
@@ -110,7 +114,7 @@
         .block-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
         .img-tools { position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; }
-        .tool-btn { background: rgba(0,0,0,0.7); color: white; border: 1px solid white; padding: 4px 8px; font-size: 0.8rem; cursor: pointer; }
+        .tool-btn { background: rgba(0,0,0,0.6); color: white; border: 1px solid white; padding: 4px 8px; font-size: 0.8rem; cursor: pointer; border-radius:4px; }
         .tool-btn:hover { background: var(--gold); color: black; border-color: var(--gold); }
         .btn-del-blk { background: var(--red); border-color: var(--red); }
 
@@ -119,11 +123,12 @@
             display: flex; 
             flex-direction: column; 
             padding: 15px; 
-            background: var(--blue); /* FOND BLEU TEXTE */
+            background: var(--blue); /* FOND BLEU CONFIRMÉ */
         }
         
         .txt-toolbar { margin-bottom: 10px; display: flex; gap: 5px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
-        .style-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .style-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius:3px; }
+        .style-btn:hover { background:white; color:black; }
         
         .editable { 
             flex: 1; 
@@ -132,10 +137,10 @@
             font-size: 1rem; 
             line-height: 1.4;
             outline: none;
-            border: 1px dotted rgba(255,255,255,0.1);
             padding: 5px;
+            border: 1px dotted rgba(255,255,255,0.1);
         }
-        .editable:focus { border-color: var(--gold); }
+        .editable:focus { border-color: var(--gold); background:rgba(255,255,255,0.05); }
 
         /* PAINT */
         #paint-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; flex-direction: column; }
@@ -145,35 +150,35 @@
         .p-tool.active { background: var(--gold); color: black; }
 
         /* NOTIF */
-        #toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 10px 20px; border-radius: 4px; display: none; z-index:9999; }
+        #toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 10px 20px; border-radius: 4px; display: none; z-index:9999; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
 <div id="toast">✅ Sauvegardé !</div>
 
-<input type="file" id="f-import" class="hidden" onchange="importFile(this)">
-<input type="file" id="f-photo" class="hidden" multiple accept="image/*" onchange="addPhotos(this)">
-<input type="file" id="f-logo" class="hidden" accept="image/*" onchange="setLogo(this)">
+<input type="file" id="f-import" onchange="importFile(this)">
+<input type="file" id="f-photo" multiple accept="image/*" onchange="addPhotos(this)">
+<input type="file" id="f-logo" accept="image/*" onchange="setLogo(this)">
 
 <div id="view-dash">
     <div class="header" style="width: 100%;">
-        <div class="logo">STUDIO CCAS</div>
+        <div class="logo">STUDIO CCAS <span id="save-tag" class="save-indicator">Sauvé</span></div>
         <div class="actions">
             <button class="btn btn-green" onclick="exportPC()">📥 SAUVEGARDE PC</button>
-            <button class="btn" style="background:transparent; border:1px solid white;" onclick="document.getElementById('f-import').click()">📂 CHARGER</button>
+            <button class="btn btn-outline" onclick="document.getElementById('f-import').click()">📂 CHARGER</button>
         </div>
     </div>
     <div id="grid" class="grid"></div>
     <div style="margin-top: 50px;">
-        <button class="btn btn-blue" style="padding: 15px 40px; font-size: 1.1rem; border: 2px solid var(--gold); color: var(--gold);" onclick="newProj()">+ NOUVEAU DOSSIER</button>
+        <button class="btn btn-outline" style="padding: 15px 40px; font-size: 1.1rem; border: 2px solid var(--gold); color: var(--gold);" onclick="newProj()">+ NOUVEAU DOSSIER</button>
     </div>
 </div>
 
 <div id="view-studio" style="display:none;">
     <div class="sidebar">
         <div class="side-head">
-            <span class="back-link" onclick="goHome()">⬅️ Mes Dossiers</span>
+            <button class="back-btn" onclick="goHome()">⬅️ Mes Dossiers</button>
             <div id="proj-name" onclick="renameProj()">...</div>
         </div>
         <div id="bat-list" class="bat-list"></div>
@@ -184,14 +189,14 @@
     
     <div class="editor">
         <div class="editor-bar">
-            <div class="logo-box" onclick="document.getElementById('f-logo').click()">
+            <div class="logo-box" onclick="document.getElementById('f-logo').click()" title="Changer Logo">
                 <img id="img-logo" src="" style="display:none; height:100%;">
                 <span id="lbl-logo" style="color:#888; font-size:0.7rem;">LOGO</span>
             </div>
             <div id="bat-title" style="color:var(--gold); font-weight:bold; font-size:1.2rem;">Accueil</div>
             <div class="actions">
                 <button class="btn btn-green" onclick="exportPC()">💾 SAUVEGARDE PC</button>
-                <button class="btn btn-blue" onclick="genZip()">📦 GÉNÉRER PDF</button>
+                <button class="btn btn-outline" onclick="genZip()">📦 PDF</button>
             </div>
         </div>
         <div id="content" class="content"></div>
@@ -203,7 +208,7 @@
         <b>RETOUCHE</b>
         <div>
             <button class="btn btn-green" onclick="savePaint()">VALIDER</button>
-            <button class="btn" style="background:transparent; border:1px solid #666;" onclick="closePaint()">ANNULER</button>
+            <button class="btn btn-outline" style="border:none;" onclick="closePaint()">ANNULER</button>
         </div>
     </div>
     <div id="canvas-box" style="flex:1; display:flex; justify-content:center; align-items:center; overflow:hidden;">
@@ -215,17 +220,17 @@
         <button class="p-tool" onclick="tool='arrow'">↗️</button>
         <button class="p-tool" onclick="tool='free'">✏️</button>
         <input type="color" onchange="color=this.value" value="#ff0000">
-        <input type="range" min="1" max="20" value="5" oninput="brushSize=this.value">
+        <input type="range" min="1" max="20" value="5" oninput="width=this.value">
     </div>
 </div>
 
 <script>
-/* MOTEUR V70 - LOCALSTORAGE + DOWNLOAD */
-const STORAGE_KEY = "CCAS_V70_FINAL";
+/* --- MOTEUR SANS BASE DE DONNEES (ANTI-BLOCAGE) --- */
+const STORAGE_KEY = "CCAS_V71_DATA";
 let app = { projects: {}, config: { logo: "" } };
 let curP = null, curB = null, dragSrc = null;
 
-// CHARGEMENT AUTO
+// CHARGEMENT INSTANTANÉ (Pas de "Loading...")
 if(localStorage.getItem(STORAGE_KEY)) {
     try {
         app = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -238,23 +243,27 @@ if(localStorage.getItem(STORAGE_KEY)) {
 }
 renderGrid();
 
-/* SYSTEME DE SAUVEGARDE ROBUSTE */
-function saveSite() {
+/* SAUVEGARDE AUTOMATIQUE (LocalStorage) */
+function autoSave() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
+        const ind = document.getElementById('save-tag');
+        ind.style.opacity = 1;
+        setTimeout(() => ind.style.opacity = 0, 1000);
     } catch(e) {
-        alert("⚠️ MÉMOIRE NAVIGATEUR PLEINE !\n\nVeuillez cliquer sur 'SAUVEGARDE PC' immédiatement pour ne rien perdre.");
+        alert("⚠️ ATTENTION : Mémoire pleine. Faites une 'Sauvegarde PC' maintenant !");
     }
 }
 
+/* EXPORT PC (Fichier JSON) */
 function exportPC() {
-    saveSite(); // Tente une save locale avant
+    autoSave();
     const b = new Blob([JSON.stringify(app)], {type: 'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(b);
-    a.download = `CCAS_SAUVEGARDE_${Date.now()}.json`;
+    a.download = `CCAS_PROJET_${Date.now()}.json`;
     a.click();
-    showToast("✅ Sauvegardé sur l'ordinateur !");
+    showToast("Fichier téléchargé sur votre PC");
 }
 
 function importFile(input) {
@@ -263,13 +272,13 @@ function importFile(input) {
     r.onload = e => {
         try {
             app = JSON.parse(e.target.result);
-            saveSite();
+            autoSave();
             renderGrid();
             if(app.config.logo) {
                 document.getElementById('img-logo').src = app.config.logo;
                 document.getElementById('img-logo').style.display = 'block';
             }
-            showToast("Projet restauré !");
+            showToast("Projet importé !");
         } catch(x) { alert("Fichier invalide"); }
     };
     r.readAsText(input.files[0]);
@@ -287,9 +296,7 @@ function newProj() {
     if(n) {
         const id = 'p' + Date.now();
         app.projects[id] = { name: n, date: Date.now(), data: {} };
-        saveSite();
-        renderGrid();
-        openProj(id);
+        autoSave(); renderGrid(); openProj(id);
     }
 }
 
@@ -304,8 +311,8 @@ function openProj(id) {
 }
 
 function renameProj() {
-    const n = prompt("Nouveau nom :", app.projects[curP].name);
-    if(n) { app.projects[curP].name = n; document.getElementById('proj-name').innerText = n; saveSite(); }
+    const n = prompt("Renommer le projet :", app.projects[curP].name);
+    if(n) { app.projects[curP].name = n; document.getElementById('proj-name').innerText = n; autoSave(); }
 }
 
 function goHome() {
@@ -328,7 +335,7 @@ function renderGrid() {
 
 function delProj(id, e) {
     e.stopPropagation();
-    if(confirm("Supprimer ce dossier ?")) { delete app.projects[id]; saveSite(); renderGrid(); }
+    if(confirm("Supprimer ce dossier ?")) { delete app.projects[id]; autoSave(); renderGrid(); }
 }
 
 /* RUBRIQUES */
@@ -336,8 +343,7 @@ function newBat() {
     const n = prompt("Nom de la rubrique :");
     if(n) {
         if(!app.projects[curP].data[n]) app.projects[curP].data[n] = [];
-        saveSite();
-        openBat(n);
+        autoSave(); openBat(n);
     }
 }
 
@@ -352,8 +358,8 @@ function renderBats() {
                 <span onclick="openBat('${b}')" style="flex:1;">${b}</span>
             </div>
             <div class="bat-actions">
-                <span class="icon-btn icon-edit" onclick="renBat('${b}', event)">✏️</span>
-                <span class="icon-btn icon-del" onclick="delBat('${b}', event)">×</span>
+                <span style="cursor:pointer;" onclick="renBat('${b}', event)">✏️</span>
+                <span style="cursor:pointer; color:var(--red);" onclick="delBat('${b}', event)">×</span>
             </div>`;
         
         d.ondragstart = e => { dragSrc = b; e.dataTransfer.effectAllowed = 'move'; };
@@ -366,11 +372,11 @@ function renderBats() {
                 const fromIdx = keys.indexOf(dragSrc);
                 const toIdx = keys.indexOf(b);
                 const newObj = {};
-                keys.splice(toIdx, 0, keys.splice(fromIdx, 1)[0]);
+                const movedKey = keys.splice(fromIdx, 1)[0];
+                keys.splice(toIdx, 0, movedKey);
                 keys.forEach(k => newObj[k] = data[k]);
                 app.projects[curP].data = newObj;
-                saveSite();
-                renderBats();
+                autoSave(); renderBats();
             }
         };
         l.appendChild(d);
@@ -381,7 +387,7 @@ function openBat(b) { curB = b; document.getElementById('bat-title').innerText =
 
 function renBat(oldName, e) {
     e.stopPropagation();
-    const n = prompt("Renommer la rubrique :", oldName);
+    const n = prompt("Nouveau nom :", oldName);
     if(n && n !== oldName && !app.projects[curP].data[n]) {
         const data = app.projects[curP].data;
         const newObj = {};
@@ -389,7 +395,7 @@ function renBat(oldName, e) {
             if(k === oldName) newObj[n] = data[k]; else newObj[k] = data[k];
         });
         app.projects[curP].data = newObj;
-        saveSite();
+        autoSave();
         if(curB === oldName) openBat(n); else renderBats();
     }
 }
@@ -399,9 +405,7 @@ function delBat(b, e) {
     if(confirm("Supprimer la rubrique " + b + " ?")) {
         delete app.projects[curP].data[b];
         if(curB === b) curB = null;
-        saveSite();
-        renderBats();
-        renderContent();
+        autoSave(); renderBats(); renderContent();
     }
 }
 
@@ -418,17 +422,15 @@ function addPhotos(input) {
                 const cvs = document.createElement('canvas');
                 const ctx = cvs.getContext('2d');
                 let w = img.width, h = img.height;
-                const max = 800; // COMPRESSION ANTI-CRASH
+                const max = 1000;
                 if(w > max) { h *= max/w; w = max; }
                 cvs.width = w; cvs.height = h;
                 ctx.drawImage(img, 0, 0, w, h);
-                
                 app.projects[curP].data[curB].push({
-                    src: cvs.toDataURL('image/jpeg', 0.6), // Qualité 60% pour éviter surcharge
+                    src: cvs.toDataURL('image/jpeg', 0.6),
                     text: "Description..."
                 });
-                saveSite();
-                renderContent();
+                autoSave(); renderContent();
             };
             img.src = e.target.result;
         };
@@ -442,7 +444,7 @@ function renderContent() {
     if(!curB) return;
     
     const btn = document.createElement('div');
-    btn.style = "border:2px dashed var(--gold); padding:20px; text-align:center; cursor:pointer; color:var(--gold); font-weight:bold; margin-bottom:20px;";
+    btn.style = "border:2px dashed var(--gold); padding:20px; text-align:center; cursor:pointer; color:var(--gold); font-weight:bold; margin-bottom:20px; border-radius:8px;";
     btn.innerText = "+ AJOUTER DES PHOTOS";
     btn.onclick = () => document.getElementById('f-photo').click();
     c.appendChild(btn);
@@ -479,8 +481,7 @@ function renderContent() {
                 const arr = app.projects[curP].data[curB];
                 const moved = arr.splice(from, 1)[0];
                 arr.splice(idx, 0, moved);
-                saveSite();
-                renderContent();
+                autoSave(); renderContent();
             }
         };
         
@@ -490,19 +491,18 @@ function renderContent() {
 
 function updTxt(idx, txt) {
     app.projects[curP].data[curB][idx].text = txt;
-    clearTimeout(window.st); window.st = setTimeout(saveSite, 1000);
+    clearTimeout(window.st); window.st = setTimeout(autoSave, 1000);
 }
 
 function delPhoto(idx) {
     if(confirm("Supprimer ?")) {
         app.projects[curP].data[curB].splice(idx, 1);
-        saveSite();
-        renderContent();
+        autoSave(); renderContent();
     }
 }
 
 /* PAINT */
-let pIdx, pImg, tool='rect', color='#ff0000', brushSize=5, draw=false, sx, sy;
+let pIdx, pImg, tool='rect', color='#ff0000', width=5, draw=false, sx, sy;
 function editPhoto(idx) {
     pIdx = idx;
     const src = app.projects[curP].data[curB][idx].src;
@@ -518,7 +518,7 @@ function editPhoto(idx) {
 }
 function savePaint() {
     app.projects[curP].data[curB][pIdx].src = document.getElementById('canvas').toDataURL('image/jpeg', 0.8);
-    saveSite();
+    autoSave();
     document.getElementById('paint-modal').style.display = 'none';
     renderContent();
 }
@@ -526,10 +526,8 @@ function closePaint() { document.getElementById('paint-modal').style.display = '
 
 const cvs = document.getElementById('canvas');
 cvs.addEventListener('mousedown', e => { draw=true; const r=cvs.getBoundingClientRect(); const s=cvs.width/r.width; sx=(e.clientX-r.left)*s; sy=(e.clientY-r.top)*s; cvs.getContext('2d').beginPath(); });
-cvs.addEventListener('mousemove', e => { if(!draw)return; const ctx=cvs.getContext('2d'); const r=cvs.getBoundingClientRect(); const s=cvs.width/r.width; const x=(e.clientX-r.left)*s; const y=(e.clientY-r.top)*s; ctx.strokeStyle=color; ctx.lineWidth=brushSize; ctx.lineCap="round"; if(tool==='free'){ctx.lineTo(x,y);ctx.stroke();} });
-cvs.addEventListener('mouseup', e => { draw=false; if(tool!=='free'){ const ctx=cvs.getContext('2d'); const r=cvs.getBoundingClientRect(); const s=cvs.width/r.width; const x=(e.clientX-r.left)*s; const y=(e.clientY-r.top)*s; ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=brushSize; if(tool==='rect') ctx.strokeRect(sx,sy,x-sx,y-sy); if(tool==='circle'){const rad=Math.sqrt(Math.pow(x-sx,2)+Math.pow(y-sy,2)); ctx.arc(sx,sy,rad,0,2*Math.PI); ctx.stroke();} if(tool==='arrow'){ctx.moveTo(sx,sy); ctx.lineTo(x,y); ctx.stroke(); 
-const angle = Math.atan2(y-sy, x-sx); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x-15*Math.cos(angle-Math.PI/6), y-15*Math.sin(angle-Math.PI/6)); ctx.moveTo(x, y); ctx.lineTo(x-15*Math.cos(angle+Math.PI/6), y-15*Math.sin(angle+Math.PI/6)); ctx.stroke();
-} } });
+cvs.addEventListener('mousemove', e => { if(!draw)return; const ctx=cvs.getContext('2d'); const r=cvs.getBoundingClientRect(); const s=cvs.width/r.width; const x=(e.clientX-r.left)*s; const y=(e.clientY-r.top)*s; ctx.strokeStyle=color; ctx.lineWidth=width; ctx.lineCap="round"; if(tool==='free'){ctx.lineTo(x,y);ctx.stroke();} });
+cvs.addEventListener('mouseup', e => { draw=false; if(tool!=='free'){ const ctx=cvs.getContext('2d'); const r=cvs.getBoundingClientRect(); const s=cvs.width/r.width; const x=(e.clientX-r.left)*s; const y=(e.clientY-r.top)*s; ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=width; if(tool==='rect') ctx.strokeRect(sx,sy,x-sx,y-sy); if(tool==='circle'){const rad=Math.sqrt(Math.pow(x-sx,2)+Math.pow(y-sy,2)); ctx.arc(sx,sy,rad,0,2*Math.PI); ctx.stroke();} if(tool==='arrow'){ctx.moveTo(sx,sy); ctx.lineTo(x,y); ctx.stroke(); const ang=Math.atan2(y-sy,x-sx); ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-15*Math.cos(ang-Math.PI/6),y-15*Math.sin(ang-Math.PI/6)); ctx.moveTo(x,y); ctx.lineTo(x-15*Math.cos(ang+Math.PI/6),y-15*Math.sin(ang+Math.PI/6)); ctx.stroke();} } });
 
 /* CONFIG LOGO */
 function setLogo(input) {
@@ -540,7 +538,7 @@ function setLogo(input) {
             document.getElementById('img-logo').src = e.target.result;
             document.getElementById('img-logo').style.display = 'block';
             document.getElementById('lbl-logo').style.display = 'none';
-            saveSite();
+            autoSave();
         };
         r.readAsDataURL(input.files[0]);
     }
@@ -553,7 +551,7 @@ function genZip() {
     const jsonData = JSON.stringify(proj.data).replace(/</g, '\\u003c');
     const logoSrc = app.config.logo || "";
     
-    // HTML FINAL IDENTIQUE AU DESIGN EDITEUR
+    // HTML FINAL IDENTIQUE AU DESIGN EDITEUR (Bleu/Or)
     const htmlContent = `<!DOCTYPE html>
 <html>
 <head>
@@ -569,14 +567,21 @@ function genZip() {
     .frame img { max-width:100%; max-height:100%; object-fit:contain; }
     .bot { height:25vh; background:#0A1A3C; padding:20px 40px; overflow-y:auto; box-sizing:border-box; }
     #desc { color:white; font-size:1.3rem; line-height:1.5; }
+    /* Garder les couleurs du texte */
     #desc * { background:transparent !important; }
     #desc font { color:inherit; }
     #tit { color:#CCA43B; text-transform:uppercase; border-bottom:1px solid #555; padding-bottom:10px; margin-top:0; font-size:1.4rem; }
+    
     .nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(204,164,59,0.5); color:white; border:none; font-size:40px; padding:10px; cursor:pointer; border-radius:50%; }
     .p { left:20px; } .n { right:20px; }
     .pdf-btn { position:absolute; top:10px; left:10px; background:#c0392b; color:white; border:none; padding:5px 15px; border-radius:4px; font-weight:bold; cursor:pointer; z-index:99; }
     .top-logo { position:absolute; top:10px; right:10px; background:rgba(255,255,255,0.9); padding:5px 10px; border:1px solid #CCA43B; display:flex; align-items:center; border-radius:4px; }
-    @media print { #side, .nav, .pdf-btn { display:none; } .view { height:70vh; page-break-inside:avoid; } .bot { height:30vh; page-break-after:always; } }
+    
+    @media print { 
+        #side, .nav, .pdf-btn { display:none; } 
+        .view { height:70vh; page-break-inside:avoid; } 
+        .bot { height:30vh; page-break-after:always; } 
+    }
 </style>
 </head>
 <body>
